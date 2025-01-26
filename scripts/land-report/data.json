@@ -1,0 +1,289 @@
+{
+  "subject": {
+    "address": "10307 E County Rd 95, Midland, TX 79706",
+    "legalDescription": "Acres: 63.250, NW/4, SEC: 38, BLK: 38-T1S",
+    "size": {
+      "acres": "63.250 acres",
+      "squareFeet": "2,753,070 SF"
+    },
+    "frontage": "Road frontage along County Road 1130",
+    "zoning": {
+      "description": "None (outside city limits)",
+      "map": "scripts/land-report/images/placeholder.png"
+    },
+    "highestBestUse": "Rural residential and agricultural use",
+    "valueEstimate": "TODO",
+    "neighborhood": {
+      "description": "The subject property is located east of Midland, Texas, along County Road 1130, with close proximity to Interstate 20. The subject neighborhood can best be described as that portion of Midland County situated east of Interstate 20, south of the Midland city limits, west of FM 1213, and north of E County Road 140, within an area characterized by a mix of rural residential, agricultural, and light industrial uses.",
+      "map": "scripts/land-report/images/subject-location-map.png",
+      "primaryUse": "Agricultural"
+    },
+    "surveyImage": "scripts/land-report/images/subject-survey.png",
+    "floodMap": {
+      "number": "48329C0125F",
+      "date": "September 16, 2005",
+      "description": "Not in a floodplain.",
+      "image": "scripts/land-report/images/subject-flood-map.png",
+      "femaImage": "scripts/land-report/images/subject-fema-flood-map.png"
+    },
+    "utilities": {
+      "electricity": "Oncor",
+      "gas": "Atmos Energy",
+      "phone": "AT&T",
+      "protection": "Midland County Sheriff",
+      "water": "Private water well",
+      "sewer": "Private septic system upon development"
+    },
+    "analysis": {
+      "location": "Located along County Road 1130 in Midland County, just east of I-20.",
+      "sizeAndConfig": "63.250 acres with adequate frontage and rectangular configuration.",
+      "frontageAndAccessibility": "Frontage along County Road 1130 provides accessibility to nearby highways.",
+      "easements": "The subject tract includes a pipeline running from the northern and southern boundaries to the tank site, which then connects westward to the pump jack.",
+      "zoning": "No zoning restrictions outside city limits.",
+      "propertyDevelopment": "Vacant tract of land, with an oil tank site and pump jack site, each approximately one acre, for a total of two acres.",
+      "ownership": {
+        "salesHistory": "The current owners, listed below, acquired the subject property on September 15, 1988, as recorded in Document 1988-17008. Prior to this, the property was part of a larger tract recorded in 1987 under Document 1987-9649. In 2023, 6.82 acres were sold from the total, as recorded in Document 2023-4167. No other transactions have occurred over the past five years.",
+        "totalAcres": "63.250",
+        "owners": "automatically generated",
+        "partOwners": [
+          {
+            "name": "Donna Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "David Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "Curtis Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "Casse Terry",
+            "shares": "0.1666000",
+            "acres": "10.53745"
+          },
+          {
+            "name": "Gara Hill",
+            "shares": "0.1666000",
+            "acres": "10.53745"
+          },
+          {
+            "name": "Danny Truelove",
+            "shares": "0.2500000",
+            "acres": "15.8125"
+          },
+          {
+            "name": "Melissa Jones",
+            "shares": "0.2500000",
+            "acres": "15.8125"
+          }
+        ]
+      }
+    }
+  },
+  "client": {
+    "fullName": "Donna Miller",
+    "address": {
+      "street": "3802 75th PL",
+      "cityStateZip": "Lubbock, TX 79423"
+    },
+    "firstName": "Donna"
+  },
+  "report": {
+    "date": "January 4, 2025",
+    "appraisalDate": "December 31, 2024"
+  },
+  "salesComparison": {
+    "introduction": "The following sales were analyzed to determine land value.",
+    "list": "LAND SALE NUMBER 1, LAND SALE NUMBER 2, etc.",
+    "map": {
+      "image": "scripts/land-report/images/placeholder.png"
+    },
+    "analysis": {
+      "summary": "Sales indicate a price range of $40,547/AC to $56,710/AC.",
+      "dateOfSale": {
+        "description": "Most comparable sales occurred in 2023 and 2024.",
+        "adjustments": "Adjustments were made for market conditions."
+      },
+      "size": "Larger tracts tend to command a lower per-acre price.",
+      "location": "Location near County Road 1130 enhances value."
+    }
+  },
+  "sales": [
+    {
+      "number": "1",
+      "location": "8201 S. CR 1270, Midland",
+      "legalDescription": "Part of the W/3 Sec 40 Block 40-T2S",
+      "dateOfSale": "Pending - Closing Jan 2025",
+      "deedNumber": "Deed 39055948",
+      "mlsNumber": "N/A",
+      "grantor": "Chinn",
+      "grantee": "TBD",
+      "consideration": "$1,850,000",
+      "terms": "Cash to seller",
+      "pricePerAcre": "$20,431/acre",
+      "size": "90.55 acres",
+      "zoning": "None",
+      "propertyId": ["R000008103"],
+      "floodPlain": "None known",
+      "easements": "Mineral",
+      "improvements": "None",
+      "comments": "Located southwest of the subject between CR 160 and CR 170. DOM - 122.",
+      "source": "Broker/Midland County Deed Records"
+    },
+    {
+      "number": "2",
+      "location": "4718 CR 1232/Antelope Trail, Midland",
+      "legalDescription": "Part of Sections 13 & 24 Block 40-T2S",
+      "dateOfSale": "April 25, 2024",
+      "deedNumber": "Deed 203186120",
+      "mlsNumber": "N/A",
+      "grantor": "Antelope Trail West LLC",
+      "grantee": "B2S I LLC",
+      "consideration": "$2,058,680",
+      "terms": "Cash to seller",
+      "pricePerAcre": "$26,000/acre",
+      "size": "79.18 acres",
+      "zoning": "None",
+      "propertyId": ["R000217867", "R000217899"],
+      "floodPlain": "+/- 20% on N side",
+      "easements": "None known",
+      "improvements": "None",
+      "comments": "Located southwest of subject south of I-20. DOM - 136.",
+      "source": "Broker/Midland County Deed Records"
+    },
+    {
+      "number": "3",
+      "location": "CR 1103, Midland",
+      "legalDescription": "Part of the Section 30 Block 37-T1S",
+      "dateOfSale": "September 26, 2024",
+      "deedNumber": "Deed 223400036",
+      "mlsNumber": "N/A",
+      "grantor": "Montevallo Inc.",
+      "grantee": "Caliche Now LLC",
+      "consideration": "$1,353,140",
+      "terms": "Cash to seller",
+      "pricePerAcre": "$13,333/acre",
+      "size": "101.488 acres",
+      "zoning": "None",
+      "propertyId": ["R000001501"],
+      "floodPlain": "+/- 20% on W side",
+      "easements": "None Known",
+      "improvements": "None",
+      "comments": "Located northeast of subject just north of I-20 east of Midland. DOM - 84 days.",
+      "source": "Broker/Midland County Deed Records"
+    },
+    {
+      "number": "4",
+      "location": "0000 FM 307, Midland, TX 79706",
+      "legalDescription": "34 acres out of 79.170, 113.462 AC OUT OF SE/4, SE",
+      "dateOfSale": "May 13, 2024",
+      "deedNumber": "Deed 204705976",
+      "mlsNumber": "151925",
+      "grantor": "James R. Brooks ET UX",
+      "grantee": "Serape Holdings LLC",
+      "consideration": "$1,300,000",
+      "terms": "Cash, Conventional",
+      "pricePerAcre": "$38,235/acre",
+      "size": "34 acres",
+      "zoning": "None",
+      "propertyId": ["R000003160"],
+      "floodPlain": "None",
+      "easements": "Not known",
+      "improvements": "None",
+      "comments": "Located northeast of the subject, south of I-20 bordering FM 307. DOM - 57 days.",
+      "source": "OBR MLS/Midland County Deed Records"
+    },
+    {
+      "number": "5",
+      "location": "1411 N County Rd 110, Midland, TX 79706",
+      "legalDescription": "39.732 AC OUT OF N/2 E/2 SE/4, SEC: 37, BLK: 38-T1S",
+      "dateOfSale": "April 12, 2024",
+      "deedNumber": "Deed 199748682",
+      "mlsNumber": "156444",
+      "grantor": "Donna Kay Miller",
+      "grantee": "David Miller",
+      "consideration": "$500,000",
+      "terms": "Cash, Conventional",
+      "pricePerAcre": "$12,590/acre",
+      "size": "39.732 acres",
+      "zoning": "None",
+      "propertyId": ["R000002806"],
+      "floodPlain": "None",
+      "easements": "Not known",
+      "improvements": "Barbed wire fencing",
+      "comments": "Located northeast of the subject, south of I-20 bordering CR 1103. DOM - 653 days.",
+      "source": "OBR MLS/Midland County Deed Records"
+    },
+    {
+      "number": "6",
+      "location": "1234 NW County RD 41, Midland, TX 79707",
+      "legalDescription": "Acres: 27.86, NW/4, SEC: 14, BLK: 40-T1S",
+      "dateOfSale": "May 26, 2023",
+      "deedNumber": "Deed 170056860",
+      "mlsNumber": "50003889",
+      "grantor": "Unknown",
+      "grantee": "Unknown",
+      "consideration": "$825,000",
+      "terms": "Cash",
+      "pricePerAcre": "$29,612/acre",
+      "size": "27.86 acres",
+      "zoning": "None",
+      "propertyId": ["R000007369"],
+      "floodPlain": "None",
+      "easements": "Building restrictions and deed restrictions",
+      "improvements": "None",
+      "comments": "Sunridge Ranch Estates. Located northwest of the subject, bordering State Highway 349. DOM - 2467 days.",
+      "source": "PBBR MLS/Midland County Deed Records"
+    },
+    {
+      "number": "7",
+      "location": "7700 S County Rd 1110, Midland, TX 79706",
+      "legalDescription": "49.7 acres out of Section 30, Block 38, T-2-S",
+      "dateOfSale": "August 28, 2024",
+      "deedNumber": "Deed 213518397",
+      "mlsNumber": "50070702",
+      "grantor": "KNK Energy Consulting LLC",
+      "grantee": "Apple Valley Ranch LLC",
+      "consideration": "$500,000",
+      "terms": "Conventional",
+      "pricePerAcre": "$10,060/acre",
+      "size": "49.7 acres",
+      "zoning": "None",
+      "propertyId": ["R000043494"],
+      "floodPlain": "+/- 20% on N side",
+      "easements": "Mineral Rights Leased, No Mineral Rights, Pipe Line, Utility Easements",
+      "improvements": "3 bedroom home, barn, other outbuildings",
+      "comments": "Apple Valley Ranch. Located south of the subject, bordering CR 1110. DOM - 107 days.",
+      "source": "PBBR MLS/Midland County Deed Records"
+    },
+    {
+      "number": "8",
+      "location": "2510 W County Rd 135, Midland, TX 79706",
+      "legalDescription": "Acres: 24.57, NE/4, SEC: 21, BLK: 39-T2S",
+      "dateOfSale": "August 5, 2024",
+      "deedNumber": "N/A",
+      "mlsNumber": "50060257",
+      "grantor": "Unknown",
+      "grantee": "Unknown",
+      "consideration": "$436,472",
+      "terms": "Cash",
+      "pricePerAcre": "$17,761/acre",
+      "size": "24.57 acres",
+      "zoning": "None",
+      "propertyId": ["R000225684"],
+      "floodPlain": "None",
+      "easements": "No mineral rights",
+      "improvements": "House 1706 SQ FT, Storage Building 2492 SQ FT",
+      "comments": "Raw land to be developed. Located southwest of the subject, bordering CR 135. DOM - 343 days.",
+      "source": "PBBR MLS/Midland County Deed Records"
+    }
+  ],
+  "addenda": {
+    "engagementContract": "scripts/land-report/images/engagement.png"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "subject": {
+    "address": "S County Rd 1110, just north of Hwy. 307, Midland County, TX",
+    "legalDescription": "34.295 AC tract out Section 48, Block 38, T-1-S, T&P RR County Survey, Abstract No. 728",
+    "size": {
+      "acres": "34.295 acres",
+      "squareFeet": "1,493,890 SF"
+    },
+    "frontage": "1200 feet along S County Rd 1110",
+    "zoning": {
+      "description": "None",
+      "map": "path/to/zoning-map.png"
+    },
+    "highestBestUse": "Commercial/Industrial Use",
+    "valueEstimate": "$1,715,000",
+    "neighborhood": {
+      "description": "Primarily industrial with open pasture land south of Interstate 20.",
+      "map": "path/to/neighborhood-map.png",
+      "primaryUse": "Industrial"
+    },
+    "floodMap": {
+      "number": "48329C0125F",
+      "date": "September 16, 2005",
+      "description": "Lies outside the 100-year floodplain.",
+      "image": "path/to/flood-map.png",
+      "femaImage": "path/to/fema-flood-map.png"
+    },
+    "utilities": {
+      "electricity": "Oncor",
+      "gas": "Atmos Energy",
+      "phone": "AT&T",
+      "protection": "Midland County Sheriff",
+      "water": "Private well",
+      "sewer": "Private septic system"
+    },
+    "analysis": {
+      "location": "Located along S County Rd 1110, just north of Hwy 307.",
+      "sizeAndConfig": "34.295 acres with adequate frontage and rectangular configuration.",
+      "frontageAndAccessibility": "Frontage along S County Rd 1110 provides excellent accessibility.",
+      "easements": "Pipeline easement along the western boundary.",
+      "zoning": "No zoning restrictions outside city limits.",
+      "propertyDevelopment": "Vacant land suitable for industrial development.",
+      "ownership": {
+        "salesHistory": "The current owners, listed below, acquired the subject property on September 15, 1988, as recorded in Document 1988-17008. Prior to this, the property was part of a larger tract recorded in 1987 under Document 1987-9649. In 2023, 6.82 acres were sold from the total, as recorded in Document 2023-4167. No other transactions have occurred over the past five years.",
+        "salesHistorySingle": "Acquired by Serape Holdings LLC in 2021 for $1,000,000.",
+        "totalAcres": "63.250",
+        "partOwners": [
+          {
+            "name": "Donna Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "David Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "Curtis Miller",
+            "shares": "0.0556000",
+            "acres": "3.517"
+          },
+          {
+            "name": "Casse Terry",
+            "shares": "0.1666000",
+            "acres": "10.53745"
+          },
+          {
+            "name": "Gara Hill",
+            "shares": "0.1666000",
+            "acres": "10.53745"
+          },
+          {
+            "name": "Danny Truelove",
+            "shares": "0.2500000",
+            "acres": "15.8125"
+          },
+          {
+            "name": "Melissa Jones",
+            "shares": "0.2500000",
+            "acres": "15.8125"
+          }
+        ]
+      }
+    }
+  },
+  "client": {
+    "fullName": "Community National Bank",
+    "address": {
+      "street": "PO Box 3903",
+      "cityStateZip": "Midland, TX 79702"
+    },
+    "firstName": "Brandon"
+  },
+  "report": {
+    "date": "July 20, 2022",
+    "appraisalDate": "July 10, 2022"
+  },
+  "salesComparison": {
+    "introduction": "The following sales were analyzed to determine land value.",
+    "list": "LAND SALE NUMBER 1, LAND SALE NUMBER 2, etc.",
+    "map": {
+      "image": "path/to/comparable-sales-map.png"
+    },
+    "analysis": {
+      "summary": "Sales indicate a price range of $40,547/AC to $56,710/AC.",
+      "dateOfSale": {
+        "description": "Most comparable sales occurred in 2021 and 2022.",
+        "adjustments": "Adjustments were made for market conditions."
+      },
+      "size": "Larger tracts tend to command a lower per-acre price.",
+      "location": "Location near Interstate 20 enhances value."
+    }
+  },
+  "sales": [
+    {
+      "number": "1",
+      "location": "5600 W. County Rd 123, Midland Co., TX",
+      "legalDescription": "10.31 AC located in Section 13 Block 40",
+      "dateOfSale": "September 5, 2018",
+      "deedNumber": "Document #2018-26166",
+      "mlsNumber": "MLS#118680",
+      "grantor": "Huseman Land and Cattle, LLC",
+      "grantee": "Viking 2 Investors, LLC",
+      "consideration": "$443,300",
+      "terms": "Cash to Seller",
+      "pricePerAcre": "$43,000/acre",
+      "size": "10.31 Acres",
+      "zoning": "None",
+      "comments": "Industrial area SW side Midland."
+    }
+  ],
+  "addenda": {
+    "engagementContract": "path/to/engagement-contract-image.png"
+  }
+}

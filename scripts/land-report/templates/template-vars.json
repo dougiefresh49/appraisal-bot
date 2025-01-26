@@ -1,0 +1,95 @@
+{
+  "subject": {
+    "address": "S County Rd 1110, just north of Hwy. 307, Midland County, TX",
+    "legalDescription": "Being a 34.295 AC tract of land out Section 48, Block 38, T-1-S, T&P RR County Survey, Abstract No. 728",
+    "size": {
+      "acres": "34.295 acres",
+      "squareFeet": "1,493,890 SF"
+    },
+    "frontage": "1200 feet along S County Rd 1110",
+    "zoning": {
+      "description": "None (outside city limits)",
+      "map": "path/to/zoning-map.png"
+    },
+    "highestBestUse": "Commercial/Industrial Use",
+    "valueEstimate": "$1,715,000",
+    "neighborhood": {
+      "description": "Primarily industrial with open pasture land south of Interstate 20.",
+      "map": "path/to/neighborhood-map.png",
+      "primaryUse": "Industrial"
+    },
+    "floodMap": {
+      "number": "48329C0125F",
+      "date": "September 16, 2005",
+      "description": "Lies outside the 100-year floodplain.",
+      "image": "path/to/flood-map.png",
+      "femaImage": "path/to/fema-flood-map.png"
+    },
+    "utilities": {
+      "electricity": "Oncor",
+      "gas": "Atmos Energy",
+      "phone": "AT&T",
+      "protection": "Midland County Sheriff",
+      "water": "Private water well",
+      "sewer": "Private septic system upon development"
+    },
+    "analysis": {
+      "location": "Located along S County Rd 1110, just north of Hwy 307.",
+      "sizeAndConfig": "34.295 acres with adequate frontage and rectangular configuration.",
+      "frontageAndAccessibility": "Frontage along S County Rd 1110 provides excellent accessibility.",
+      "easements": "Pipeline easement along the western boundary.",
+      "zoning": "No zoning restrictions outside city limits.",
+      "propertyDevelopment": "Vacant land suitable for industrial development.",
+      "ownershipSalesHistory": "Acquired by Serape Holdings LLC on April 6, 2021 for $1,000,000, as recorded in Document #10194."
+    }
+  },
+  "client": {
+    "fullName": "Community National Bank",
+    "address": {
+      "street": "PO Box 3903",
+      "cityStateZip": "Midland, TX 79702"
+    },
+    "firstName": "Brandon"
+  },
+  "report": {
+    "date": "July 20, 2022",
+    "appraisalDate": "July 10, 2022"
+  },
+  "salesComparison": {
+    "introduction": "The following sales were analyzed to determine land value.",
+    "list": "LAND SALE NUMBER 1, LAND SALE NUMBER 2, etc.",
+    "map": {
+      "image": "path/to/comparable-sales-map.png"
+    },
+    "analysis": {
+      "summary": "Sales indicate a price range of $40,547/AC to $56,710/AC.",
+      "dateOfSale": {
+        "description": "Most comparable sales occurred in 2021 and 2022.",
+        "adjustments": "Adjustments were made for market conditions."
+      },
+      "size": "Larger tracts tend to command a lower per-acre price.",
+      "location": "Location near Interstate 20 enhances value."
+    }
+  },
+  "sales": [
+    {
+      "number": "1",
+      "location": "5600 W. County Rd 123, Midland Co., TX",
+      "legalDescription": "10.31 AC located in Section 13 Block 40",
+      "dateOfSale": "September 5, 2018",
+      "deedNumber": "Document #2018-26166",
+      "mlsNumber": "MLS#118680",
+      "grantor": "Huseman Land and Cattle, LLC",
+      "grantee": "Viking 2 Investors, LLC",
+      "consideration": "$443,300",
+      "terms": "Cash to Seller",
+      "pricePerAcre": "$43,000/acre",
+      "size": "10.31 Acres",
+      "zoning": "None",
+      "comments": "Industrial area SW side Midland."
+    }
+  ],
+  "addenda": {
+    "engagementContract": "path/to/engagement-contract-image.png"
+  }
+}

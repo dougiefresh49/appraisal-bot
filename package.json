@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@browserbasehq/stagehand": "^1.8.0",
+    "@types/node": "^22.10.1",
+    "angular-expressions": "^1.4.3",
+    "docx": "^9.1.0",
+    "docxtemplater": "^3.55.9",
+    "docxtemplater-image-module-free": "^1.1.1",
+    "fs": "0.0.1-security",
+    "jsdom": "^25.0.1",
+    "path": "^0.12.7",
+    "pizzip": "^3.1.7",
+    "tsx": "^4.19.2",
+    "xmldom": "^0.6.0",
+    "zod": "^3.24.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dougiefresh49/appraisal-bot.git"
+  },
+  "scripts": {
+    "html:clean": "tsx --env-file=.env ./scripts/mathpix/adjust-html.ts",
+    "convert:mmd": "tsx --env-file=.env ./scripts/mathpix/convert-mmd.ts",
+    "report:populate": "tsx --env-file=.env ./scripts/land-report/populate-report-template.ts",
+    "report:get-tags": "tsx --env-file=.env ./scripts/land-report/extract-tags.ts",
+    "mcad:links": "tsx --env-file=.env ./scripts/get-mcad-links.ts"
+  }
+}
