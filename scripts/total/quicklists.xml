@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<QLForms QuickListType="AllForms" Mode="Normal" version="2.0">
+  <QLForm Name="AllForms">
+    <Entry key="1" shortName="EA1" value="Loop 338 to the North, W 87th St to the South, Andrews Hwy to the East and WCR to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="2" shortName="EA3" value="W 87th St to the North, Yukon to the South, Andrews Hwy to the East and WCR to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="3" shortName="EA4" value="Yukon Rd to the North, E 57th St to the South, West County Rd to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="4" shortName="EA5" value="Yukon Rd to the North, E 57th St to the South, Andrews Hwy to the East and West County Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="5" shortName="EB1" value="W 42nd St to the North, W University to the South, WCR to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="6" shortName="EB2" value="W 42nd St to the North, W University to the South, Andrews Hwy to the East and WCR to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="7" shortName="EB3" value="W University to the North, W 14th St to the South, WCR to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="8" shortName="EB4" value="W University to the North, W 14th St to the South, Andrews Hwy to the East and WCR to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="9" shortName="EB5" value="W 16th to the North, W 2nd St to the South, WCR to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="10" shortName="EB6" value="W 14th to the North, W 2nd St to the South, Andrews Hwy to the East and WCR to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="11" shortName="EB7" value="W 2nd to the North, I-20 to the South, S Crane Ave to the East and FM 2227 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="12" shortName="EC1" value="Loop 338 to the North, Hillmont to the South, Ector to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="13" shortName="EC2" value="Loop 338 to the North, Hillmont to the South, Grandview to the East and Ector to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="14" shortName="EC3" value="Hillmont to the North, Yukon to the South, Ector to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="15" shortName="EC4" value="Hillmont to the North, Yukon to the South, Grandview to the East and Ector to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="16" shortName="EC5" value="Yukon to the North, W 57th St to the South, Ector Ave to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="17" shortName="EC6" value="Yukon to the North, W 57th St to the South, Grandview to the East and Ector to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="18" shortName="EC7" value="Yukon to the North, W 57th St to the South, JBS Parkway to the East and Grandview to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="19" shortName="ED1" value="57th to the North, 42nd to the South, Dixie to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="20" shortName="ED2" value="57th to the North, 42nd to the South, Grandview to the East and Dixie to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="21" shortName="ED3" value="57th to the North, 42nd to the South, JBS Parkway to the East and Grandview to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="22" shortName="ED4" value="42nd to the North, University to the South, Dixie Blvd to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="23" shortName="ED5" value="42nd to the North, University to the South, Grandview to the East and Dixie Blvd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="24" shortName="ED6" value="42nd to the North, University to the South, JBS to the East and Grandview to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="25" shortName="EE1" value="University to the North, 8th St to the South, Dixie Blvd to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="26" shortName="EE2" value="University to the North, 8th St to the South, Grandview to the East and Dixie Blvd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="27" shortName="EE3" value="University to the North, Business I-20 to the South, JBS Parkway to the East and Grandview to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="28" shortName="EE4" value="8th St to the North, Murphy to the South, Dixie Blvd to the East and Andrews Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="29" shortName="EE5" value="8th St to the North, Murphy to the South, Grandview to the East and Dixie Blvd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="30" shortName="EE6" value="Murphy St to the North, I-20 to the South, S Dixie Blvd to the East and S Crane Ave to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="31" shortName="EE7" value="Murphy St to the North, I-20 to the South, Grandview to the East and Dixie Blvd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="32" shortName="EF1" value="Loop 338 to the North and East, 42nd Street to the South and JBS Parkway to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="33" shortName="EF2" value="Yukon Rd to the North, E 55th St to the South, Billy Hext Rd to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="34" shortName="EF3" value="E 55th St to the North, 42nd St to the South, SH 191 to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="35" shortName="EF4" value="42nd St to the North, Business I-20 to the South, Loop 338 to the East and JBS Parkway to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="36" shortName="EF5" value="SH 191 to the North, Business I-20 to the South, Billy Hext Rd to the East and Loop 338 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="37" shortName="EF6" value="SH 191 to the North, Business I-20 to the South, Faudree Rd to the East and Billy Hext to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="38" shortName="EF7" value="University Blvd to the North, Business I-20 to the South, Loop 338 to the East and JBS Parkway to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="39" shortName="EG1" value="Ector County Line to the North, Odessa City Limits to the South, Ector County Line to the East and US 385 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="40" shortName="EN1" value="Ector County Line to the North, SH 302 to the South, US 385 to the East and Ector County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="41" shortName="ES1" value="I-20 to the North, Ector County Line to the South, US 385 to the East and I-20 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="42" shortName="ES2" value="Business I-20 to the North, Ector County Line to the South and East and US 385 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="43" shortName="EW1" value="Kermit Hwy to the North, I-20 to the South, W Loop 338 to the East and Moss Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="44" shortName="EW2" value="EW 3 = W University to the North, I-20 to the South, Moss Rd to the East and Tripp Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="45" shortName="EW4" value="Yukon Rd to the North, W University to the South, Tripp Ave to the East and Knox Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="46" shortName="EW5" value="W University to the North, I-20 to the South, Tripp Ave to the East and Knox Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="47" shortName="EW6" value="Yukon Rd to the North, W University to the South, Knox Dr to the East and FM 866 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="48" shortName="EW7" value="W University to the North, I-20 to the South, Knox Dr to the East and FM 866 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="49" shortName="MA1" value="Rustic Trail to the North, Greentree Blvd to the South, Midland Dr to the East and Holiday Hill Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="50" shortName="MA2" value="Rustic Trail to the North, Greentree Blvd to the South, Midkiff Rd to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="51" shortName="MA3" value="Greentree Blvd to the North, Mockingbird Lane to the South, Midland Dr to the East and Holiday Hill Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="52" shortName="MA4" value="Greentree Blvd to the North, Mockingbird Lane to the South, Midkiff Rd to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="53" shortName="MA5" value="Greentree Blvd to the North, Mockingbird Lane to the South, Garfield to the East and Midkiff Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="54" shortName="MA6" value="Mockingbird Lane to the North, Briarwood to the South, Midland Dr to the East and Holiday Hill Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="55" shortName="MA7" value="Mockingbird Lane to the North, Loop 250 to the South, Midkiff Rd to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="56" shortName="MA8" value="Mockingbird Lane to the North, Loop 250 to the South, Garfield to the East and Midkiff Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="57" shortName="MB1" value="Midland City Limits to the North, Mockingbird Lane to the South, North “A” St to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="58" shortName="MB2" value="Midland City Limits to the North, Mockingbird Lane to the South, SH 349 to the East and North “A” St to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="59" shortName="MB3" value="Midland City Limits to the North, Mockingbird Lane to the South, Fairgrounds Rd to the East and SH 349 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="60" shortName="MB4" value="Midland City Limits to the North, Loop 250 to the South, CR 1160 to the East and Fairgrounds Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="61" shortName="MB5" value="Mockingbird Lane to the North, Loop 250 to the South, North “A” St to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="62" shortName="MB6" value="Mockingbird Lane to the North, Loop 250 to the South, Lamesa Rd to the East and North “A” St to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="63" shortName="MB7" value="Mockingbird Lane to the North, Loop 250 to the South, Fairgrounds Rd to the East and Lamesa Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="64" shortName="MB8" value="Mockingbird Lane to the North, Loop 250 to the South, CR 1160 to the East and Fairgrounds Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="65" shortName="MC1" value="Briarwood to the North, Wadley to the South, Midland Dr to the East and Loop 250 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="66" shortName="MC2" value="Loop 250 to the North, Wadley to the South, Midkiff to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="67" shortName="MC3" value="Loop 250 to the North, Wadley to the South, Garfield to the East and Midkiff to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="68" shortName="MC4" value="Wadley to the North, Andrews Hwy to the South, Loop 250 to the East and SH 158 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="69" shortName="MC5" value="Wadley to the North, Andrews Hwy to the South, Midland Dr to the East and Loop 250 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="70" shortName="MC6" value="Wadley to the North, Andrews Hwy to the South, Midkiff to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="71" shortName="MC7" value="Wadley to the North, Andrews Hwy to the South, Garfield to the East and Midkiff to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="72" shortName="MC8" value="Briarwood to the North, Wadley to the South, Holiday Hill Rd to the East and the Midland County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="73" shortName="MD4" value="Wadley to the North, Golf Course to the South, N “A” St to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="74" shortName="MD5" value="Wadley to the North, Golf Course to the South, Lamesa to the East, “A” Street to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="75" shortName="MD6" value="Wadley to the North, Golf Course to the South, Fairgrounds Rd to the East and Lamesa to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="76" shortName="MD7" value="Loop 250 to the North, Front St to the South, Todd Rd to the East and Fairgrounds Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="77" shortName="MD8" value="Is a Rural area that is bordered by Loop 250 to the North, I-20 to the South, Loop 250 to the East and Fairgrounds Rd to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="78" shortName="ME1" value="SH 191 to the North, I-20 to the South, Loop 250 to the East and Midland County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="79" shortName="ME2" value="SH 191 to the North, Illinois to the South, Midland Dr to the East and Loop 250 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="80" shortName="ME3" value="Golf Course Rd to the North, Illinois to the South, Midkiff to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="81" shortName="ME4" value="Golf Course Rd to the North, Illinois to the South, Garfield to the East and Midkiff to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="82" shortName="ME5" value="Illinois to the North, W Wall St to the South, Midland Dr to the East and Loop 250 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="83" shortName="ME6" value="Illinois to the North, W Wall to the South, Midkiff to the East and Midland Dr to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="84" shortName="ME7" value="Illinois to the North, Front to the South, Garfield to the East and Midkiff to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="85" shortName="MF1" value="Golf Course to the North, Wall St to the South, A Street to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="86" shortName="MF2" value="Golf Course to the North, Wall St to the South, Lamesa to the East and North “A” St to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="87" shortName="MF3" value="Golf Course to the North, Wall St to the South, Fairgrounds Rd to the East and Lamesa to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="88" shortName="MF4" value="Wall St to the North, Front St to the South, Wall St to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="89" shortName="MF5" value="Front St to the North, City Limits to the South, SH 349 to the East and Garfield to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="90" shortName="MF6" value="Front St to the North, City Limits to the South, Lamesa to the East and SH 349 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="91" shortName="MF7" value="Front St to the North, Cloverdale Rd to the South, Fairgrounds Rd to the East and Lamesa to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="92" shortName="MF8" value="Cloverdale Rd to the North, City Limits to the South, SH 158 to the East and Lamesa to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="93" shortName="MG1" value="Midland County Line to the North, I-20 to the South and East and SH 349 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="94" shortName="MG2" value="Hwy 80 to the North, I-20 to the South and East and SH 158 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="95" shortName="MG3" value="I-20 to the North, FM 307 to the South, Midland County Line to the East and I-20 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="96" shortName="MG4" value="FM 307 to the North, SH 158 to the South, FM 1379 to the East and SH 158 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="97" shortName="MG5" value="FM 307 to the North, SH 158 to the South, Midland County Line to the East and FM 1379 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="98" shortName="MM1" value="191 to the North, Old Bankhead Hwy to the South, FM 1305 to the East and Billy Hext to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="99" shortName="MM2" value="Old Bankhead Hwy to the North, I-20 to the South, Old Bankhead Hwy to the East and Old Bankhead Hwy to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="100" shortName="MM3" value="191 to the North, Old Bankhead Hwy /I-20 to the South, FM 1788 to the East and FM 1305 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="101" shortName="MM4" value="158 to the North, 191 to the South, FM 1788 to the East and Billy Hext to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="102" shortName="MM5" value="WCR 60 to the North, 191 to the South, the Midland County Line to the East and SH 158 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="103" shortName="MM6" value="SH 158 to the North, 191 to the South, SH 158 to the East and FM 1788 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="104" shortName="MM7" value="191 to the North, I-20 to the South, Holiday Hill Rd to the East and FM 1788 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="105" shortName="MS1" value="I-20 to the North, FM 1787 to the South, FM 1788 to the East and Midland County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="106" shortName="MS2" value="I-20 to the North, FM 1787 to the South, SH 349 to the East and FM 1788 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="107" shortName="MS3" value="I-20/SH 158 to the North, FM 1379 to the South, FM 1379 to the East and SH 349 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="108" shortName="MS4" value="SH 158 to the North, CR 110 to the South, FM 1379 to the East and Midland County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="109" shortName="MS5" value="FM 1787 to the North, Midland County Line to the South, FM 1788 to the East and Midland County Line to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="110" shortName="MS6" value="FM 1787 to the North, Midland County Line to the South, SH 349 to the East and FM 1788 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+    <Entry key="111" shortName="MS7" value="FM 1379 to the North, Midland County Line to the South, Midland County Line to the East and SH 349 to the West." DateModified="1/29/2025, 1:07:05 PM"/>
+  </QLForm>
+</QLForms>

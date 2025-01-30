@@ -169,7 +169,7 @@ Porch/Patio Deck
 - The appraiser must select one quality rating from the list below for the subject property and each
   comparable property. The appraiser must indicate the quality rating that best describes the overall quality
   of the property. Multiple choices are not permitted.
-  • Q1|
+  • Q1
   • Q2
   • Q3
   • Q4
