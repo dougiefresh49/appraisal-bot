@@ -22,13 +22,13 @@ console.log(`[INFO] Using file extension: .${extension}`);
 // List of .mmd files to be modified
 const files = [
   // 'paired-analysis-o1-v1.mmd',
-  'paired-analysis-o1pro-v3.mmd',
+  'paired-analysis-o1pro-v1.mmd',
   // Add more files as needed
 ];
 
 // Folder to search for files
 const folderName =
-  '/Users/dougiefresh/Dropbox/Appraisals/basin-appraisals-llc/2025/residential/in-progress/10568 W Rolling Hills Rd/reports/analysis/results/';
+  '/Users/dougiefresh/Dropbox/Appraisals/basin-appraisals-llc/2025/residential/in-progress/3101 Storey -- AN 2-6-25/reports/analysis/results/';
 
 async function findFilePaths(
   folder: string,

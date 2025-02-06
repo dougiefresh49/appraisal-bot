@@ -9,7 +9,7 @@
 # @raycast.icon 🗂️
 
 # Documentation:
-# @raycast.description Creates a folder for each file in the comps directory using only the address (up to the $) and moves the file into the respective folder.
+# @raycast.description Creates a folder for each file in the comps directory using only the address (up to the $) and moves the file into the respective folder, works for both rentals and standard comps.
 # @raycast.packageName Appraisal Bot
 # @raycast.needsConfirmation false
 # @raycast.author dougiefresh49
@@ -37,18 +37,29 @@ else
     exit 1
 fi
 
-# Iterate over each file in the comps directory (excluding subfolders)
-for file in *; do
-    # Skip directories
-    if [ -d "$file" ]; then
+# Iterate over each PDF file in the comps directory (excluding subfolders)
+for file in *.pdf; do
+    # Skip if no PDFs are found
+    if [ ! -f "$file" ]; then
         continue
     fi
 
     # Extract the filename without the extension
     base_name="${file%.*}"
 
+    # Remove "Rental " from filename if it exists
+    clean_name=$(echo "$base_name" | sed 's/^Rental //')
+
     # Remove everything after the `$` character to get just the address
-    folder_name=$(echo "$base_name" | awk -F'\\$' '{print $1}' | xargs)
+    folder_name=$(echo "$clean_name" | awk -F'\\$' '{print $1}' | xargs)
+
+    # Append " - mls" to the cleaned file name
+    final_name="${folder_name} - mls.pdf"
+
+    # Prefix rental folders with "(R) "
+    if [[ "$file" == Rental* ]]; then
+        folder_name="(R) $folder_name"
+    fi
 
     # Create a folder with the cleaned name (if it doesn't already exist)
     if [ ! -d "$folder_name" ]; then
@@ -57,8 +68,9 @@ for file in *; do
     fi
 
     # Move the file into the corresponding folder
-    mv "$file" "$folder_name/"
-    echo "Moved file: $file -> $folder_name/"
+    mv "$file" "$folder_name/$final_name"
+    echo "Moved file: $file -> $folder_name/$final_name"
+
 done
 
 echo "Comps organized successfully."
