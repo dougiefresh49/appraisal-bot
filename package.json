@@ -26,7 +26,7 @@
     "report:populate": "tsx --env-file=.env ./scripts/land-report/populate-report-template.ts",
     "report:get-tags": "tsx --env-file=.env ./scripts/land-report/extract-tags.ts",
     "mcad:links": "tsx --env-file=.env ./scripts/stagehand/get-mcad-links.ts",
-    "mcad:download": "tsx --env-file=.env ./scripts/stagehand/download-mcad-docs.ts",
+    "cad:download": "tsx --env-file=.env ./scripts/stagehand/download-mcad-docs.ts",
     "ecad:data": "tsx --env-file=.env ./scripts/ecad/fetch-prop-data.ts",
     "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts"
   }

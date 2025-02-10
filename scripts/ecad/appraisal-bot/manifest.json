@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "AppraisalBot Linker",
+  "author": "AppraisalBot",
+  "version": "1.4",
+  "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
+  "icons": {
+    "16": "logos/logo16.png",
+    "48": "logos/logo48.png",
+    "128": "logos/logo128.png"
+  },
+  "action": {
+    "default_icon": "logos/logo48.png"
+  },
+  "permissions": ["activeTab", "cookies", "webNavigation"],
+  "host_permissions": [
+    "https://ectorcountytx-web.tylerhost.net/*",
+    "https://search.ectorcad.org/*",
+    "https://next.navicamls.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://search.ectorcad.org/parcel/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1*"
+      ],
+      "js": ["search-injector.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://next.navicamls.net/*"],
+      "js": ["mls-injector.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

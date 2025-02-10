@@ -21,12 +21,13 @@ function updateDeedLink() {
         return;
       }
 
-      console.log(`Instrument found: ${instrument}`); // Debugging log
+      console.log(`Instrument found: ${instrument}`);
 
-      const deedUrl = `https://ectorcountytx-web.tylerhost.net/web/document/DOCCRP-${instrument}-WD?search=DOCSEARCH144S1`;
+      // Generate the search page URL with the document number as a query param
+      const searchUrl = `https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1?doc=${instrument}`;
 
-      // Replace text with a clickable link
-      valueCell.innerHTML = `<a href="${deedUrl}" target="_blank">${instrument}</a>`;
+      // Replace text with a clickable link to the search page
+      valueCell.innerHTML = `<a href="${searchUrl}" target="_blank">${instrument}</a>`;
       console.log('Deed link updated successfully!');
     }
   });
