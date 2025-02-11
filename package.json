@@ -28,6 +28,7 @@
     "mcad:links": "tsx --env-file=.env ./scripts/stagehand/get-mcad-links.ts",
     "cad:download": "tsx --env-file=.env ./scripts/stagehand/download-mcad-docs.ts",
     "ecad:data": "tsx --env-file=.env ./scripts/ecad/fetch-prop-data.ts",
+    "realapi:details": "tsx --env-file=.env ./scripts/real-api/save-details.ts",
     "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts"
   }
 }
