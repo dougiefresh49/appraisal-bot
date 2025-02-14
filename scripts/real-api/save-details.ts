@@ -138,7 +138,7 @@ async function getPropertyDetails(propertyId: string): Promise<any> {
  * Sanitizes a string so it can be safely used as a filename.
  */
 function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  return name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
 }
 
 /**

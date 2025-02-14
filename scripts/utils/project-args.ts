@@ -6,6 +6,7 @@ type ProjectArgs = {
   projectFolder: string;
   projectType: string;
   propType: string;
+  outDir: string;
 };
 
 type ProjectPaths = {
@@ -33,12 +34,15 @@ export function getProjectArgs(
     'residential';
   const propType =
     args.find((arg) => arg.startsWith('--prop='))?.split('=')[1] ?? 'comps';
+  const outDir =
+    args.find((arg) => arg.startsWith('--out='))?.split('=')[1] ?? 'downloads';
 
   const projectArgs = {
     cadType,
     projectFolder,
     projectType,
     propType,
+    outDir,
   };
   const projectPaths = getProjectPaths(projectArgs, outputFolderName);
   return { ...projectArgs, ...projectPaths };
@@ -57,8 +61,9 @@ export function getProjectPaths(
     args.propType
   );
   const dataFilePath = path.resolve(dataPathRoot, 'data/property-data.json');
-  const outputFolder =
+  const defaultOutputFolder =
     args.propType === 'comps' ? outputFolderName ?? 'downloads' : '';
+  const outputFolder = args.outDir ?? defaultOutputFolder;
   const outputPath = path.resolve(dataPathRoot, outputFolder);
 
   // Ensure the output directory exists
