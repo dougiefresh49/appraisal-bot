@@ -1,0 +1,95 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  width: 260px;
+  padding: 12px;
+  background: #2b2e3b; /* Dark background */
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+}
+
+h1 {
+  font-size: 16px;
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Section Containers */
+.section {
+  width: 100%;
+  padding: 10px;
+  background: #404455; /* Dark gray for contrast */
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 6px;
+  color: #e0e0e0;
+}
+
+h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #b0b0b0;
+  margin-bottom: 6px;
+}
+
+/* Links */
+.link {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  margin: 2px 0;
+  background: none;
+  color: #d0d0d0;
+  text-decoration: none;
+  text-align: left;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+.link:hover {
+  color: #30d5ff; /* Bright blue hover state */
+  text-decoration: underline;
+}
+
+.link:active {
+  color: #1eb5e0; /* Slightly darker blue when clicked */
+}

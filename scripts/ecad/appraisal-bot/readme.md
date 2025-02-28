@@ -42,3 +42,20 @@ Since this is a local extension, follow these steps to install it in Chrome: 1. 
 ## 📞 Need Help?
 
 Ask doug for help! 🚀 Happy linking!
+
+## Future Features
+
+###On ECAD,
+
+- add ability to show a link to other parcels with the same Instrument Number.
+
+  - Example: https://search.ectorcad.org/parcel/01050.00010.00000 has other parcels with Instrument Number 2023-00017387
+  - The advanced search has a filter for Instrument Number with url like: `https://search.ectorcad.org/search/adv?query[sale][instr_num]=2023-00017387&type=r`
+  - Maybe can use stagehand to run the advanced search and get the results and display them below the last sale instrument.
+
+- add logic either show the code values (Ex: Building Type S30M) or fix the link
+  - currently the building type link is broken
+    - https://search.ectorcad.org/lu/r/bld/S30M
+    - it opens but you have to search for it
+    - it should scroll down to it
+    - might need to use logic to add the value in the table to the link as a query param because its not always at the end of the url

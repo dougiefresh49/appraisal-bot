@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.4",
+  "version": "1.9.3",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -10,13 +10,15 @@
     "128": "logos/logo128.png"
   },
   "action": {
-    "default_icon": "logos/logo48.png"
+    "default_icon": "logos/logo48.png",
+    "default_popup": "popup/index.html"
   },
-  "permissions": ["activeTab", "cookies", "webNavigation"],
+  "permissions": ["activeTab", "cookies", "webNavigation", "tabs"],
   "host_permissions": [
     "https://ectorcountytx-web.tylerhost.net/*",
     "https://search.ectorcad.org/*",
-    "https://next.navicamls.net/*"
+    "https://next.navicamls.net/*",
+    "https://iswdataclient.azurewebsites.net/webProperty.aspx*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -36,8 +38,23 @@
       "run_at": "document_end"
     },
     {
-      "matches": ["https://next.navicamls.net/*"],
-      "js": ["mls-injector.js"],
+      "matches": ["https://next.navicamls.net/377/*"],
+      "js": ["mls-injector-obr.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://next.navicamls.net/381/*"],
+      "js": ["mls-injector-pbbr.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://iswdataclient.azurewebsites.net/webProperty.aspx*"],
+      "js": ["mcad-deed-injector.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://pbbr.crsdata.com/mls/property/*"],
+      "js": ["mls-tax-suite-injector.js"],
       "run_at": "document_end"
     }
   ]
