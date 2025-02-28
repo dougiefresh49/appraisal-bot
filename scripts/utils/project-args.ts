@@ -7,6 +7,7 @@ type ProjectArgs = {
   projectType: string;
   propType: string;
   outDir: string;
+  nestedFolderDir?: string;
 };
 
 type ProjectPaths = {
@@ -36,13 +37,15 @@ export function getProjectArgs(
     args.find((arg) => arg.startsWith('--prop='))?.split('=')[1] ?? 'comps';
   const outDir =
     args.find((arg) => arg.startsWith('--out='))?.split('=')[1] ?? 'downloads';
-
+  const nestedFolderDir =
+    args.find((arg) => arg.startsWith('--nested='))?.split('=')[1] ?? '';
   const projectArgs = {
     cadType,
     projectFolder,
     projectType,
     propType,
     outDir,
+    nestedFolderDir,
   };
   const projectPaths = getProjectPaths(projectArgs, outputFolderName);
   return { ...projectArgs, ...projectPaths };
@@ -60,7 +63,12 @@ export function getProjectPaths(
     args.projectFolder,
     args.propType
   );
-  const dataFilePath = path.resolve(dataPathRoot, 'data/property-data.json');
+  const dataFilePath = path.resolve(
+    dataPathRoot,
+    `${
+      args.nestedFolderDir ? `${args.nestedFolderDir}/` : ''
+    }data/property-data.json`
+  );
   const defaultOutputFolder =
     args.propType === 'comps' ? outputFolderName ?? 'downloads' : '';
   const outputFolder = args.outDir ?? defaultOutputFolder;
