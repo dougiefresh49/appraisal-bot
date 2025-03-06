@@ -45,7 +45,7 @@ Ask doug for help! 🚀 Happy linking!
 
 ## Future Features
 
-###On ECAD,
+### On ECAD,
 
 - add ability to show a link to other parcels with the same Instrument Number.
 
@@ -59,3 +59,10 @@ Ask doug for help! 🚀 Happy linking!
     - it opens but you have to search for it
     - it should scroll down to it
     - might need to use logic to add the value in the table to the link as a query param because its not always at the end of the url
+
+### On MLS Tax Suite
+
+- add links to ecad deed site in the table
+
+  - Example: https://pbbr.crsdata.com/mls/Property/~gtpb3DQ3mnhhe5Nfv2TL4UAauJgAK1R8xUIRzcwDLSVeFesfZ4VIz0Ol85M5gHz5Igih0a4NSdlV5Cnre~sVA2#EXPMAP
+  - APN: 05730.00790.00000

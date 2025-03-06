@@ -25,6 +25,8 @@ const properties: {
   mls: string;
   cad?: string;
   apn?: string;
+  lot?: string;
+  skip?: boolean;
 }[] = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
 
 async function downloadDeedDocs(
@@ -95,6 +97,7 @@ async function downloadDeedDocs(
 
 async function downloadPropertyDocs() {
   const stagehand = new Stagehand({
+    modelName: 'gpt-4o',
     env: 'LOCAL', // Or 'BROWSERBASE' if using API keys
     headless: true, // Run in headless mode to bypass print preview UI
   });
@@ -103,7 +106,8 @@ async function downloadPropertyDocs() {
   const page = stagehand.page;
   const instrumentNumbers: Record<string, string> = {};
 
-  for (const { address, cad, apn } of properties) {
+  const filteredProperties = properties.filter((p) => !p.skip);
+  for (const { address, cad, apn, lot } of filteredProperties) {
     if (!cad && !apn) {
       console.warn(`⚠️ Skipping property ${address} - No CAD ID`);
       continue;
@@ -116,35 +120,47 @@ async function downloadPropertyDocs() {
     const sanitizedAddress = address.replace(/[^a-zA-Z0-9]/g, ' ');
 
     // Define PDF file path
-    const pdfPath = path.join(outputPath, `${sanitizedAddress}-cad.pdf`);
+    // const pdfPath = path.join(
+    //   outputPath,
+    //   `${sanitizedAddress}${lot ? `-lot-${lot}` : ''}-cad.pdf`
+    // );
 
     // Directly save the page as a PDF (bypasses print preview)
-    await page.pdf({ path: pdfPath, format: 'A4' });
+    // await page.pdf({ path: pdfPath, format: 'A4' });
 
-    console.log(`✅ PDF saved: ${pdfPath}`);
+    // console.log(`✅ PDF saved: ${pdfPath}`);
 
     // extract instrument number from ecad
-    if (cadType === 'ecad') {
-      const extractedData = await page.extract({
-        instruction:
-          "Find the 'Last Sale Instrument' value from the property details page.",
-        schema: z.object({
-          instrumentNumber: z.string(),
-        }),
-      });
-      const instrumentNumber = extractedData.instrumentNumber;
-      if (instrumentNumber) {
-        instrumentNumbers[apn!] = instrumentNumber;
-        console.log(
-          `✅ Instrument number found for apn ${apn!}: ${instrumentNumber}`
-        );
-        await downloadDeedDocs(page, instrumentNumber, sanitizedAddress);
-      } else {
-        console.warn(
-          `⚠️ Skipping deed for property ${address} - No instrument number found`
-        );
-      }
-    }
+    // if (cadType === 'ecad') {
+    //   const extractedData = await page.extract({
+    //     instruction:
+    //       "Find the 'Last Sale Instrument' value from the property details page.",
+    //     schema: z.object({
+    //       instrumentNumber: z.string(),
+    //     }),
+    //   });
+    //   const instrumentNumber = extractedData.instrumentNumber;
+    //   if (instrumentNumber) {
+    //     instrumentNumbers[apn!] = instrumentNumber;
+    //     console.log(
+    //       `✅ Instrument number found for apn ${apn!}: ${instrumentNumber}`
+    //     );
+    //     await downloadDeedDocs(page, instrumentNumber, sanitizedAddress);
+    //   } else {
+    //     console.warn(
+    //       `⚠️ Skipping deed for property ${address} - No instrument number found`
+    //     );
+    //   }
+    // }
+
+    // const extractedNetAssessedValue = await page.extract({
+    //   instruction:
+    //     "find the 'Net Assessed Value' for 2024 in the value history table. It is the last row in the first column in the table. Return only the value, no other text.",
+    //   schema: z.object({
+    //     netAssessedValue: z.string(),
+    //   }),
+    // });
+    // console.log(extractedNetAssessedValue);
   }
 
   await stagehand.close();

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@browserbasehq/stagehand": "^1.8.0",
+    "@google/generative-ai": "^0.21.0",
     "@types/node": "^22.10.1",
     "angular-expressions": "^1.4.3",
     "docx": "^9.1.0",
@@ -8,7 +9,7 @@
     "docxtemplater-image-module-free": "^1.1.1",
     "fast-csv": "^5.0.2",
     "fs": "0.0.1-security",
-    "jsdom": "^25.0.1",
+    "jsdom": "^26.0.0",
     "path": "^0.12.7",
     "pizzip": "^3.1.7",
     "tsx": "^4.19.2",
@@ -29,6 +30,7 @@
     "cad:download": "tsx --env-file=.env ./scripts/stagehand/download-cad-docs.ts",
     "ecad:data": "tsx --env-file=.env ./scripts/ecad/fetch-prop-data.ts",
     "realapi:details": "tsx --env-file=.env ./scripts/real-api/save-details.ts",
+    "realapi:stats": "tsx --env-file=.env ./scripts/real-api/get-neighborhood-stats.ts",
     "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts"
   }
 }

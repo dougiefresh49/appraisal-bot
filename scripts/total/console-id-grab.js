@@ -1,0 +1,269 @@
+const elements = [
+  document.getElementById('sxs-neighborhood_1'),
+  ...document.querySelectorAll('[id^="1004UADT%!-GC1_"]'),
+]
+  .slice(0, 112)
+  .filter((el) => el.tagName.toLowerCase() !== 'ol');
+
+const forceIncludeIds = [
+  'sxs-neighborhood_1',
+  '_ADDR1',
+  '_ADDR2',
+  '_PROX1',
+  '_PR_SALEPR1',
+  '_PU_PERGLA',
+  '_SC_SOURCE1',
+  '_SC_SOURCE2',
+  'RM_TOTAL',
+  'RM_BED',
+  'RM_BATH',
+  'SF_GLA',
+  'ST_SITSIZE',
+  'ST_SITEVW',
+];
+
+const adjustmentIds = elements
+  .filter((el) => el.id.includes('_ADJ'))
+  .map((el) => el.id);
+
+const adjustmentMatchingFieldsNames = adjustmentIds.map((id) =>
+  id.replace('_ADJ', '')
+);
+const fieldFilterVals = ['_ADJ'];
+const fieldElements = elements.filter((el) => {
+  if (el.id.includes('_ADJ')) {
+    return false;
+  } else if (forceIncludeIds.some((i) => el.id.includes(i))) {
+    console.log('force include', el.id);
+    return true;
+  } else if (adjustmentMatchingFieldsNames.includes(el.id)) {
+    console.log('adjustment matching', el.id);
+    return true;
+  }
+
+  return false;
+});
+const ids = fieldElements.map((el) => el.id);
+
+console.log(fieldElements);
+console.log(ids);
+
+/*
+ALL IDS
+
+[
+    "1004UADT%!-GC1_AD_ADDR1",
+    "1004UADT%!-GC1_AD_ADDR2",
+    "1004UADT%!-GC1_DB_CITY",
+    "1004UADT%!-GC1_DB_STATE",
+    "1004UADT%!-GC1_DB_ZIPCODE",
+    "1004UADT%!-GC1_PROX1",
+    "1004UADT%!-GC1_PR_SALEPR1",
+    "1004UADT%!-GC1_PU_PERGLA",
+    "1004UADT%!-GC1_SC_SOURCE1",
+    "1004UADT%!-GC1_EX_DATSRC1",
+    "1004UADT%!-GC1_EX_DOM",
+    "1004UADT%!-GC1_SC_SOURCE2",
+    "1004UADT%!-GC1_FN_CONC1",
+    "1004UADT%!-GC1_FN_CONC1list",
+    "1004UADT%!-GC1_FN_CONC1_ADJ",
+    "1004UADT%!-GC1_FN_CONC2",
+    "1004UADT%!-GC1_DP_FINTYP1",
+    "1004UADT%!-GC1_DP_FINTYP1list",
+    "1004UADT%!-GC1_EX_OTHCONC",
+    "1004UADT%!-GC1_EX_CONCAMT",
+    "1004UADT%!-GC1_FN_CONC2_ADJ",
+    "1004UADT%!-GC1_DT_SALTIM1",
+    "1004UADT%!-GC1_DP_CMPTYPE",
+    "1004UADT%!-GC1_DP_CMPTYPElist",
+    "1004UADT%!-GC1_EX_CONTKWN",
+    "1004UADT%!-GC1_EX_CONTUNK",
+    "1004UADT%!-GC1_EX_CONTDATE",
+    "1004UADT%!-GC1_EX_SETTDATE",
+    "1004UADT%!-GC1_EX_WTDRDATE",
+    "1004UADT%!-GC1_EX_EXPRDATE",
+    "1004UADT%!-GC1_DT_SALTIM1_ADJ",
+    "1004UADT%!-GC1_LC_LOCAT1",
+    "1004UADT%!-GC1_DP_LOCAT",
+    "1004UADT%!-GC1_DP_LOCATlist",
+    "1004UADT%!-GC1_DP_LOC1",
+    "1004UADT%!-GC1_DP_LOC1list",
+    "1004UADT%!-GC1_EX_LOC1OTH",
+    "1004UADT%!-GC1_DP_LOC2",
+    "1004UADT%!-GC1_DP_LOC2list",
+    "1004UADT%!-GC1_EX_LOC2OTH",
+    "1004UADT%!-GC1_LC_LOCAT1_ADJ",
+    "1004UADT%!-GC1_RG_RIGHTS",
+    "1004UADT%!-GC1_RG_RIGHTS_ADJ",
+    "1004UADT%!-GC1_ST_SITSIZE",
+    "1004UADT%!-GC1_ST_SITSIZE_ADJ",
+    "1004UADT%!-GC1_ST_SITEVW",
+    "1004UADT%!-GC1_DP_SITVW1",
+    "1004UADT%!-GC1_DP_SITVW1list",
+    "1004UADT%!-GC1_DP_SITVW2",
+    "1004UADT%!-GC1_DP_SITVW2list",
+    "1004UADT%!-GC1_EX_SITVWO2",
+    "1004UADT%!-GC1_DP_SITVW3",
+    "1004UADT%!-GC1_DP_SITVW3list",
+    "1004UADT%!-GC1_EX_SITVWO3",
+    "1004UADT%!-GC1_ST_SITEVW_ADJ",
+    "1004UADT%!-GC1_DA_DESAPL1",
+    "1004UADT%!-GC1_TP_DETACH",
+    "1004UADT%!-GC1_TP_ATTACH",
+    "1004UADT%!-GC1_TP_SEMIDET",
+    "1004UADT%!-GC1_NUMSTORIES",
+    "1004UADT%!-GC1_AB_DESAPL1",
+    "1004UADT%!-GC1_DA_DESAPL1_ADJ",
+    "1004UADT%!-GC1_DA_CONSTQL",
+    "1004UADT%!-GC1_DA_CONSTQLlist",
+    "1004UADT%!-GC1_DA_CONSTQL_ADJ",
+    "1004UADT%!-GC1_AG_AGYRBLT",
+    "1004UADT%!-GC1_AG_AGYRBLT_ADJ",
+    "1004UADT%!-GC1_AG_COND1",
+    "1004UADT%!-GC1_AG_COND1list",
+    "1004UADT%!-GC1_AG_COND1_ADJ",
+    "1004UADT%!-GC1_RM_BED_ADJ",
+    "1004UADT%!-GC1_RM_TOTAL",
+    "1004UADT%!-GC1_RM_BED",
+    "1004UADT%!-GC1_RM_BATH",
+    "1004UADT%!-GC1_RM_TOTAL_ADJ",
+    "1004UADT%!-GC1_SF_GLA",
+    "1004UADT%!-GC1_SF_GLA_ADJ",
+    "1004UADT%!-GC1_BM_BSM1",
+    "1004UADT%!-GC1_EX_BSMSF",
+    "1004UADT%!-GC1_EX_BSMFIN",
+    "1004UADT%!-GC1_DP_BSMEXIT",
+    "1004UADT%!-GC1_DP_BSMEXITlist",
+    "1004UADT%!-GC1_BM_BSM1_ADJ",
+    "1004UADT%!-GC1_BM_BSM2",
+    "1004UADT%!-GC1_EX_BSMRECRM",
+    "1004UADT%!-GC1_EX_BSMBED",
+    "1004UADT%!-GC1_EX_BSMBATH",
+    "1004UADT%!-GC1_EX_BSMOTHRM",
+    "1004UADT%!-GC1_BM_BSM2_ADJ",
+    "1004UADT%!-GC1_FU_FUNCTUT",
+    "1004UADT%!-GC1_FU_FUNCTUT_ADJ",
+    "1004UADT%!-GC1_HC_HTCOOL",
+    "1004UADT%!-GC1_HC_HTCOOL_ADJ",
+    "1004UADT%!-GC1_EE_EFFIC1",
+    "1004UADT%!-GC1_EE_EFFIC1_ADJ",
+    "1004UADT%!-GC1_CR_GARPRK1",
+    "1004UADT%!-GC1_EX_CARNONE",
+    "1004UADT%!-GC1_EX_GARATT",
+    "1004UADT%!-GC1_EX_GARDET",
+    "1004UADT%!-GC1_EX_GARBLT",
+    "1004UADT%!-GC1_EX_CARPT",
+    "1004UADT%!-GC1_EX_DRVWY",
+    "1004UADT%!-GC1_CR_GARPRK1_ADJ",
+    "1004UADT%!-GC1_PF_PORPAT1",
+    "1004UADT%!-GC1_PF_PORPAT1_ADJ",
+    "1004UADT%!-GC1_BL_BLANK1",
+    "1004UADT%!-GC1_BL_BLANK1_ADJ",
+    "1004UADT%!-GC1_BL_BLANK2",
+    "1004UADT%!-GC1_BL_BLANK2_ADJ",
+    "1004UADT%!-GC1_BL_BLANK3",
+    "1004UADT%!-GC1_BL_BLANK3_ADJ"
+]
+
+FOUND IDS SO FAR
+[
+    "1004UADT%!-GC1_FN_CONC1",
+    "1004UADT%!-GC1_FN_CONC2",
+    "1004UADT%!-GC1_DT_SALTIM1",
+    "1004UADT%!-GC1_LC_LOCAT1",
+    "1004UADT%!-GC1_RG_RIGHTS",
+    "1004UADT%!-GC1_ST_SITSIZE",
+    "1004UADT%!-GC1_ST_SITEVW",
+    "1004UADT%!-GC1_DA_DESAPL1",
+    "1004UADT%!-GC1_DA_CONSTQL",
+    "1004UADT%!-GC1_AG_AGYRBLT",
+    "1004UADT%!-GC1_AG_COND1",
+    "1004UADT%!-GC1_RM_TOTAL",
+    "1004UADT%!-GC1_RM_BED",
+    "1004UADT%!-GC1_SF_GLA",
+    "1004UADT%!-GC1_BM_BSM1",
+    "1004UADT%!-GC1_BM_BSM2",
+    "1004UADT%!-GC1_FU_FUNCTUT",
+    "1004UADT%!-GC1_HC_HTCOOL",
+    "1004UADT%!-GC1_EE_EFFIC1",
+    "1004UADT%!-GC1_CR_GARPRK1",
+    "1004UADT%!-GC1_PF_PORPAT1",
+    "1004UADT%!-GC1_BL_BLANK1",
+    "1004UADT%!-GC1_BL_BLANK2",
+    "1004UADT%!-GC1_BL_BLANK3"
+]
+
+FINAL
+
+[
+    "sxs-neighborhood_1",
+    "1004UADT%!-GC1_AD_ADDR1",
+    "1004UADT%!-GC1_AD_ADDR2",
+    "1004UADT%!-GC1_PROX1",
+    "1004UADT%!-GC1_PR_SALEPR1",
+    "1004UADT%!-GC1_PU_PERGLA",
+    "1004UADT%!-GC1_SC_SOURCE1",
+    "1004UADT%!-GC1_SC_SOURCE2",
+    "1004UADT%!-GC1_FN_CONC1",
+    "1004UADT%!-GC1_FN_CONC2",
+    "1004UADT%!-GC1_DT_SALTIM1",
+    "1004UADT%!-GC1_LC_LOCAT1",
+    "1004UADT%!-GC1_RG_RIGHTS",
+    "1004UADT%!-GC1_ST_SITSIZE",
+    "1004UADT%!-GC1_ST_SITEVW",
+    "1004UADT%!-GC1_DA_DESAPL1",
+    "1004UADT%!-GC1_DA_CONSTQL",
+    "1004UADT%!-GC1_AG_AGYRBLT",
+    "1004UADT%!-GC1_AG_COND1",
+    "1004UADT%!-GC1_RM_TOTAL",
+    "1004UADT%!-GC1_RM_BED",
+    "1004UADT%!-GC1_RM_BATH",
+    "1004UADT%!-GC1_SF_GLA",
+    "1004UADT%!-GC1_BM_BSM1",
+    "1004UADT%!-GC1_BM_BSM2",
+    "1004UADT%!-GC1_FU_FUNCTUT",
+    "1004UADT%!-GC1_HC_HTCOOL",
+    "1004UADT%!-GC1_EE_EFFIC1",
+    "1004UADT%!-GC1_CR_GARPRK1",
+    "1004UADT%!-GC1_PF_PORPAT1",
+    "1004UADT%!-GC1_BL_BLANK1",
+    "1004UADT%!-GC1_BL_BLANK2",
+    "1004UADT%!-GC1_BL_BLANK3",
+]
+
+Keys to use to map to labels
+sxs-neighborhood
+AD_ADDR1
+AD_ADDR2
+PROX1
+PR_SALEPR1
+PU_PERGLA
+SC_SOURCE1
+SC_SOURCE2
+FN_CONC1
+FN_CONC2
+DT_SALTIM1
+LC_LOCAT1
+RG_RIGHTS
+ST_SITSIZE
+ST_SITEVW
+DA_DESAPL1
+DA_CONSTQL
+AG_AGYRBLT
+AG_COND1
+RM_TOTAL
+RM_BED
+RM_BATH
+SF_GLA
+BM_BSM1
+BM_BSM2
+FU_FUNCTUT
+HC_HTCOOL
+EE_EFFIC1
+CR_GARPRK1
+PF_PORPAT1
+BL_BLANK1
+BL_BLANK2
+BL_BLANK3
+
+*/
