@@ -88,6 +88,21 @@ function updateMLSPropertyLinks() {
   existingCadLink.insertAdjacentElement('afterend', cadLink);
 
   console.log('✅ CAD link updated successfully!');
+
+  addGisLink(cadLink, propertyId, isOdessa);
+}
+
+function addGisLink(cadLink, apn, isOdessa) {
+  const gisUrl = isOdessa
+    ? `https://search.ectorcad.org/map/#${apn}`
+    : `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${apn}`;
+  const gisLink = document.createElement('a');
+  gisLink.href = gisUrl;
+  gisLink.target = '_blank';
+  gisLink.textContent = '[GIS]';
+  cadLink.insertAdjacentElement('afterend', gisLink);
+
+  console.log('✅ GIS link updated successfully!');
 }
 
 // Observer to watch `#JsDisplaySequence` for property changes

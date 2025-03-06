@@ -1,5 +1,16 @@
 console.log('MLS Link Injector: Script loaded!');
 
+function formatEctorCadNumber(cadNumber) {
+  // Ensure the Ector CAD number is in the correct format: xxxxx.xxxxx.xxxxx
+  if (!cadNumber.includes('.')) {
+    return `${cadNumber.substring(0, 5)}.${cadNumber.substring(
+      5,
+      10
+    )}.${cadNumber.substring(10)}`;
+  }
+  return cadNumber; // Already formatted correctly
+}
+
 function updateMlsTaxIdLink() {
   const taxIdContainers = document.querySelectorAll(
     '.exp-HeaderAndFieldContainer'
@@ -10,7 +21,7 @@ function updateMlsTaxIdLink() {
     const valueSpan = container.querySelector('span');
 
     if (label && valueSpan && label.textContent.trim() === 'Tax ID:') {
-      const parcelId = valueSpan.textContent.trim();
+      const parcelId = formatEctorCadNumber(valueSpan.textContent.trim());
 
       // Ensure we don't modify it multiple times
       if (valueSpan.querySelector('a')) {
@@ -29,13 +40,25 @@ function updateMlsTaxIdLink() {
         ${parcelId}
       </a>`;
 
-      console.log('MLS Tax ID link updated successfully!');
+      console.log('✅ MLS Tax ID link updated successfully!');
 
+      addGisLink(valueSpan, parcelId);
       // Stop observing once we successfully update the link
       observer.disconnect();
       console.log('MutationObserver disconnected.');
     }
   });
+}
+
+function addGisLink(cadLink, apn) {
+  const gisUrl = `https://search.ectorcad.org/map/#${apn}`;
+  const gisLink = document.createElement('a');
+  gisLink.href = gisUrl;
+  gisLink.target = '_blank';
+  gisLink.textContent = '[GIS]';
+  cadLink.insertAdjacentElement('afterend', gisLink);
+
+  console.log('✅ GIS link updated successfully!');
 }
 
 // Observer to wait for Tax ID field to load dynamically
