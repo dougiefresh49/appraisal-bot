@@ -28,7 +28,7 @@
   "content_scripts": [
     {
       "matches": ["https://search.ectorcad.org/parcel/*"],
-      "js": ["content.js"],
+      "js": ["ecad-injector.js"],
       "run_at": "document_end"
     },
     {
