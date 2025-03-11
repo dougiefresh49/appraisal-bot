@@ -1,8 +1,22 @@
 import fs from 'fs/promises';
 import { JSDOM } from 'jsdom';
+import path from 'path';
 
-export async function cleanHtmlFile(file: string): Promise<void> {
+export async function cleanHtmlFile(
+  file: string,
+  reportName?: string
+): Promise<void> {
   try {
+    // example title: sale-analysis-results--v2.mmd
+    const fileName = file.split('/').pop()?.split('.').shift();
+    const fileVersion = fileName?.split('--').pop();
+    const cleanedTitle = fileName
+      ?.split('--')
+      .shift()
+      ?.replace(/-/g, ' ')
+      .replace('results', '')
+      .trim();
+    const title = `${cleanedTitle} ${fileVersion}`;
     // Read the file asynchronously
     const data = await fs.readFile(file, 'utf-8');
 
@@ -10,16 +24,41 @@ export async function cleanHtmlFile(file: string): Promise<void> {
     const dom = new JSDOM(data);
     const document = dom.window.document;
 
+    // Load the icon as a Base64 string
+    const iconPath =
+      '/Users/dougiefresh/Dropbox/Appraisals/basin-appraisals-llc/tools/appraisal-bot/logos/logo48.png';
+    const iconData = await fs.readFile(iconPath);
+    const base64Icon = `data:image/png;base64,${iconData.toString('base64')}`;
+
+    // Replace or add the favicon link
+    let headIcon = document.querySelector('link[rel="icon"]');
+    if (!!headIcon) {
+      // @ts-ignore
+      headIcon.href = base64Icon;
+    } else {
+      headIcon = document.createElement('link');
+      // @ts-ignore
+      headIcon.rel = 'icon';
+      // @ts-ignore
+      headIcon.href = base64Icon;
+      document.head.appendChild(headIcon);
+    }
+
     // Remove the meta title tag
     const metaTitle = document.querySelector('meta[charset=UTF-8]');
     if (metaTitle) {
       metaTitle.remove();
     }
 
-    // Remove the <h1> element with specific attributes
+    const headTitle = document.querySelector('title');
+    if (headTitle) {
+      headTitle.textContent = title;
+    }
+
     const h1Element = document.querySelector('h1[type="title"].main-title');
     if (h1Element) {
-      h1Element.remove();
+      // change the title to the new title
+      h1Element.textContent = `${title} ${reportName}`;
     }
 
     // Modify the #preview CSS class

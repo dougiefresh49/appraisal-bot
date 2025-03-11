@@ -21,11 +21,15 @@ console.log(`[INFO] Using file extension: .${extension}`);
 
 // List of .mmd files to be modified
 const files = [
-  'land-analysis-results.mmd',
-  'sale-analysis-results.mmd',
-  'lease-analysis-results.mmd',
+  // 'land-analysis-results.mmd',
+  // 'sale-analysis-results.mmd',
+  // 'lease-analysis-results.mmd',
+  // 'o1-pro-adj--results.mmd',
+  'sale-analysis-results--v3.mmd',
+  // 'land-analysis-results--v3.mmd',
   // Add more files as needed
 ];
+const reportName = '1227 S Murphy';
 
 // Folder to search for files
 const folderName =
@@ -82,7 +86,7 @@ async function findFilePaths(
         console.log(`[INFO] ✅ Command stdout: ${stdout}`);
         if (extension === 'html') {
           console.log(`[INFO] ℹ️ cleaning output html file: ${command}`);
-          await cleanHtmlFile(outputFilePath);
+          await cleanHtmlFile(outputFilePath, reportName);
         }
       } catch (err) {
         console.error(`[ERROR] ❌ processing file: ${filePath}`, err);
