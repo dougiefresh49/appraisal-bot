@@ -16,26 +16,51 @@ function updateDeedLink() {
       const instrument = valueCell.textContent.trim();
 
       // Check if it's already a link to prevent duplicate modifications
-      if (valueCell.querySelector('a')) {
-        console.log('Deed Link already exists, skipping...');
+      if (
+        valueCell.querySelector('.deed-link') ||
+        valueCell.querySelector('.search-icon')
+      ) {
+        console.log('Deed Link or Search Icon already exists, skipping...');
         return;
       }
 
-      console.log(`Instrument found: ${instrument}`);
+      console.log(`📌 Instrument found: ${instrument}`);
 
-      // Generate the search page URL with the document number as a query param
-      const searchUrl = `https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1?doc=${instrument}`;
+      // Generate URLs
+      const deedSearchUrl = `https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1?doc=${instrument}`;
+      const advancedSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrument}&type=r`;
 
-      // Replace text with a clickable link to the search page
-      valueCell.innerHTML = `<a href="${searchUrl}" target="_blank">${instrument}</a>`;
-      console.log('Deed link updated successfully!');
+      // Create deed search link
+      const deedLink = document.createElement('a');
+      deedLink.href = deedSearchUrl;
+      deedLink.target = '_blank';
+      deedLink.className = 'deed-link';
+      deedLink.style =
+        'color: #0044cc; font-weight: bold; text-decoration: underline; margin-right: 8px;';
+      deedLink.textContent = instrument;
+
+      // Create advanced search icon link
+      const searchIconLink = document.createElement('a');
+      searchIconLink.href = advancedSearchUrl;
+      searchIconLink.target = '_blank';
+      searchIconLink.className = 'search-icon';
+      searchIconLink.style =
+        'margin-left: 5px; color: #0044cc; font-size: 14px;';
+      searchIconLink.innerHTML = '🔍'; // Search icon
+
+      // Replace text with both the clickable deed link and search icon
+      valueCell.innerHTML = '';
+      valueCell.appendChild(deedLink);
+      valueCell.appendChild(searchIconLink);
+
+      console.log('✅ Deed link and advanced search icon added successfully!');
     }
   });
 }
 
 // Observe the page for changes and apply the function when needed
 const observer = new MutationObserver(() => {
-  console.log('DOM changed, checking for Last Sale Instrument field...');
+  console.log('🔄 DOM changed, checking for Last Sale Instrument field...');
   updateDeedLink();
 });
 

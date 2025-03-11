@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.9.6",
+  "version": "1.9.10",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -50,7 +50,7 @@
     },
     {
       "matches": ["https://iswdataclient.azurewebsites.net/webProperty.aspx*"],
-      "js": ["mcad-deed-injector.js"],
+      "js": ["mcad-injector.js"],
       "run_at": "document_end"
     },
     {
@@ -62,7 +62,10 @@
       "matches": [
         "https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47*"
       ],
-      "js": ["gis-injector-midland.js"],
+      "js": [
+        "gis-injector-midland--search.js",
+        "gis-injector-midland--popup.js"
+      ],
       "run_at": "document_end"
     }
   ]

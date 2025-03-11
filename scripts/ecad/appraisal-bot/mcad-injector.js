@@ -1,5 +1,44 @@
 console.log('Midland Deed Link Injector: Script loaded!');
 
+function addMidlandGISLink() {
+  // Select the APN (Property ID) element
+  const apnElement = document.getElementById('ucidentification_webprop_id');
+  if (!apnElement) {
+    console.log('❌ APN (Property ID) element not found.');
+    return;
+  }
+
+  let apn = apnElement.textContent.trim();
+  if (!apn) {
+    console.log('⚠️ APN is empty.');
+    return;
+  }
+
+  // Check if GIS link already exists
+  if (document.querySelector('.midland-gis-link')) {
+    console.log('🔵 GIS link already added.');
+    return;
+  }
+
+  console.log(`📌 Found APN: ${apn}`);
+
+  // Create GIS search URL
+  const gisUrl = `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${apn}`;
+
+  // Create GIS link element
+  const gisLink = document.createElement('a');
+  gisLink.href = gisUrl;
+  gisLink.target = '_blank';
+  gisLink.className = 'midland-gis-link';
+  gisLink.style =
+    'color: #0044cc; font-weight: bold; text-decoration: underline; margin-left: 8px;';
+  gisLink.textContent = '[GIS]';
+
+  // Insert GIS link next to APN
+  apnElement.insertAdjacentElement('afterend', gisLink);
+  console.log('✅ GIS link added successfully!');
+}
+
 function ensureInstrumentHasYear(instrumentNumber, deedDate) {
   // Check if the instrument already has a year prefix
   if (/^\d{4}-\d+$/.test(instrumentNumber)) {
@@ -92,7 +131,8 @@ function updateMidlandDeedLinks() {
 
 // Observer to wait for deed history table to load dynamically
 const observer = new MutationObserver(() => {
-  console.log('🔄 DOM changed, checking for Deed History table...');
+  console.log('🔄 DOM changed, checking for updates to make...');
+  addMidlandGISLink();
   updateMidlandDeedLinks();
 });
 
