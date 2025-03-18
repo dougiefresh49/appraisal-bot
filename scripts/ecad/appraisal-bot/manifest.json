@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",

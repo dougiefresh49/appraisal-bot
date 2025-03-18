@@ -11,7 +11,64 @@ function formatEctorCadNumber(cadNumber) {
   return cadNumber; // Already formatted correctly
 }
 
+function formatMidlandCad(cadNumber) {
+  // If it's a Midland CAD ID and doesn't start with "R", add it
+  if (!cadNumber.startsWith('R')) {
+    return 'R' + cadNumber;
+  }
+  return cadNumber; // Already formatted correctly
+}
+
+function formatCad(apn, county) {
+  return county === 'Midland' ? formatMidlandCad(apn) : formatEctorCad(apn);
+}
+
+function detectCounty() {
+  // Find all labels inside `.exp-Row`
+  const rows = document.querySelectorAll('.exp-Row');
+
+  for (let row of rows) {
+    const label = row.querySelector('.exp-RowLabel');
+    if (label && label.textContent.trim() === 'County:') {
+      const countyElement = row.querySelector('.exp-RowData');
+      if (countyElement) {
+        const county = countyElement.textContent.trim();
+        console.log(`📌 Detected County: ${county}`);
+        return county;
+      }
+    }
+  }
+
+  console.log('❌ County field not found.');
+  return null;
+}
+
+function getCadUrl(parcelId, county) {
+  if (county === 'Midland') {
+    return `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${parcelId}`;
+  } else if (county === 'Ector') {
+    return `https://search.ectorcad.org/parcel/${parcelId}`;
+  } else {
+    console.log(`⚠️ Unrecognized county: ${county}.`);
+    return `https://search.ectorcad.org/parcel/${parcelId}`;
+  }
+}
+
+function addGisLink(valueSpan, parcelId, county) {
+  const gisUrl =
+    county === 'Midland'
+      ? `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${parcelId}`
+      : `https://search.ectorcad.org/map/#${parcelId}`;
+  const gisLink = document.createElement('a');
+  gisLink.href = gisUrl;
+  gisLink.target = '_blank';
+  gisLink.textContent = '[GIS]';
+  valueSpan.insertAdjacentElement('afterend', gisLink);
+  console.log('✅ GIS link updated successfully!');
+}
+
 function updateMlsTaxIdLink() {
+  const county = detectCounty();
   const taxIdContainers = document.querySelectorAll(
     '.exp-HeaderAndFieldContainer'
   );
@@ -21,7 +78,7 @@ function updateMlsTaxIdLink() {
     const valueSpan = container.querySelector('span');
 
     if (label && valueSpan && label.textContent.trim() === 'Tax ID:') {
-      const parcelId = formatEctorCadNumber(valueSpan.textContent.trim());
+      const parcelId = formatCad(valueSpan.textContent.trim(), county);
 
       // Ensure we don't modify it multiple times
       if (valueSpan.querySelector('a')) {
@@ -32,7 +89,7 @@ function updateMlsTaxIdLink() {
       console.log(`Found Tax ID: ${parcelId}`);
 
       // Create the CAD search URL
-      const cadUrl = `https://search.ectorcad.org/parcel/${parcelId}`;
+      const cadUrl = getCadUrl(parcelId, county);
 
       // Replace text with a clickable link with inline styles
       valueSpan.innerHTML = `<a href="${cadUrl}" target="_blank" 
@@ -42,23 +99,12 @@ function updateMlsTaxIdLink() {
 
       console.log('✅ MLS Tax ID link updated successfully!');
 
-      addGisLink(valueSpan, parcelId);
+      addGisLink(valueSpan, parcelId, county);
       // Stop observing once we successfully update the link
       observer.disconnect();
       console.log('MutationObserver disconnected.');
     }
   });
-}
-
-function addGisLink(cadLink, apn) {
-  const gisUrl = `https://search.ectorcad.org/map/#${apn}`;
-  const gisLink = document.createElement('a');
-  gisLink.href = gisUrl;
-  gisLink.target = '_blank';
-  gisLink.textContent = '[GIS]';
-  cadLink.insertAdjacentElement('afterend', gisLink);
-
-  console.log('✅ GIS link updated successfully!');
 }
 
 // Observer to wait for Tax ID field to load dynamically
