@@ -1,5 +1,8 @@
 console.log('MLS Link Injector: Script loaded!');
 
+let lastObservedSequence = ''; // Store the last detected sequence
+let updateTimeout = null; // Track update delay
+
 function formatEctorCadNumber(cadNumber) {
   // Ensure the Ector CAD number is in the correct format: xxxxx.xxxxx.xxxxx
   if (!cadNumber.includes('.')) {
@@ -11,7 +14,7 @@ function formatEctorCadNumber(cadNumber) {
   return cadNumber; // Already formatted correctly
 }
 
-function formatMidlandCad(cadNumber) {
+function formatMidlandCadNumber(cadNumber) {
   // If it's a Midland CAD ID and doesn't start with "R", add it
   if (!cadNumber.startsWith('R')) {
     return 'R' + cadNumber;
@@ -20,7 +23,9 @@ function formatMidlandCad(cadNumber) {
 }
 
 function formatCad(apn, county) {
-  return county === 'Midland' ? formatMidlandCad(apn) : formatEctorCad(apn);
+  return county === 'Midland'
+    ? formatMidlandCadNumber(apn)
+    : formatEctorCadNumber(apn);
 }
 
 function detectCounty() {
@@ -100,21 +105,42 @@ function updateMlsTaxIdLink() {
       console.log('✅ MLS Tax ID link updated successfully!');
 
       addGisLink(valueSpan, parcelId, county);
-      // Stop observing once we successfully update the link
-      observer.disconnect();
-      console.log('MutationObserver disconnected.');
     }
   });
 }
 
-// Observer to wait for Tax ID field to load dynamically
-const observer = new MutationObserver(() => {
-  console.log('DOM changed, checking for Tax ID field...');
-  updateMlsTaxIdLink();
+// Observer to watch `#JsDisplaySequence` for property changes
+const sequenceObserver = new MutationObserver(() => {
+  const sequenceElement = document.querySelector('#JsDisplaySequence span');
+  if (!sequenceElement) {
+    console.log('❌ Sequence element not found. Skipping...');
+    return;
+  }
+
+  const currentSequence = sequenceElement.textContent.trim();
+  if (currentSequence === lastObservedSequence) {
+    console.log('🔵 Sequence unchanged, skipping update.');
+    return;
+  }
+
+  console.log(`🔄 Detected property change: ${currentSequence}`);
+  lastObservedSequence = currentSequence;
+
+  // Clear any existing timeout to avoid duplicate runs
+  if (updateTimeout) clearTimeout(updateTimeout);
+
+  // Wait 1 second before updating to ensure all data is loaded
+  updateTimeout = setTimeout(updateMlsTaxIdLink, 1000);
 });
 
-// Start observing the body for changes
-observer.observe(document.body, { childList: true, subtree: true });
+// Start observing `#JsDisplaySequence`
+const sequenceElement = document.querySelector('#JsDisplaySequence');
+if (sequenceElement) {
+  sequenceObserver.observe(sequenceElement, { childList: true, subtree: true });
+  console.log('👀 Watching for property changes...');
+} else {
+  console.log('⚠️ Sequence element not found, will retry on next mutation.');
+}
 
 // Initial run in case the element is already there
 updateMlsTaxIdLink();
