@@ -56,7 +56,7 @@ export function getProjectPaths(
   outputFolderName?: string
 ): ProjectPaths {
   const dataPathRoot = path.resolve(
-    '/Users/dougiefresh/Dropbox/Appraisals/basin-appraisals-llc',
+    '/Users/dougiefresh/Library/CloudStorage/GoogleDrive-dougiefreshdesigns@gmail.com/My Drive/appraising/basin-appraisals-llc/',
     '2025',
     args.projectType,
     'in-progress',

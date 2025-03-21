@@ -23,7 +23,7 @@ const deedBaseUrl = deedUrls[cadType as keyof typeof deedUrls];
 const properties: {
   address: string;
   mls: string;
-  cad?: string;
+  cad?: keyof typeof cadUrls;
   apn?: string;
   lot?: string;
   skip?: boolean;
@@ -113,22 +113,22 @@ async function downloadPropertyDocs() {
       continue;
     }
 
-    const url = `${baseUrl}${cad ?? apn}`;
+    const url = !!cad ? `${cadUrls[cad]}${apn}` : `${baseUrl}${apn}`;
     await page.goto(url, { waitUntil: 'networkidle' });
 
     // Format address for filename (replace spaces & special characters)
     const sanitizedAddress = address.replace(/[^a-zA-Z0-9]/g, ' ');
 
     // Define PDF file path
-    // const pdfPath = path.join(
-    //   outputPath,
-    //   `${sanitizedAddress}${lot ? `-lot-${lot}` : ''}-cad.pdf`
-    // );
+    const pdfPath = path.join(
+      outputPath,
+      `${sanitizedAddress}${lot ? `-lot-${lot}` : ''}-cad.pdf`
+    );
 
     // Directly save the page as a PDF (bypasses print preview)
-    // await page.pdf({ path: pdfPath, format: 'A4' });
+    await page.pdf({ path: pdfPath, format: 'A4' });
 
-    // console.log(`✅ PDF saved: ${pdfPath}`);
+    console.log(`✅ PDF saved: ${pdfPath}`);
 
     // extract instrument number from ecad
     // if (cadType === 'ecad') {
