@@ -28,6 +28,7 @@ async function main() {
     );
     const landCount = await fetchNeighborStatByMlsArea(mlsArea as MlsAreaName, {
       property_type: 'LAND',
+      corporate_owned: false,
     });
     const mfrCount = await fetchNeighborStatByMlsArea(mlsArea as MlsAreaName, {
       property_type: 'MFR',
@@ -58,15 +59,17 @@ async function main() {
       }
     );
 
-    console.log(total);
-    console.log(sfrCount);
-    console.log(condoCount);
-    console.log(landCount);
-    console.log(mfrCount);
-    console.log(mfr2To4Count);
-    console.log(mobileCount);
-    console.log(otherCount);
-    console.log(commercialCount);
+    console.log(`# Neighborhood Stats for MLS Area: ${mlsArea}`);
+    console.log('## Counts');
+    console.log(`total: ${total}`);
+    console.log(`sfr: ${sfrCount}`);
+    console.log(`condo: ${condoCount}`);
+    console.log(`land: ${landCount}`);
+    console.log(`mfr: ${mfrCount}`);
+    console.log(`mfr2to4: ${mfr2To4Count}`);
+    console.log(`mobile: ${mobileCount}`);
+    console.log(`other: ${otherCount}`);
+    console.log(`commercial: ${commercialCount}`);
 
     const percentages = {
       sfr: getPercentage(total, sfrCount),
@@ -79,24 +82,12 @@ async function main() {
       commercial: getPercentage(total, commercialCount),
     };
 
+    console.log('## Percentages');
     console.log(percentages);
+    await getYearBuiltStatsByDecade(mlsArea as MlsAreaName);
   } catch (error) {
     console.error('Error reading or processing the input file:', error);
   }
-}
-
-async function getYearBuiltStats(mlsArea: MlsAreaName) {
-  const yearBuiltMin = 1963;
-  const yearBuiltMax = 2022;
-  const yearBuiltCount = await fetchNeighborStatByMlsArea(
-    mlsArea as MlsAreaName,
-    {
-      property_type: 'SFR',
-      year_built_min: yearBuiltMin,
-      year_built_max: yearBuiltMax,
-    }
-  );
-  console.log(yearBuiltCount);
 }
 
 async function getYearBuiltStatsPerYear(
@@ -131,6 +122,8 @@ async function getYearBuiltStatsPerYear(
   const highestYearBuilt = Object.keys(yearBuiltCountMap).find(
     (key) => yearBuiltCountMap[key] === highestYearBuiltCount
   );
+  const firstYearBuilt = Object.keys(yearBuiltCountMap).sort()[0];
+  const lastYearBuilt = Object.keys(yearBuiltCountMap).sort().reverse()[0];
 
   outputText += `
   ### Summary
@@ -138,23 +131,49 @@ async function getYearBuiltStatsPerYear(
   - Highest Year Built: ${highestYearBuilt} (${highestYearBuiltCount})
   `;
 
-  console.log(yearBuiltCountMap);
-  console.log(`total: ${total}`);
-  console.log(`highest year built count: ${highestYearBuiltCount}`);
-  console.log(`highest year built: ${highestYearBuilt}`);
   return {
     total,
     highestYearBuiltCount,
     highestYearBuilt,
+    firstYearBuilt,
+    lastYearBuilt,
     outputText,
   };
 }
 
+async function getHighAndLowYearBuilt(
+  mlsArea: MlsAreaName,
+  decadesMap: Record<number, number>
+) {
+  const oldestDecadeWithCount = Object.entries(decadesMap).find(
+    ([_, count]) => count > 0
+  );
+  const newestDecadeWithCount = Object.keys(decadesMap)
+    .sort((a, b) => Number(b) - Number(a))
+    .find((year) => decadesMap[year] > 0);
+
+  const firstYearBuiltStats = await getYearBuiltStatsPerYear(
+    mlsArea as MlsAreaName,
+    Number(oldestDecadeWithCount![0]),
+    Math.min(Number(oldestDecadeWithCount![0]) + 9, 2025)
+  );
+  const lastYearBuiltStats = await getYearBuiltStatsPerYear(
+    mlsArea as MlsAreaName,
+    Number(newestDecadeWithCount!),
+    Math.min(Number(newestDecadeWithCount!) + 9, 2025)
+  );
+
+  return {
+    firstYearBuilt: firstYearBuiltStats.firstYearBuilt,
+    lastYearBuilt: lastYearBuiltStats.lastYearBuilt,
+  };
+}
+
 async function getYearBuiltStatsByDecade(mlsArea: MlsAreaName) {
-  const yearBuiltMin = 1963;
-  const yearBuiltMax = 2022;
+  const yearBuiltMin = 1900;
+  const yearBuiltMax = 2025;
   let outputText = `
-  # Predominant Year Built Calculation
+  ## Predominant Year Built Calculation
 
   ## Data
   - MLS Area: ${mlsArea}
@@ -170,7 +189,6 @@ async function getYearBuiltStatsByDecade(mlsArea: MlsAreaName) {
   // loop through and get totals for each decade
   for (let i = decadeStart; i <= yearBuiltMax; i += 10) {
     const decadeEnd = Math.min(i + 9, yearBuiltMax);
-    console.log(`${i} - ${decadeEnd}`);
     const yearBuiltCount = await fetchNeighborStatByMlsArea(
       mlsArea as MlsAreaName,
       {
@@ -180,21 +198,21 @@ async function getYearBuiltStatsByDecade(mlsArea: MlsAreaName) {
       }
     );
     decadesMap[i] = yearBuiltCount;
-    console.log(yearBuiltCount);
     outputText += `
     ${i} - ${decadeEnd}: ${yearBuiltCount}
     `;
   }
+
+  const { firstYearBuilt, lastYearBuilt } = await getHighAndLowYearBuilt(
+    mlsArea,
+    decadesMap
+  );
+
   const total = Object.values(decadesMap).reduce((acc, curr) => acc + curr, 0);
   const highestDecadeCount = Math.max(...Object.values(decadesMap));
   const highestDecade = Object.keys(decadesMap).find(
     (key) => decadesMap[key] === highestDecadeCount
   );
-
-  console.log(decadesMap);
-  console.log(`total: ${total}`);
-  console.log(`highest decade: ${highestDecade}`);
-  console.log(`highest decade count: ${highestDecadeCount}`);
 
   outputText += `
   ### Summary
@@ -210,21 +228,24 @@ async function getYearBuiltStatsByDecade(mlsArea: MlsAreaName) {
   const predominantYearBuilt = highestYearBuiltCount.highestYearBuilt;
   const yearsSince = new Date().getFullYear() - Number(predominantYearBuilt);
 
-  console.log(`Predominant Year:`);
-  console.log(`${predominantYearBuilt} (${yearsSince} years ago)`);
-
   outputText += `
   ${highestYearBuiltCount.outputText}
   
   ## Predominant Year Built
   ${predominantYearBuilt} (${yearsSince} years ago)
+
+  ## High and Low Age
+  - High: ${
+    new Date().getFullYear() - Number(firstYearBuilt)
+  } (${firstYearBuilt})
+  - Low: ${new Date().getFullYear() - Number(lastYearBuilt)} (${lastYearBuilt})
   `;
 
   console.log(outputText);
 }
 
-// main();
-getYearBuiltStatsByDecade('MA7');
+main();
+
 // Helper Functions
 
 function getPercentage(total: number, count: number) {

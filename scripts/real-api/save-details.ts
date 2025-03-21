@@ -18,10 +18,13 @@ async function processProperty(
 ): Promise<void> {
   try {
     console.log(`Processing property with APN: ${property.apn}`);
-    const searchResults = await searchProperty(property.apn);
+    const searchString =
+      !!property.apn && property.apn !== '_' ? property.apn : property.address;
+    console.log(`Searching for: ${searchString}`);
+    const searchResults = await searchProperty(searchString);
 
     if (!searchResults || searchResults.length === 0) {
-      console.error(`No search results found for APN: ${property.apn}`);
+      console.error(`No search results found for ${searchString}`);
       return;
     }
 

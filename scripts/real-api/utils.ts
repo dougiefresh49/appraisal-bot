@@ -66,10 +66,10 @@ export async function fetchNeighborStatByMlsArea(
     options
   );
   const results = await response.json();
-  return results.resultCount ?? -1;
+  return results.resultCount ?? 0;
 }
 
-export async function searchProperty(apn: string): Promise<SearchResult[]> {
+export async function searchProperty(search: string): Promise<SearchResult[]> {
   const options = {
     method: 'POST',
     headers: {
@@ -77,7 +77,7 @@ export async function searchProperty(apn: string): Promise<SearchResult[]> {
       'content-type': 'application/json',
       'x-api-key': process.env.REAL_API_KEY as string,
     },
-    body: JSON.stringify({ search: apn }),
+    body: JSON.stringify({ search }),
   };
 
   const response = await fetch(
@@ -85,5 +85,6 @@ export async function searchProperty(apn: string): Promise<SearchResult[]> {
     options
   );
   const data = await response.json();
+  console.log(`Search results: ${JSON.stringify(data)}`);
   return data.data as SearchResult[];
 }
