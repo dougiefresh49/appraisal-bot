@@ -58,10 +58,11 @@ if [ "$CURRENT_LAYOUT" = "mac" ]; then
   echo "Switching to Windows-style swap (⌘ ↔ ⌥)..."
   apply_mapping "$WINDOWS_LAYOUT"
   echo "windows" > "$STATE_FILE"
+  echo "Keyboard shortcuts toggled to Windows layout successfully."
 else
   echo "Switching to Mac default (no swap)..."
   apply_mapping "$MAC_LAYOUT"
   echo "mac" > "$STATE_FILE"
+  echo "Keyboard shortcuts toggled to Mac layout successfully."
 fi
 
-echo "Keyboard shortcuts toggled successfully."
