@@ -5,14 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Appraisal Bot</title>
     <link rel="stylesheet" href="popup.css" />
-    <script src="popup.js"></script>
+    <script src="popup.js" defer></script>
   </head>
   <body>
-    <div class="popup-container" id="appraisal-bot-popup">
+    <div class="popup-container">
       <div class="header">
         <img src="/logos/logo48.png" alt="Appraisal Bot" class="logo" />
         <h1>Appraisal Bot</h1>
-        <button class="settings-btn" id="appraisal-bot-settings-btn">⚙️</button>
+        <button class="settings-btn" id="settings-btn">⚙️</button>
+      </div>
+
+      <h2>Reports</h2>
+      <h2>Reports</h2>
+      <button id="select-folder">Select Report Directory</button>
+      <select id="report-selector" title="Select Report">
+        <option value="">Select Report</option>
+      </select>
+
+      <div class="section">
+        <h3>Actions</h3>
+        <button id="download-mls">Download MLS Data</button>
+        <button>Something else eventually</button>
       </div>
 
       <h2>Quick Links</h2>

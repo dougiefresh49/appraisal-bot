@@ -22,6 +22,19 @@ function ensureMidlandCadStartsWithR(cadNumber) {
   return cadNumber; // Already formatted correctly
 }
 
+function linkAddressToGoogleMaps(address, addressElement) {
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    address
+  )}`;
+  const googleMapsLink = document.createElement('a');
+  googleMapsLink.href = googleMapsUrl;
+  googleMapsLink.target = '_blank';
+  googleMapsLink.textContent = '📍'; // change to map icon
+  googleMapsLink.style =
+    'color: #0044cc; font-weight: bold; text-decoration: underline; margin-left: 8px;';
+  addressElement.insertAdjacentElement('afterend', googleMapsLink);
+}
+
 function updateMLSPropertyLinks() {
   // Locate the property address
   const addressElement = document.querySelector('.listingInfoAddress span');
@@ -35,6 +48,7 @@ function updateMLSPropertyLinks() {
     console.log('❌ Property address is empty.');
     return;
   }
+  linkAddressToGoogleMaps(currentAddress, addressElement);
 
   console.log(`📌 Detected property address change: ${currentAddress}`);
   const isOdessa = currentAddress.includes('Odessa, TX');

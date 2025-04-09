@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.9.11",
+  "version": "1.10.6",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -13,7 +13,14 @@
     "default_icon": "logos/logo48.png",
     "default_popup": "popup/index.html"
   },
-  "permissions": ["activeTab", "cookies", "webNavigation", "tabs"],
+  "permissions": [
+    "activeTab",
+    "cookies",
+    "webNavigation",
+    "storage",
+    "tabs",
+    "fileSystem"
+  ],
   "host_permissions": [
     "https://ectorcountytx-web.tylerhost.net/*",
     "https://search.ectorcad.org/*",

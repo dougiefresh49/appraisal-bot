@@ -43,11 +43,31 @@ h1 {
   cursor: pointer;
 }
 
+/* Report Selector */
+#report-selector {
+  width: 100%;
+  padding: 6px;
+  border: none;
+  background: #555b6e;
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+#report-selector option {
+  color: #d0d0d0;
+}
+
+#report-selector option:disabled {
+  font-weight: bold;
+  color: #b0b0b0;
+}
+
 /* Section Containers */
 .section {
   width: 100%;
   padding: 10px;
-  background: #404455; /* Dark gray for contrast */
+  background: #404455;
   border-radius: 8px;
   margin-bottom: 10px;
   display: flex;
@@ -86,10 +106,6 @@ h3 {
 }
 
 .link:hover {
-  color: #30d5ff; /* Bright blue hover state */
+  color: #30d5ff;
   text-decoration: underline;
-}
-
-.link:active {
-  color: #1eb5e0; /* Slightly darker blue when clicked */
 }
