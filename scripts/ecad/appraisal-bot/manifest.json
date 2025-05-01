@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.10.6",
+  "version": "1.11.1",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -19,7 +19,10 @@
     "webNavigation",
     "storage",
     "tabs",
-    "fileSystem"
+    "fileSystem",
+    "scripting",
+    "webRequest",
+    "contextMenus"
   ],
   "host_permissions": [
     "https://ectorcountytx-web.tylerhost.net/*",
@@ -39,9 +42,7 @@
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1*"
-      ],
+      "matches": ["https://ectorcountytx-web.tylerhost.net/web/*"],
       "js": ["search-injector.js"],
       "run_at": "document_end"
     },
@@ -73,6 +74,13 @@
         "gis-injector-midland--search.js",
         "gis-injector-midland--popup.js"
       ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541*"
+      ],
+      "js": ["zoning-injector-ector.js"],
       "run_at": "document_end"
     }
   ]

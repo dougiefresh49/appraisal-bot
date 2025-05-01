@@ -14,6 +14,12 @@ function addMidlandGISLink() {
     return;
   }
 
+  const { situsEl, situs } = getSitusElement();
+  updatePageMetadataTitle(apn, situs);
+  // if (!!situsEl) {
+  //   linkAddressToGoogleMaps(situsEl, situs);
+  // }
+
   // Check if GIS link already exists
   if (document.querySelector('.midland-gis-link')) {
     console.log('🔵 GIS link already added.');
@@ -25,18 +31,75 @@ function addMidlandGISLink() {
   // Create GIS search URL
   const gisUrl = `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${apn}`;
 
-  // Create GIS link element
-  const gisLink = document.createElement('a');
-  gisLink.href = gisUrl;
-  gisLink.target = '_blank';
-  gisLink.className = 'midland-gis-link';
-  gisLink.style =
-    'color: #0044cc; font-weight: bold; text-decoration: underline; margin-left: 8px;';
-  gisLink.textContent = '[GIS]';
-
-  // Insert GIS link next to APN
-  apnElement.insertAdjacentElement('afterend', gisLink);
+  if (!!situsEl) {
+    linkAddressToGoogleMaps(apnElement, situs, `margin-left: 8px;`);
+  }
+  addLinkElement(
+    apnElement,
+    gisUrl,
+    '[GIS]',
+    'midland-gis-link',
+    `margin-left: 8px;`
+  );
   console.log('✅ GIS link added successfully!');
+}
+
+function getSitusElement() {
+  const situsEl = document.getElementById('webprop_situs');
+  if (!situsEl) {
+    console.log('❌ Situs element not found.');
+    return null;
+  }
+
+  const situsText = situsEl.textContent.trim();
+  const situsValue = situsText.replace('Situs:', '').trim();
+
+  // Return early if "Not Applicable"
+  if (situsValue === 'Not Applicable') {
+    return situsValue;
+  }
+
+  // Normalize the address format
+  const normalizedAddress = normalizeSitusAddress(situsValue);
+  console.log(`📌 Found Situs: ${normalizedAddress}`);
+  return { situsEl, situs: normalizedAddress };
+}
+
+function normalizeSitusAddress(situs) {
+  // Split the address into parts and filter out empty strings
+  const parts = situs.split(/\s+/).filter((part) => part);
+
+  if (parts.length < 3) return situs; // Return original if not enough parts
+
+  // Extract street type (ST, AVE, etc.)
+  const streetType = parts[1];
+  // Extract street number
+  const number = parts[2];
+  // Extract direction if it exists (N, S, E, W)
+  const direction = parts[3] || '';
+  // Get street name
+  const streetName = parts[0];
+
+  // Capitalize properly
+  const formattedStreetName =
+    streetName.charAt(0).toUpperCase() + streetName.slice(1).toLowerCase();
+  const formattedStreetType =
+    streetType.charAt(0).toUpperCase() + streetType.slice(1).toLowerCase();
+
+  // Construct normalized address
+  return `${number} ${direction} ${formattedStreetName} ${formattedStreetType}`.trim();
+}
+
+function updatePageMetadataTitle(apn, situs) {
+  const titleElement = document.querySelector('title');
+  if (!titleElement) {
+    console.log('❌ Title element not found.');
+    return;
+  }
+
+  const newTitle = `${situs ?? apn} - CAD`;
+  titleElement.textContent = newTitle;
+  console.log(`✅ Title updated to: ${newTitle}`);
 }
 
 function ensureInstrumentHasYear(instrumentNumber, deedDate) {
@@ -127,6 +190,36 @@ function updateMidlandDeedLinks() {
       console.log('✅ Deed link added successfully!');
     }
   });
+}
+
+/* Google Maps link for address */
+function linkAddressToGoogleMaps(cell, address, style) {
+  if (!address || cell.querySelector('.AppraisalBot-google-maps-link')) return;
+
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    address
+  )}`;
+
+  addLinkElement(cell, mapUrl, '📍', 'AppraisalBot-google-maps-link', style);
+}
+
+/* Generic Link Creator */
+function addLinkElement(parent, url, label, className, style) {
+  if (parent.querySelector(`.${className}`)) return;
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.className = className;
+  link.textContent = label;
+  link.style = `
+    color: #0044cc;
+    font-weight: bold;
+    text-decoration: underline;
+    ${style}
+  `;
+
+  parent.appendChild(link);
 }
 
 // Observer to wait for deed history table to load dynamically

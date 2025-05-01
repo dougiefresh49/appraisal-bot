@@ -4,14 +4,20 @@ let lastObservedSequence = ''; // Store the last detected sequence
 let updateTimeout = null; // Track update delay
 
 function formatEctorCadNumber(cadNumber) {
-  // Ensure the Ector CAD number is in the correct format: xxxxx.xxxxx.xxxxx
-  if (!cadNumber.includes('.')) {
-    return `${cadNumber.substring(0, 5)}.${cadNumber.substring(
-      5,
-      10
-    )}.${cadNumber.substring(10)}`;
+  // Remove any non-numeric characters
+  const cleanNumber = cadNumber.replace(/[^0-9]/g, '');
+
+  // Ensure we have exactly 15 digits
+  if (cleanNumber.length !== 15) {
+    console.warn(`Invalid CAD number length: ${cleanNumber.length} digits`);
+    return cadNumber; // Return original if invalid
   }
-  return cadNumber; // Already formatted correctly
+
+  // Format as xxxxx.xxxxx.xxxxx
+  return `${cleanNumber.substring(0, 5)}.${cleanNumber.substring(
+    5,
+    10
+  )}.${cleanNumber.substring(10)}`;
 }
 
 function ensureMidlandCadStartsWithR(cadNumber) {

@@ -45,6 +45,18 @@ Ask doug for help! 🚀 Happy linking!
 
 ## Future Features
 
+### FEMA Flood Maps
+
+`Priority: LOW`
+Map does not work great
+
+- add query param support
+- put address in query param
+- extract param
+- put in search bar
+- hit enter
+- click
+
 ### On ECAD,
 
 - add ability to show a link to other parcels with the same Instrument Number.
