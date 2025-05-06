@@ -1,4 +1,4 @@
-console.log('Deed Link Enhancer: Search Injector script loaded!');
+console.log('ECAD Deed Link Injector: Search Injector script loaded!');
 
 let searchClicked = false; // Flag to track if search button has been clicked
 let instrumentNumber = ''; // Store the instrument number for later use

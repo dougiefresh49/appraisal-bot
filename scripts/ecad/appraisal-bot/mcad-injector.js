@@ -1,6 +1,8 @@
 console.log('Midland Deed Link Injector: Script loaded!');
-
+let didAddDeedLink = false;
+let hasObserved = false;
 function addMidlandGISLink() {
+  console.log('🔄 Adding Midland GIS link...');
   // Select the APN (Property ID) element
   const apnElement = document.getElementById('ucidentification_webprop_id');
   if (!apnElement) {
@@ -16,9 +18,6 @@ function addMidlandGISLink() {
 
   const { situsEl, situs } = getSitusElement();
   updatePageMetadataTitle(apn, situs);
-  // if (!!situsEl) {
-  //   linkAddressToGoogleMaps(situsEl, situs);
-  // }
 
   // Check if GIS link already exists
   if (document.querySelector('.midland-gis-link')) {
@@ -97,7 +96,7 @@ function updatePageMetadataTitle(apn, situs) {
     return;
   }
 
-  const newTitle = `${situs ?? apn} - CAD`;
+  const newTitle = `${situs ?? apn} - cad`;
   titleElement.textContent = newTitle;
   console.log(`✅ Title updated to: ${newTitle}`);
 }
@@ -188,8 +187,14 @@ function updateMidlandDeedLinks() {
       instrumentCell.innerHTML = `${formattedInstrument} `;
       instrumentCell.appendChild(deedLink);
       console.log('✅ Deed link added successfully!');
+      didAddDeedLink = true;
     }
   });
+
+  if (!didAddDeedLink && !hasObserved) {
+    console.log('❌ No deed links added. Manually running GIS link...');
+    addMidlandGISLink();
+  }
 }
 
 /* Google Maps link for address */
@@ -225,6 +230,7 @@ function addLinkElement(parent, url, label, className, style) {
 // Observer to wait for deed history table to load dynamically
 const observer = new MutationObserver(() => {
   console.log('🔄 DOM changed, checking for updates to make...');
+  hasObserved = true;
   addMidlandGISLink();
   updateMidlandDeedLinks();
 });
