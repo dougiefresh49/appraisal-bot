@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.11.3",
+  "version": "1.11.5",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -87,6 +87,11 @@
     {
       "matches": ["https://midland.tx.publicsearch.us/results*"],
       "js": ["mcad-deed-injector.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://i2j.uslandrecords.com/TX/Upton/D/default.aspx*"],
+      "js": ["upton-deed-injector.js"],
       "run_at": "document_end"
     }
   ]

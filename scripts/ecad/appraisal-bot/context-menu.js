@@ -8,6 +8,14 @@ function isMidlandCAD(text) {
   return /^R\d{9}$/.test(text);
 }
 
+// Upton County format checkers
+function isUptonAPN(text) {
+  return /^\d{4}$/.test(text);
+}
+function isUptonDeed(text) {
+  return /^\d{6}$/.test(text);
+}
+
 // Function to create context menu items
 function createContextMenuItems() {
   // Remove existing menu items
@@ -86,6 +94,35 @@ function createContextMenuItems() {
     title: 'Deeds',
     contexts: ['all'],
   });
+
+  // Create Upton County submenu
+  chrome.contextMenus.create({
+    id: 'upton-county',
+    parentId: 'appraisal-bot-menu',
+    title: 'UPTON COUNTY',
+    contexts: ['all'],
+  });
+
+  chrome.contextMenus.create({
+    id: 'upton-cad',
+    parentId: 'upton-county',
+    title: 'CAD',
+    contexts: ['all'],
+  });
+
+  chrome.contextMenus.create({
+    id: 'upton-gis',
+    parentId: 'upton-county',
+    title: 'GIS',
+    contexts: ['all'],
+  });
+
+  chrome.contextMenus.create({
+    id: 'upton-deeds',
+    parentId: 'upton-county',
+    title: 'Deeds',
+    contexts: ['all'],
+  });
 }
 
 // Handle context menu clicks
@@ -139,6 +176,30 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     case 'midland-deeds':
       url = 'https://midland.tx.publicsearch.us/';
+      break;
+
+    case 'upton-cad':
+      if (selectedText && isUptonAPN(selectedText)) {
+        url = `https://uptoncad.org/Home/Details?parcelId=${selectedText}`;
+      } else {
+        url = 'https://uptoncad.org/home';
+      }
+      break;
+
+    case 'upton-gis':
+      if (selectedText && isUptonAPN(selectedText)) {
+        url = `https://maps.pandai.com/UptonCAD/?find=${selectedText}`;
+      } else {
+        url = 'https://maps.pandai.com/UptonCAD/';
+      }
+      break;
+
+    case 'upton-deeds':
+      if (selectedText && isUptonDeed(selectedText)) {
+        url = `https://i2j.uslandrecords.com/TX/Upton/D/default.aspx?doc=${selectedText}`;
+      } else {
+        url = 'https://i2j.uslandrecords.com/TX/Upton/D/default.aspx';
+      }
       break;
   }
 
