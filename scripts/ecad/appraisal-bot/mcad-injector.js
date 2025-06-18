@@ -2,6 +2,7 @@ console.log('Midland Deed Link Injector: Script loaded!');
 let didAddDeedLink = false;
 let hasObserved = false;
 let apn = null;
+let gisUrl = null;
 const GIS_BASE_URL =
   'https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=';
 
@@ -32,7 +33,7 @@ function addMidlandGISLink() {
   console.log(`📌 Found APN: ${apn}`);
 
   // Create GIS search URL
-  const gisUrl = `${GIS_BASE_URL}${apn}`;
+  gisUrl = `${GIS_BASE_URL}${apn}`;
 
   if (!!situsEl) {
     linkAddressToGoogleMaps(apnElement, situs, `margin-left: 8px;`);
@@ -268,8 +269,6 @@ function injectGISLayout() {
     console.log('❌ Main property info table not found.');
     return;
   }
-
-  const gisUrl = `${GIS_BASE_URL}${apn}`;
 
   // Create wrapper table
   const wrapperTable = document.createElement('table');
