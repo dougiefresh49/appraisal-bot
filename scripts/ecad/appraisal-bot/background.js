@@ -1,31 +1,60 @@
 // Import context menu functionality
 import './context-menu.js';
 
-chrome.webRequest.onBeforeSendHeaders.addListener(
-  (details) => {
-    const existingCookies = details.requestHeaders.find(
-      (header) => header.name.toLowerCase() === 'cookie'
-    );
-
-    if (existingCookies) {
-      if (!existingCookies.value.includes('disclaimerAccepted=true')) {
-        existingCookies.value += '; disclaimerAccepted=true';
+// Set persistent cookies for Ector County disclaimer and Midland GIS splash
+function setPersistentCookies() {
+  // Ector County disclaimer cookie
+  chrome.cookies.set(
+    {
+      url: 'https://ectorcountytx-web.tylerhost.net/',
+      name: 'disclaimerAccepted',
+      value: 'true',
+      path: '/',
+      expirationDate: Date.now() / 1000 + 60 * 60 * 24 * 365, // 1 year
+    },
+    (cookie) => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          'Failed to set Ector disclaimer cookie:',
+          chrome.runtime.lastError
+        );
+      } else {
+        console.log('Ector disclaimer cookie set:', cookie);
       }
-    } else {
-      details.requestHeaders.push({
-        name: 'Cookie',
-        value: 'disclaimerAccepted=true',
-        domain: 'ectorcountytx-web.tylerhost.net',
-        path: '/',
-        expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString(), // 1 year
-      });
     }
+  );
 
-    return { requestHeaders: details.requestHeaders };
-  },
-  { urls: ['https://ectorcountytx-web.tylerhost.net/*'] },
-  ['blocking', 'requestHeaders']
-);
+  // Midland GIS splash cookie
+  chrome.cookies.set(
+    {
+      url: 'https://maps.midlandtexas.gov/',
+      name: 'isfirst_3cce4985d5f94f1c8c5d0ea06e1e5b47',
+      value: 'false',
+      path: '/',
+      expirationDate: Date.now() / 1000 + 60 * 60 * 24 * 365, // 1 year
+    },
+    (cookie) => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          'Failed to set Midland GIS splash cookie:',
+          chrome.runtime.lastError
+        );
+      } else {
+        console.log('Midland GIS splash cookie set:', cookie);
+      }
+    }
+  );
+}
+
+// Set cookies on extension install/update
+chrome.runtime.onInstalled.addListener(() => {
+  setPersistentCookies();
+});
+
+// Set cookies on extension startup
+chrome.runtime.onStartup.addListener(() => {
+  setPersistentCookies();
+});
 
 // Background script to handle deed search and data extraction
 console.log('Deed Search Background Script loaded!');

@@ -1,6 +1,10 @@
 console.log('Midland Deed Link Injector: Script loaded!');
 let didAddDeedLink = false;
 let hasObserved = false;
+let apn = null;
+const GIS_BASE_URL =
+  'https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=';
+
 function addMidlandGISLink() {
   console.log('🔄 Adding Midland GIS link...');
   // Select the APN (Property ID) element
@@ -10,7 +14,7 @@ function addMidlandGISLink() {
     return;
   }
 
-  let apn = apnElement.textContent.trim();
+  apn = apnElement.textContent.trim();
   if (!apn) {
     console.log('⚠️ APN is empty.');
     return;
@@ -28,7 +32,7 @@ function addMidlandGISLink() {
   console.log(`📌 Found APN: ${apn}`);
 
   // Create GIS search URL
-  const gisUrl = `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${apn}`;
+  const gisUrl = `${GIS_BASE_URL}${apn}`;
 
   if (!!situsEl) {
     linkAddressToGoogleMaps(apnElement, situs, `margin-left: 8px;`);
@@ -41,6 +45,7 @@ function addMidlandGISLink() {
     `margin-left: 8px;`
   );
   console.log('✅ GIS link added successfully!');
+  return { gisUrl, apn };
 }
 
 function getSitusElement() {
@@ -157,7 +162,7 @@ function updateMidlandDeedLinks() {
       const instrumentCell = cells[instrumentIndex];
       let instrumentNumber = instrumentCell.textContent.trim();
 
-      // Ensure we don’t modify it multiple times
+      // Ensure we don't modify it multiple times
       if (instrumentCell.querySelector('a')) {
         console.log(`🔵 Link for ${instrumentNumber} already exists.`);
         return;
@@ -233,6 +238,7 @@ const observer = new MutationObserver(() => {
   hasObserved = true;
   addMidlandGISLink();
   updateMidlandDeedLinks();
+  injectGISLayout(); // Ensure GIS layout is injected on DOM changes
 });
 
 // Start observing the body for changes
@@ -240,3 +246,90 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Initial run in case the element is already there
 updateMidlandDeedLinks();
+
+function injectGISLayout() {
+  // Prevent multiple injections
+  if (document.querySelector('.appraisalbot-gis-layout')) return;
+
+  // Find the first table sibling of the table with class propertyDetails
+  const propertyDetailsTable = document.querySelector('table.propertyDetails');
+  let mainTable = null;
+  if (propertyDetailsTable) {
+    let sibling = propertyDetailsTable.nextElementSibling;
+    while (sibling) {
+      if (sibling.tagName === 'TABLE') {
+        mainTable = sibling;
+        break;
+      }
+      sibling = sibling.nextElementSibling;
+    }
+  }
+  if (!mainTable) {
+    console.log('❌ Main property info table not found.');
+    return;
+  }
+
+  const gisUrl = `${GIS_BASE_URL}${apn}`;
+
+  // Create wrapper table
+  const wrapperTable = document.createElement('table');
+  wrapperTable.className = 'appraisalbot-gis-layout';
+  wrapperTable.style.width = '100%';
+  wrapperTable.style.borderCollapse = 'separate';
+  const row = wrapperTable.insertRow();
+
+  // Left column: move all descendant tables of mainTable in order
+  const leftCol = row.insertCell();
+  leftCol.style.width = '40%';
+  leftCol.style.verticalAlign = 'top';
+  leftCol.style.padding = '10px 0 0 10px';
+  const tables = Array.from(mainTable.querySelectorAll('table'));
+  tables.forEach((table) => {
+    if (table.parentNode) table.parentNode.removeChild(table);
+    leftCol.appendChild(table);
+  });
+
+  // Middle spacing column
+  const spacerCol = row.insertCell();
+  spacerCol.style.width = '4%';
+  spacerCol.style.background = 'none';
+  spacerCol.style.border = 'none';
+
+  // Right column: only GIS iframe
+  const rightCol = row.insertCell();
+  rightCol.style.width = '56%';
+  rightCol.style.verticalAlign = 'top';
+  rightCol.style.padding = '10px 30px 0 0';
+  const iframe = document.createElement('iframe');
+  iframe.src = gisUrl;
+  iframe.className = 'gis-iframe';
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('loading', 'lazy');
+  iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+  rightCol.appendChild(iframe);
+
+  // Insert responsive CSS for iframe
+  if (!document.getElementById('appraisalbot-gis-style')) {
+    const style = document.createElement('style');
+    style.id = 'appraisalbot-gis-style';
+    style.textContent = `
+      .gis-iframe {
+        width: 100%;
+        height: 600px;
+        border: 0;
+        border-radius: 8px;
+        display: block;
+      }
+      @media (max-width: 768px) {
+        .gis-iframe {
+          height: 50vh;
+          min-height: 300px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Replace main table with new layout
+  mainTable.parentNode.replaceChild(wrapperTable, mainTable);
+}

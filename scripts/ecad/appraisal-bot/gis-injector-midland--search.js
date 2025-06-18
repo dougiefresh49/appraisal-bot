@@ -1,5 +1,38 @@
 console.log('📍 Midland GIS Injector: Script loaded!');
 
+let isSplashHidden = false;
+let isAppStatePopupHidden = false;
+
+// Utility to hide an element by id
+function hideElementById(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = 'none';
+    console.log(`[AppraisalBot] Hid element: #${id}`);
+    return true;
+  }
+  return false;
+}
+
+// Try to hide splash and app state popups immediately
+if (!isSplashHidden) {
+  isSplashHidden = hideElementById('widgets_Splash_Widget_14');
+}
+if (!isAppStatePopupHidden) {
+  isAppStatePopupHidden = hideElementById('jimu_dijit_AppStatePopup_0');
+}
+
+// Also observe DOM for dynamic addition
+const styleObserver = new MutationObserver(() => {
+  if (!isSplashHidden) {
+    isSplashHidden = hideElementById('widgets_Splash_Widget_14');
+  }
+  if (!isAppStatePopupHidden) {
+    isAppStatePopupHidden = hideElementById('jimu_dijit_AppStatePopup_0');
+  }
+});
+styleObserver.observe(document.body, { childList: true, subtree: true });
+
 // Extract parcel ID from the URL
 const urlParams = new URLSearchParams(window.location.search);
 const parcelId = urlParams.get('apn');
@@ -29,6 +62,7 @@ if (parcelId) {
           // Click the search button
           searchButton.click();
           console.log('✅ GIS search submitted!');
+          parcelButton.click();
         }, 500);
       }, 1000);
     } else {
