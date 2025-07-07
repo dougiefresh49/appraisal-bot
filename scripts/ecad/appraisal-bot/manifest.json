@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.11.6",
+  "version": "1.11.9",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -31,7 +31,8 @@
     "https://iswdataclient.azurewebsites.net/webProperty.aspx*",
     "https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47*",
     "maps.midlandtexas.gov/*",
-    "https://midland.tx.publicsearch.us/*"
+    "https://midland.tx.publicsearch.us/*",
+    "https://www.wardcad.org/home/map*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -92,6 +93,11 @@
     {
       "matches": ["https://i2j.uslandrecords.com/TX/Upton/D/default.aspx*"],
       "js": ["upton-deed-injector.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://maps.pandai.com/WardCAD/*"],
+      "js": ["gis-injector-ward--search.js"],
       "run_at": "document_end"
     }
   ]

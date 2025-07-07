@@ -16,6 +16,11 @@ function isUptonDeed(text) {
   return /^\d{6}$/.test(text);
 }
 
+// Ward County format checker (assume 6 digits for APN)
+function isWardAPN(text) {
+  return /^\d{6}$/.test(text);
+}
+
 // Function to create context menu items
 function createContextMenuItems() {
   // Remove existing menu items
@@ -123,6 +128,26 @@ function createContextMenuItems() {
     title: 'Deeds',
     contexts: ['all'],
   });
+
+  // Create Ward County submenu
+  chrome.contextMenus.create({
+    id: 'ward-county',
+    parentId: 'appraisal-bot-menu',
+    title: 'WARD COUNTY',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'ward-cad',
+    parentId: 'ward-county',
+    title: 'CAD',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'ward-gis',
+    parentId: 'ward-county',
+    title: 'GIS',
+    contexts: ['all'],
+  });
 }
 
 // Handle context menu clicks
@@ -199,6 +224,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         url = `https://i2j.uslandrecords.com/TX/Upton/D/default.aspx?doc=${selectedText}`;
       } else {
         url = 'https://i2j.uslandrecords.com/TX/Upton/D/default.aspx';
+      }
+      break;
+
+    case 'ward-cad':
+      if (selectedText && isWardAPN(selectedText)) {
+        url = `https://www.wardcad.org/Home/Details?parcelId=${selectedText}`;
+      } else {
+        url = 'https://www.wardcad.org/home';
+      }
+      break;
+
+    case 'ward-gis':
+      if (selectedText && isWardAPN(selectedText)) {
+        url = `https://maps.pandai.com/WardCAD/?find=${selectedText}`;
+      } else {
+        url = 'https://maps.pandai.com/WardCAD/';
       }
       break;
   }

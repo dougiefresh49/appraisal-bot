@@ -55,27 +55,66 @@ function detectCounty() {
 }
 
 function getCadUrl(parcelId, county) {
-  if (county === 'Midland') {
-    return `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${parcelId}`;
-  } else if (county === 'Ector') {
-    return `https://search.ectorcad.org/parcel/${parcelId}`;
-  } else {
-    console.log(`⚠️ Unrecognized county: ${county}.`);
-    return `https://search.ectorcad.org/parcel/${parcelId}`;
+  switch (county) {
+    case 'Midland':
+      return `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${parcelId}`;
+    case 'Ector':
+      return `https://search.ectorcad.org/parcel/${parcelId}`;
+    case 'Ward':
+      return `https://www.wardcad.org/Home/Details?parcelId=${parcelId}`;
+    case 'Upton':
+      return `https://uptoncad.org/Home/Details?parcelId=${parcelId}`;
+    default:
+      console.log(`⚠️ Unrecognized county: ${county}.`);
+      return `https://search.ectorcad.org/parcel/${parcelId}`;
   }
 }
 
 function addGisLink(valueSpan, parcelId, county) {
-  const gisUrl =
-    county === 'Midland'
-      ? `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${parcelId}`
-      : `https://search.ectorcad.org/map/#${parcelId}`;
+  let gisUrl;
+  if (county === 'Midland') {
+    gisUrl = `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${parcelId}`;
+  } else if (county === 'Ward') {
+    gisUrl = `https://maps.pandai.com/WardCAD/?find=${parcelId}`;
+  } else {
+    gisUrl = `https://search.ectorcad.org/map/#${parcelId}`;
+  }
   const gisLink = document.createElement('a');
   gisLink.href = gisUrl;
   gisLink.target = '_blank';
   gisLink.textContent = '[GIS]';
   valueSpan.insertAdjacentElement('afterend', gisLink);
   console.log('✅ GIS link updated successfully!');
+}
+
+function linkAddressToGoogleMaps(address, addressElement) {
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    address
+  )}`;
+  const googleMapsLink = document.createElement('a');
+  googleMapsLink.href = googleMapsUrl;
+  googleMapsLink.target = '_blank';
+  googleMapsLink.textContent = '📍';
+  googleMapsLink.style =
+    'color: #0044cc; font-weight: bold; text-decoration: underline; margin-left: 8px;';
+  addressElement.insertAdjacentElement('afterend', googleMapsLink);
+}
+
+function updateMlsAddressLink() {
+  const addressElement = document.querySelector('span.listingInfoAddress span');
+  if (!addressElement) {
+    console.log('❌ Property address field not found.');
+    return;
+  }
+
+  const currentAddress = addressElement.textContent.trim();
+  if (!currentAddress) {
+    console.log('❌ Property address is empty.');
+    return;
+  }
+
+  linkAddressToGoogleMaps(currentAddress, addressElement);
+  console.log(`📌 Detected property address change: ${currentAddress}`);
 }
 
 function updateMlsTaxIdLink() {
@@ -113,6 +152,8 @@ function updateMlsTaxIdLink() {
       addGisLink(valueSpan, parcelId, county);
     }
   });
+
+  updateMlsAddressLink();
 }
 
 // Observer to watch `#JsDisplaySequence` for property changes
