@@ -28,10 +28,20 @@ function formatMidlandCadNumber(cadNumber) {
   return cadNumber; // Already formatted correctly
 }
 
+function formatWardCadNumber(cadNumber) {
+  // Ward CAD numbers are 4-6 digits, just digits, no formatting needed
+  return cadNumber.replace(/[^0-9]/g, '');
+}
+
 function formatCad(apn, county) {
-  return county === 'Midland'
-    ? formatMidlandCadNumber(apn)
-    : formatEctorCadNumber(apn);
+  switch (county) {
+    case 'Midland':
+      return formatMidlandCadNumber(apn);
+    case 'Ward':
+      return formatWardCadNumber(apn);
+    default:
+      return formatEctorCadNumber(apn);
+  }
 }
 
 function detectCounty() {

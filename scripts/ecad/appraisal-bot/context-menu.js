@@ -18,7 +18,7 @@ function isUptonDeed(text) {
 
 // Ward County format checker (assume 6 digits for APN)
 function isWardAPN(text) {
-  return /^\d{6}$/.test(text);
+  return /^\d{4,6}$/.test(text);
 }
 
 // Function to create context menu items
