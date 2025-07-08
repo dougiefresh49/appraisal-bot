@@ -22,9 +22,11 @@ chrome.storage.local.get(['searchState'], (result) => {
 // Function to auto-fill the search field and click the search button
 function autoFillAndSearch() {
   const params = new URLSearchParams(window.location.search);
-  instrumentNumber = params.get('doc');
+  const instrumentNumber = params.get('doc');
+  const volume = params.get('volume');
+  const page = params.get('page');
 
-  if (instrumentNumber) {
+  if (!!instrumentNumber) {
     console.log(`Auto-filling document number: ${instrumentNumber}`);
 
     // Select the input field
@@ -51,6 +53,30 @@ function autoFillAndSearch() {
           }
         }
       }, 500);
+    }
+  } else if (volume && page) {
+    console.log(`Auto-filling volume: ${volume}, page: ${page}`);
+    const volumeField = document.getElementById('field_BookPageID_DOT_Volume');
+    const pageField = document.getElementById('field_BookPageID_DOT_Page');
+    if (volumeField && pageField) {
+      volumeField.value = volume;
+      pageField.value = page;
+      console.log('Volume and page inserted successfully!');
+      setTimeout(() => {
+        if (!searchClicked) {
+          const searchButton = document.querySelector('#searchButton');
+          if (searchButton) {
+            console.log('Clicking the search button for volume/page...');
+            searchButton.click();
+            searchClicked = true;
+            watchForResults();
+          } else {
+            console.log('Search button not found!');
+          }
+        }
+      }, 500);
+    } else {
+      console.log('Volume or page field not found!');
     }
   }
 }

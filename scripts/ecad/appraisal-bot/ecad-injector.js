@@ -72,6 +72,7 @@ function updateLinks() {
 
       switch (label) {
         case 'Last Sale Instrument':
+          console.log('valueText for instrument', valueText);
           updateDeedLink(valueCell, valueText);
           break;
         case 'Location':
@@ -92,10 +93,16 @@ function updateDeedLink(cell, instrument) {
     return;
   }
 
-  console.log(`📌 Found instrument: ${instrument}`);
-
-  const deedUrl = `https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1?doc=${instrument}`;
+  const deedBaseUrl =
+    'https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1';
   const advSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrument}&type=r`;
+  // Detect volume/page format (e.g., 1417/044)
+  const [_, volume, page] =
+    instrument.match(/^(\d{3,5})\s*\/\s*(\d{1,4})$/) ?? [];
+  const hasVolumePage = !!volume && !!page;
+  const deedUrl = `${deedBaseUrl}?${
+    hasVolumePage ? `volume=${volume}&page=${page}` : `doc=${instrument}`
+  }`;
 
   // Create container for links and info
   const container = document.createElement('div');
@@ -123,57 +130,52 @@ function updateDeedLink(cell, instrument) {
 
   // Request deed info from background script
   console.log('Requesting deed info from background script...');
-  chrome.runtime.sendMessage(
-    { action: 'searchDeed', instrument },
-    (response) => {
-      console.log('Received response from background script:', response);
+  chrome.runtime.sendMessage({ action: 'searchDeed', deedUrl }, (response) => {
+    console.log('Received response from background script:', response);
 
-      if (!response) {
-        console.error('No response received from background script');
-        infoContainer.textContent = 'Error: No response from background script';
-        infoContainer.style.color = '#ff0000';
-        return;
-      }
-
-      if (response.success) {
-        infoContainer.textContent = '';
-
-        const { grantor, grantee } = response.data;
-        console.log('Successfully received deed data:', { grantor, grantee });
-
-        // Create a new row for Grantor
-        const grantorRow = document.createElement('tr');
-        const grantorLabelCell = document.createElement('th');
-        grantorLabelCell.textContent = 'Last Sale Grantor';
-        grantorLabelCell.style.textAlign = 'left';
-        const grantorNameCell = document.createElement('td');
-        grantorNameCell.textContent = grantor || 'N/A';
-        grantorRow.appendChild(grantorLabelCell);
-        grantorRow.appendChild(grantorNameCell);
-
-        // Create a new row for Grantee
-        const granteeRow = document.createElement('tr');
-        const granteeLabelCell = document.createElement('th');
-        granteeLabelCell.textContent = 'Last Sale Grantee';
-        granteeLabelCell.style.textAlign = 'left';
-        const granteeNameCell = document.createElement('td');
-        granteeNameCell.textContent = grantee || 'N/A';
-        granteeRow.appendChild(granteeLabelCell);
-        granteeRow.appendChild(granteeNameCell);
-
-        // Append the new rows under the Last Sale Instrument row
-        const lastSaleInstrumentRow = cell.closest('tr');
-        lastSaleInstrumentRow.insertAdjacentElement('afterend', grantorRow);
-        grantorRow.insertAdjacentElement('afterend', granteeRow);
-      } else {
-        console.error('Error from background script:', response.error);
-        infoContainer.textContent = `Error: ${
-          response.error || 'Unknown error'
-        }`;
-        infoContainer.style.color = '#ff0000';
-      }
+    if (!response) {
+      console.error('No response received from background script');
+      infoContainer.textContent = 'Error: No response from background script';
+      infoContainer.style.color = '#ff0000';
+      return;
     }
-  );
+
+    if (response.success) {
+      infoContainer.textContent = '';
+
+      const { grantor, grantee } = response.data;
+      console.log('Successfully received deed data:', { grantor, grantee });
+
+      // Create a new row for Grantor
+      const grantorRow = document.createElement('tr');
+      const grantorLabelCell = document.createElement('th');
+      grantorLabelCell.textContent = 'Last Sale Grantor';
+      grantorLabelCell.style.textAlign = 'left';
+      const grantorNameCell = document.createElement('td');
+      grantorNameCell.textContent = grantor || 'N/A';
+      grantorRow.appendChild(grantorLabelCell);
+      grantorRow.appendChild(grantorNameCell);
+
+      // Create a new row for Grantee
+      const granteeRow = document.createElement('tr');
+      const granteeLabelCell = document.createElement('th');
+      granteeLabelCell.textContent = 'Last Sale Grantee';
+      granteeLabelCell.style.textAlign = 'left';
+      const granteeNameCell = document.createElement('td');
+      granteeNameCell.textContent = grantee || 'N/A';
+      granteeRow.appendChild(granteeLabelCell);
+      granteeRow.appendChild(granteeNameCell);
+
+      // Append the new rows under the Last Sale Instrument row
+      const lastSaleInstrumentRow = cell.closest('tr');
+      lastSaleInstrumentRow.insertAdjacentElement('afterend', grantorRow);
+      grantorRow.insertAdjacentElement('afterend', granteeRow);
+    } else {
+      console.error('Error from background script:', response.error);
+      infoContainer.textContent = `Error: ${response.error || 'Unknown error'}`;
+      infoContainer.style.color = '#ff0000';
+    }
+  });
 
   console.log('✅ Added deed & search links!');
 }

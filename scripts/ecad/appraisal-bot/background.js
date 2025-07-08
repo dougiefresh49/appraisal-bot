@@ -62,8 +62,8 @@ console.log('Deed Search Background Script loaded!');
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'searchDeed') {
-    console.log('Received deed search request:', request.instrument);
-    searchDeed(request.instrument, sender)
+    console.log('Received deed search request:', request.deedUrl);
+    searchDeed(request.deedUrl, sender)
       .then((data) => {
         console.log('Sending back deed data:', data);
         sendResponse({ success: true, data });
@@ -103,14 +103,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function searchDeed(instrument, sender) {
+async function searchDeed(deedUrl, sender) {
   return new Promise((resolve, reject) => {
-    console.log('Starting deed search for instrument:', instrument);
+    console.log('Starting deed search for deedUrl:', deedUrl);
 
     // Create a new tab for the search
     chrome.tabs.create(
       {
-        url: `https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1?doc=${instrument}`,
+        url: deedUrl,
         active: false,
         // index: sender.tab.index + 1,
       },
