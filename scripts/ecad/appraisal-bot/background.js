@@ -1,6 +1,21 @@
 // Import context menu functionality
 import './context-menu.js';
 
+// Handle extension icon click to open side panel
+chrome.action.onClicked.addListener(async (tab) => {
+  console.log('Extension icon clicked, opening side panel');
+
+  // Open the side panel
+  await chrome.sidePanel.open({ tabId: tab.id });
+
+  // Set the side panel to show our extension
+  await chrome.sidePanel.setOptions({
+    tabId: tab.id,
+    path: './sidepanel/sidepanel.html',
+    enabled: true,
+  });
+});
+
 // Set persistent cookies for Ector County disclaimer and Midland GIS splash
 function setPersistentCookies() {
   // Ector County disclaimer cookie

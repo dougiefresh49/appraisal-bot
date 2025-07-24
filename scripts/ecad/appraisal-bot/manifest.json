@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.11.11",
+  "version": "1.11.12",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -10,8 +10,10 @@
     "128": "logos/logo128.png"
   },
   "action": {
-    "default_icon": "logos/logo48.png",
-    "default_popup": "popup/index.html"
+    "default_icon": "logos/logo48.png"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
   },
   "permissions": [
     "activeTab",
@@ -22,7 +24,8 @@
     "fileSystem",
     "scripting",
     "webRequest",
-    "contextMenus"
+    "contextMenus",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://ectorcountytx-web.tylerhost.net/*",
@@ -32,7 +35,14 @@
     "https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47*",
     "maps.midlandtexas.gov/*",
     "https://midland.tx.publicsearch.us/*",
-    "https://www.wardcad.org/home/map*"
+    "https://www.wardcad.org/home/map*",
+    "file://*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["logos/*"],
+      "matches": ["<all_urls>"]
+    }
   ],
   "background": {
     "service_worker": "background.js",

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Appraisal Bot</title>
+    <link rel="stylesheet" href="./sidepanel.css" />
+  </head>
+  <body>
+    <div class="sidepanel-container">
+      <div class="header">
+        <img src="../logos/logo48.png" alt="Appraisal Bot" class="logo" />
+        <h1>Appraisal Bot</h1>
+        <button class="settings-btn" id="settings-btn">⚙️</button>
+      </div>
+
+      <div class="content">
+        <!-- <h2>Reports</h2>
+        <button id="select-folder">Select Report Directory</button>
+        <select id="report-selector" title="Select Report">
+          <option value="">Select Report</option>
+        </select>
+
+        <div class="section">
+          <h3>Actions</h3>
+          <button id="download-mls">Download MLS Data</button>
+          <button>Something else eventually</button>
+        </div> -->
+
+        <div class="section">
+          <div class="section-header main-section" data-section="quick-links">
+            <h2>Quick Links</h2>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <div class="section-content collapsed" data-section="quick-links">
+            <div class="section">
+              <div class="section-header" data-section="ector">
+                <h3>ECTOR COUNTY</h3>
+                <span class="toggle-icon">▶</span>
+              </div>
+              <div class="section-content collapsed" data-section="ector">
+                <a
+                  href="https://search.ectorcad.org/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >CAD</a
+                >
+                <a
+                  href="https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >Deeds</a
+                >
+                <a
+                  href="https://search.ectorcad.org/map/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >GIS</a
+                >
+                <a
+                  href="https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >Zoning</a
+                >
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header" data-section="midland">
+                <h3>MIDLAND COUNTY</h3>
+                <span class="toggle-icon">▶</span>
+              </div>
+              <div class="section-content collapsed" data-section="midland">
+                <a
+                  href="https://iswdataclient.azurewebsites.net/webSearchAddress.aspx?dbkey=MIDLANDCAD"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >CAD</a
+                >
+                <a
+                  href="https://midland.tx.publicsearch.us/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >Deeds</a
+                >
+                <a
+                  href="https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >GIS</a
+                >
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header" data-section="upton">
+                <h3>UPTON COUNTY</h3>
+                <span class="toggle-icon">▶</span>
+              </div>
+              <div class="section-content collapsed" data-section="upton">
+                <a
+                  href="https://uptoncad.org/home"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >CAD</a
+                >
+                <a
+                  href="https://i2j.uslandrecords.com/TX/Upton/D/default.aspx"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >Deeds</a
+                >
+                <a
+                  href="https://maps.pandai.com/UptonCAD/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >GIS</a
+                >
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header" data-section="ward">
+                <h3>WARD COUNTY</h3>
+                <span class="toggle-icon">▶</span>
+              </div>
+              <div class="section-content collapsed" data-section="ward">
+                <a
+                  href="https://www.wardcad.org/home"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >CAD</a
+                >
+                <a
+                  href="https://maps.pandai.com/WardCAD/"
+                  target="_blank"
+                  class="link"
+                  rel="noopener noreferrer"
+                  >GIS</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header main-section" data-section="comp-grid">
+            <h2>Comp Grid Data</h2>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <div class="section-content collapsed" data-section="comp-grid">
+            <!-- CSV Input Section -->
+            <div id="csv-input-section">
+              <label for="csv-input" class="block text-sm font-medium mb-2"
+                >Paste CSV Data:</label
+              >
+              <textarea
+                id="csv-input"
+                rows="6"
+                class="w-full p-3 rounded border border-gray-600 bg-gray-700 text-white text-sm resize-none"
+                placeholder="Paste your CSV data here..."
+              ></textarea>
+              <button
+                id="generate-comps-btn"
+                class="w-full mt-3 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Generate Comps
+              </button>
+            </div>
+
+            <!-- Comp Display Section -->
+            <div id="comp-display-section" class="hidden">
+              <!-- Navigation Header -->
+              <div
+                class="comp-navigation flex items-center justify-between mb-4 p-3 bg-gray-700 rounded"
+              >
+                <button
+                  id="prev-comp-btn"
+                  class="p-2 text-gray-300 hover:text-white transition-colors"
+                  aria-label="Previous comp"
+                >
+                  ←
+                </button>
+                <span id="comp-counter" class="text-sm text-gray-300"
+                  >Comp 1 of 0</span
+                >
+                <button
+                  id="next-comp-btn"
+                  class="p-2 text-gray-300 hover:text-white transition-colors"
+                  aria-label="Next comp"
+                >
+                  →
+                </button>
+              </div>
+
+              <!-- Tab Navigation -->
+              <div class="comp-tabs mb-4">
+                <button
+                  id="grid-data-tab"
+                  class="comp-tab active"
+                  data-tab="grid-data"
+                >
+                  Grid Data
+                </button>
+                <button id="mls-tab" class="comp-tab" data-tab="mls">
+                  MLS
+                </button>
+              </div>
+
+              <!-- Tab Content -->
+              <div class="tab-content">
+                <!-- Grid Data Tab -->
+                <div id="grid-data-content" class="tab-panel active">
+                  <div id="comp-data" class="space-y-2">
+                    <!-- Comp data will be populated here -->
+                  </div>
+                </div>
+
+                <!-- MLS Tab -->
+                <div id="mls-content" class="tab-panel">
+                  <div id="mls-iframe-container">
+                    <iframe
+                      id="mls-iframe"
+                      class="mls-iframe"
+                      title="MLS PDF Viewer"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Back to Input Button -->
+              <button
+                id="back-to-input-btn"
+                class="w-full mt-4 p-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Back to Input
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+  </body>
+</html>
