@@ -155,19 +155,65 @@ body {
 }
 
 /* Comp Grid Data Styles */
-#csv-input {
-  font-family: 'Courier New', monospace;
-  line-height: 1.4;
+#select-csv-file-btn {
   width: 100%;
-  min-height: 120px;
-  max-height: 200px;
-  resize: vertical;
+  padding: 8px 12px;
+  background: #353535;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#select-csv-file-btn:hover {
+  background: #404040;
+  border-color: #505050;
+}
+
+#csv-base-path {
+  width: 100%;
+  padding: 8px 12px;
+  background: #353535;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  transition: border-color 0.2s ease;
+  margin-bottom: 12px;
+}
+
+#csv-base-path:focus {
+  outline: none;
+  border-color: #30d5ff;
+}
+
+#csv-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #353535;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  resize: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.csv-base-path-section {
+  margin-top: 12px;
 }
 
 #csv-input:focus {
   outline: none;
   border-color: #30d5ff;
-  box-shadow: 0 0 0 2px rgba(48, 213, 255, 0.2);
 }
 
 #comp-display-section {
@@ -605,4 +651,186 @@ button:active {
 
 #grid-data-content::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* Subject Data Styles */
+#select-subject-csv-file-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: #353535;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+
+#select-subject-csv-file-btn:hover {
+  background: #404040;
+  border-color: #555;
+}
+
+#subject-csv-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #353535;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease;
+}
+
+#subject-csv-input:focus {
+  outline: none;
+  border-color: #30d5ff;
+}
+
+#subject-display-section {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+#subject-display-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+#subject-display-section::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+#subject-display-section::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+#subject-display-section::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.subject-header {
+  background: #404455;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.subject-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.subject-quick-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-link {
+  padding: 6px 12px;
+  background: #353535;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.quick-link:hover {
+  background: #404040;
+  border-color: #30d5ff;
+  color: #30d5ff;
+}
+
+.subject-tabs {
+  display: flex;
+  gap: 2px;
+  background: #353535;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.subject-tab {
+  flex: 1;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: #b0b0b0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.subject-tab:hover {
+  background: #404040;
+  color: #ffffff;
+}
+
+.subject-tab.active {
+  background: #30d5ff;
+  color: #000000;
+  font-weight: 600;
+}
+
+.subject-tab-content {
+  position: relative;
+}
+
+.subject-tab-panel {
+  display: none;
+}
+
+.subject-tab-panel.active {
+  display: block;
+}
+
+#subject-mls-iframe-container {
+  width: 100%;
+  height: 400px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #404040;
+}
+
+.subject-mls-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+
+#subject-grid-data-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#subject-grid-data-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+#subject-grid-data-content::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+#subject-grid-data-content::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+#subject-grid-data-content::-webkit-scrollbar-thumb:hover {
+  background: #666;
 }

@@ -164,19 +164,46 @@
             <!-- CSV Input Section -->
             <div id="csv-input-section">
               <label for="csv-input" class="block text-sm font-medium mb-2"
-                >Paste CSV Data:</label
+                >Paste CSV Data or Select File:</label
               >
+              <div class="flex gap-2 mb-2">
+                <button id="select-csv-file-btn">📁 Select CSV File</button>
+                <input
+                  type="file"
+                  id="csv-file-input"
+                  accept=".csv"
+                  style="display: none"
+                />
+              </div>
+              <div class="mb-2 csv-base-path-section">
+                <label
+                  for="csv-base-path"
+                  class="block text-sm font-medium mb-1 text-gray-300"
+                >
+                  CSV Base Path (optional):
+                </label>
+                <input
+                  type="text"
+                  id="csv-base-path"
+                  placeholder="e.g., /Users/username/projects/appraisal-data"
+                />
+              </div>
               <textarea
                 id="csv-input"
                 rows="6"
-                class="w-full p-3 rounded border border-gray-600 bg-gray-700 text-white text-sm resize-none"
-                placeholder="Paste your CSV data here..."
+                placeholder="Paste your CSV data here or select a file above..."
               ></textarea>
               <button
                 id="generate-comps-btn"
                 class="w-full mt-3 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
               >
                 Generate Comps
+              </button>
+              <button
+                id="save-data-btn"
+                class="w-full mt-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Save Data
               </button>
             </div>
 
@@ -243,6 +270,141 @@
               <!-- Back to Input Button -->
               <button
                 id="back-to-input-btn"
+                class="w-full mt-4 p-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Back to Input
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header main-section" data-section="subject-data">
+            <h2>Subject Data</h2>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <div class="section-content collapsed" data-section="subject-data">
+            <!-- Subject CSV Input Section -->
+            <div id="subject-csv-input-section">
+              <label
+                for="subject-csv-input"
+                class="block text-sm font-medium mb-2"
+                >Paste Subject CSV Data or Select File:</label
+              >
+              <div class="flex gap-2 mb-2">
+                <button id="select-subject-csv-file-btn">
+                  📁 Select Subject CSV File
+                </button>
+                <input
+                  type="file"
+                  id="subject-csv-file-input"
+                  accept=".csv"
+                  style="display: none"
+                />
+              </div>
+              <textarea
+                id="subject-csv-input"
+                rows="6"
+                placeholder="Paste your subject CSV data here or select a file above..."
+              ></textarea>
+              <button
+                id="generate-subject-btn"
+                class="w-full mt-3 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Generate Subject Data
+              </button>
+              <button
+                id="save-subject-data-btn"
+                class="w-full mt-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Save Subject Data
+              </button>
+            </div>
+
+            <!-- Subject Display Section -->
+            <div id="subject-display-section" class="hidden">
+              <!-- Subject Header with Quick Links -->
+              <div class="subject-header mb-4 p-3 bg-gray-700 rounded">
+                <div class="subject-title text-lg font-bold text-white mb-2">
+                  Subject
+                </div>
+                <div class="subject-quick-links flex gap-2 flex-wrap">
+                  <a
+                    href="#"
+                    id="subject-cad-link"
+                    class="quick-link"
+                    target="_blank"
+                    >CAD</a
+                  >
+                  <a
+                    href="#"
+                    id="subject-deeds-link"
+                    class="quick-link"
+                    target="_blank"
+                    >Deeds</a
+                  >
+                  <a
+                    href="#"
+                    id="subject-gis-link"
+                    class="quick-link"
+                    target="_blank"
+                    >GIS</a
+                  >
+                  <a
+                    href="#"
+                    id="subject-maps-link"
+                    class="quick-link"
+                    target="_blank"
+                    >Maps</a
+                  >
+                </div>
+              </div>
+
+              <!-- Tab Navigation -->
+              <div class="subject-tabs mb-4">
+                <button
+                  id="subject-grid-data-tab"
+                  class="subject-tab active"
+                  data-tab="subject-grid-data"
+                >
+                  Grid Data
+                </button>
+                <button
+                  id="subject-mls-tab"
+                  class="subject-tab"
+                  data-tab="subject-mls"
+                >
+                  MLS
+                </button>
+              </div>
+
+              <!-- Tab Content -->
+              <div class="subject-tab-content">
+                <!-- Subject Grid Data Tab -->
+                <div
+                  id="subject-grid-data-content"
+                  class="subject-tab-panel active"
+                >
+                  <div id="subject-data" class="space-y-2">
+                    <!-- Subject data will be populated here -->
+                  </div>
+                </div>
+
+                <!-- Subject MLS Tab -->
+                <div id="subject-mls-content" class="subject-tab-panel">
+                  <div id="subject-mls-iframe-container">
+                    <iframe
+                      id="subject-mls-iframe"
+                      class="subject-mls-iframe"
+                      title="Subject MLS PDF Viewer"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Back to Input Button -->
+              <button
+                id="back-to-subject-input-btn"
                 class="w-full mt-4 p-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors"
               >
                 Back to Input

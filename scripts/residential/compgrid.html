@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1432 Wedgewood Dr - Comparable Sales Grid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f3f4f6; /* gray-100 */
+      }
+      .sticky-col {
+        position: -webkit-sticky;
+        position: sticky;
+        left: 0;
+        z-index: 10;
+      }
+      .copy-feedback {
+        position: absolute;
+        padding: 4px 8px;
+        background-color: #2d3748; /* gray-800 */
+        color: white;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 100;
+        animation: fadeOut 2s ease-in-out forwards;
+      }
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        80% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+      .collapsed-header {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+      }
+      .collapsed-header .truncate {
+        display: none;
+      }
+      .collapsed-cell {
+        background-color: #4b5563; /* gray-600 */
+        padding: 0 !important;
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+      }
+      .dark .collapsed-cell {
+        background-color: #374151; /* gray-700 */
+      }
+      .collapsed-cell > * {
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body
+    class="antialiased text-gray-800 bg-gray-100 dark:bg-gray-900 dark:text-gray-200"
+  >
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+      <header class="mb-4">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          Comparable Sales Analysis
+        </h1>
+        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+          1432 Wedgewood Dr - Side-by-side property comparison.
+        </p>
+      </header>
+
+      <!-- Data Input Section -->
+      <div id="data-input-section" class="mb-6">
+        <label
+          for="csv-input"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >Paste CSV Data Here:</label
+        >
+        <textarea
+          id="csv-input"
+          rows="10"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+        ></textarea>
+        <button
+          id="submit-button"
+          class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Generate Grid
+        </button>
+      </div>
+
+      <!-- Edit Button Section -->
+      <div id="edit-button-section" class="hidden text-right mb-4">
+        <button
+          id="edit-button"
+          class="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-gray-500 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+          aria-label="Edit Data"
+        >
+          <svg
+            class="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Grid Display Section -->
+      <div
+        id="grid-display-section"
+        class="hidden shadow-lg rounded-lg overflow-hidden"
+      >
+        <div id="table-container" class="overflow-x-auto">
+          <!-- Table will be generated here by JavaScript -->
+        </div>
+      </div>
+
+      <footer class="text-center mt-8 text-sm text-gray-500">
+        <p>Generated on <span id="generation-date"></span></p>
+      </footer>
+    </div>
+
+    <script>
+      // --- GLOBAL ELEMENTS ---
+      let dataInputSection,
+        csvInput,
+        submitButton,
+        editButtonSection,
+        editButton,
+        gridDisplaySection,
+        tableContainer;
+
+      // --- INITIAL DATA (for placeholder) ---
+      const initialCsvData = `Property Address,Sale Price,Sale Price/Gross Liv. Area,Data Source,Verification Source(s),Sales or Financing,Concessions,Date of Sale/Time,Location,Leasehold/Fee Simple,Site,View,Design (Style),Quality of Construction,Actual Age,Condition,Above Grade Room Count,Gross Living Area,Basement,Finished Rooms Below Grade,Functional Utility,Heating/Cooling,Energy Efficient Items,Garage/Carport,Porch/Patio Deck,Fireplace,Fence,Extra Amenities
+"2724 E 11th St, Odessa, TX 79761","$234,900","",MLS# 158832;DOM 114,"CAD, MLS, OLP $234,900","Listing","","","Odessa, TX","Fee Simple","8385 sf","N;Res;","DT1;Ranch","Q4",67,"Good","total 6;bdrms 3;baths 2.0",1614,"None",0,"Typical","FWA/CAC","Fans","","","1","Masonry","STG"
+"1332 Westbrook Ave, Odessa, TX 79761","$199,999","",MLS# 159662;DOM 63,"CAD, MLS, OLP $220,000","Listing","",c06/25,"Odessa, TX","Fee Simple","7405 sf","N;Res;","DT1;Ranch","Q4",66,"Good","total 5;bdrms 2;baths 1.1",1371,"None",0,"Typical","FWA/CAC","Fans","","","0","Wood","STG"
+"1424 Englewood Lane, Odessa, TX 79761","130000","$72.46",MLS# 154021;DOM 3,"CAD, MLS, OLP $150,000","ArmLth","Cash;0","s09/24;c09/24","Odessa, TX","Fee Simple","7405 sf","N;Res;","DT1;Ranch","Q4",67,"Fair","total 7;bdrms 4;baths 3.0",1794,"None",0,"Typical","FWA/CAC","Fans","1ga1dw","","0","Masonry",""
+"1424 Englewood Lane, Odessa, TX 79761","269900","$150.45",MLS# 158931;DOM 3,"CAD, MLS, OLP $269,900","ArmLth","FHA;5000","s05/25;c03/25","Odessa, TX","Fee Simple","7405 sf","N;Res;","DT1;Ranch","Q4",67,"Good","total 7;bdrms 4;baths 3.0",1794,"None",0,"Typical","FWA/CAC","Fans/Other","1ga1dw","OpPt","0","Masonry",""
+"2618 Custer Ave, Odessa, TX 79761","160000","$103.36",MLS# 156746;DOM 15,"CAD, MLS, OLP $175,000","ArmLth","Conv;0","s01/25;c12/24","Odessa, TX","Fee Simple","10454 sf","N;Res;","DT1;Ranch","Q4",67,"Fair","total 7;bdrms 3;baths 2.0",1548,"None",0,"Typical","FWA/CAC","Fans/Other","1gd1dw, 2c","CvPt","0","Wood","STG"
+"2110 Tanglewood, Odessa, TX 79761","179500","$106.21",MLS# 158084;DOM 3,"CAD, MLS, OLP $200,000","ArmLth","Cash;0","s03/25;c02/25","Odessa, TX","Fee Simple","9440 sf","N;Res;","DT1;Ranch","Q4",58,"Average","total 7;bdrms 3;baths 2.0",1690,"None",0,"Typical","FWA/CAC","Fans/Windows","2ga2dw","CvPt","1","Wood",""
+"1309 Westbrook Ave, Odessa, TX 79761","228000","$138.94",MLS# 159150;DOM 3,"CAD, MLS, OLP $229,900","ArmLth","FHA;7500","s05/25;c04/25","Odessa, TX","Fee Simple","8259 sf","N;Res;","DT1;Ranch","Q4",65,"Good","total 5;bdrms 3;baths 1.1",1641,"None",0,"Typical","FWA/CAC","Fans/Windows/Other","1ga1dw","CvPt","0","Wood","STG, WS"`;
+
+      // --- HELPER FUNCTIONS ---
+      function copyToClipboard(buttonEl, text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showCopyFeedback(buttonEl);
+        } catch (err) {
+          console.error('Failed to copy text: ', err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      function showCopyFeedback(buttonEl) {
+        const feedback = document.createElement('div');
+        feedback.textContent = 'Copied!';
+        feedback.className = 'copy-feedback';
+        document.body.appendChild(feedback);
+        const rect = buttonEl.getBoundingClientRect();
+        feedback.style.left = `${
+          rect.left + window.scrollX + rect.width / 2 - feedback.offsetWidth / 2
+        }px`;
+        feedback.style.top = `${
+          rect.top + window.scrollY - feedback.offsetHeight - 5
+        }px`;
+        setTimeout(() => {
+          feedback.remove();
+        }, 2000);
+      }
+
+      function toggleColumn(colIndex, buttonEl) {
+        const table = document.querySelector('#table-container table');
+        if (!table) return;
+        const headerCell = table.querySelector(
+          `thead th:nth-child(${colIndex})`
+        );
+        const dataCells = table.querySelectorAll(
+          `tbody td:nth-child(${colIndex})`
+        );
+        headerCell.classList.toggle('collapsed-header');
+        dataCells.forEach((cell) => cell.classList.toggle('collapsed-cell'));
+        const eyeIcon = buttonEl.querySelector('.eye-icon');
+        const eyeOffIcon = buttonEl.querySelector('.eye-off-icon');
+        const isCollapsed = headerCell.classList.contains('collapsed-header');
+        eyeIcon.classList.toggle('hidden', isCollapsed);
+        eyeOffIcon.classList.toggle('hidden', !isCollapsed);
+      }
+
+      function parseCSV(str) {
+        const arr = [];
+        let quote = false;
+        for (let row = 0, col = 0, c = 0; c < str.length; c++) {
+          let cc = str[c],
+            nc = str[c + 1];
+          arr[row] = arr[row] || [];
+          arr[row][col] = arr[row][col] || '';
+          if (cc == '"' && quote && nc == '"') {
+            arr[row][col] += cc;
+            ++c;
+            continue;
+          }
+          if (cc == '"') {
+            quote = !quote;
+            continue;
+          }
+          if (cc == ',' && !quote) {
+            ++col;
+            continue;
+          }
+          if (cc == '\n' && !quote) {
+            ++row;
+            col = 0;
+            continue;
+          }
+          arr[row][col] += cc;
+        }
+        return arr.map((row) =>
+          row.map((cell) => cell.trim().replace(/^"|"$/g, ''))
+        );
+      }
+
+      function transpose(matrix) {
+        if (!matrix || matrix.length === 0) return [];
+        return matrix[0].map((_, colIndex) =>
+          matrix.map((row) => row[colIndex])
+        );
+      }
+
+      // --- CORE LOGIC ---
+      function buildTable(csvData) {
+        tableContainer.innerHTML = ''; // Clear previous table
+        const parsedData = parseCSV(csvData.trim());
+        if (parsedData.length < 2) {
+          tableContainer.innerHTML =
+            '<p class="p-4 text-red-500">Invalid or empty CSV data. Please provide at least a header and one row of data.</p>';
+          return;
+        }
+        const headers = parsedData.shift();
+        const properties = parsedData;
+        const transposedData = transpose(properties);
+
+        let tableHtml = `<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border-collapse">`;
+        const theadBg = 'bg-gray-100 dark:bg-gray-800';
+        // UPDATED: Made the border color slightly darker for better visibility.
+        const borderClass = 'border-r border-gray-300 dark:border-gray-500';
+        tableHtml += `<thead class="${theadBg}"><tr>`;
+        tableHtml += `<th scope="col" class="sticky-col ${theadBg} ${borderClass} px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Feature</th>`;
+        properties.forEach((prop, propIndex) => {
+          const address = prop[0] || 'N/A';
+          const columnIndex = propIndex + 2;
+          tableHtml += `<th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-all duration-300 ease-in-out"><div class="flex items-center justify-between"><span class="truncate pr-2">${address}</span><button onclick="toggleColumn(${columnIndex}, this)" class="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none" aria-label="Toggle column visibility"><svg class="h-5 w-5 eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg><svg class="h-5 w-5 eye-off-icon hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg></button></div></th>`;
+        });
+        tableHtml += `</tr></thead>`;
+        tableHtml += `<tbody class="divide-y divide-gray-200 dark:divide-gray-700">`;
+        headers.forEach((header, index) => {
+          if (index === 0) return;
+          const isOddRow = index % 2 !== 0;
+          const rowBgClass = isOddRow
+            ? 'bg-gray-50 dark:bg-gray-700'
+            : 'bg-white dark:bg-gray-800';
+          tableHtml += `<tr class="${rowBgClass}">`;
+          tableHtml += `<th scope="row" class="sticky-col px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white text-left ${rowBgClass} ${borderClass}">${header}</th>`;
+          const dataRow = transposedData[index] || [];
+          dataRow.forEach((cellData) => {
+            const cleanCellData = (cellData || '')
+              .replace(/'/g, '&apos;')
+              .replace(/"/g, '&quot;');
+            tableHtml += `<td class="group relative px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 transition-all duration-300 ease-in-out"><span>${
+              cellData || ''
+            }</span><button onclick="copyToClipboard(this, '${cleanCellData}')" class="absolute top-1/2 right-2 -translate-y-1/2 p-1 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none" aria-label="Copy to clipboard"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button></td>`;
+          });
+          tableHtml += `</tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        tableContainer.innerHTML = tableHtml;
+      }
+
+      function handleSubmit() {
+        const newData = csvInput.value;
+        if (newData.trim() === '') {
+          alert('Please paste CSV data into the text area.');
+          return;
+        }
+        buildTable(newData);
+        dataInputSection.classList.add('hidden');
+        gridDisplaySection.classList.remove('hidden');
+        editButtonSection.classList.remove('hidden');
+      }
+
+      function handleEdit() {
+        dataInputSection.classList.remove('hidden');
+        gridDisplaySection.classList.add('hidden');
+        editButtonSection.classList.add('hidden');
+      }
+
+      // --- INITIALIZATION ---
+      document.addEventListener('DOMContentLoaded', () => {
+        // Assign elements to global variables
+        dataInputSection = document.getElementById('data-input-section');
+        csvInput = document.getElementById('csv-input');
+        submitButton = document.getElementById('submit-button');
+        editButtonSection = document.getElementById('edit-button-section');
+        editButton = document.getElementById('edit-button');
+        gridDisplaySection = document.getElementById('grid-display-section');
+        tableContainer = document.getElementById('table-container');
+
+        // Set initial state
+        csvInput.value = initialCsvData;
+        document.getElementById('generation-date').textContent =
+          new Date().toLocaleString();
+
+        // Add event listeners
+        submitButton.addEventListener('click', handleSubmit);
+        editButton.addEventListener('click', handleEdit);
+      });
+    </script>
+  </body>
+</html>
