@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.11.15",
+  "version": "1.11.19",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -108,6 +108,11 @@
     {
       "matches": ["https://maps.pandai.com/WardCAD/*"],
       "js": ["gis-injector-ward--search.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://search.ectorcad.org/search/adv*"],
+      "js": ["ecad-deed-search-injector.js"],
       "run_at": "document_end"
     }
   ]

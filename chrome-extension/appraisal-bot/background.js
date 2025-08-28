@@ -115,6 +115,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       console.error('Invalid zoning data received:', request.data);
     }
+  } else if (request.action === 'getSalePriceFromDeedSearch') {
+    console.log('Received sale price from deed search request:', request);
+    getSalePriceFromDeedSearch(request.instrumentNumber, sender)
+      .then((data) => {
+        console.log('Sending back sale price data from deed search:', data);
+        sendResponse({ success: true, data });
+      })
+      .catch((error) => {
+        console.error('Sale price from deed search failed:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+    return true;
+  } else if (request.action === 'salePriceDataFromDeedSearch') {
+    console.log(
+      'Received sale price data from deed-search-injector:',
+      request.data
+    );
+    if (request.data && typeof request.data === 'object') {
+      chrome.storage.local.set(
+        { salePriceDataFromDeedSearch: request.data },
+        () => {
+          console.log('Sale price data from deed search stored successfully');
+        }
+      );
+    } else {
+      console.error(
+        'Invalid sale price data from deed search received:',
+        request.data
+      );
+    }
   }
 });
 
@@ -193,6 +223,60 @@ async function getZoning(address, sender) {
           reject(new Error('Zoning data not found after 30 seconds'));
           // Close the tab
           console.log('Closing zoning tab:', tab.id);
+          chrome.tabs.remove(tab.id);
+        }, 30000);
+      }
+    );
+  });
+}
+
+async function getSalePriceFromDeedSearch(instrumentNumber, sender) {
+  return new Promise((resolve, reject) => {
+    console.log(
+      'Starting sale price search from deed search for Instrument:',
+      instrumentNumber
+    );
+
+    // Create the deed search URL (same as the advSearchUrl in ecad-injector.js)
+    const deedSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrumentNumber}&type=r`;
+
+    chrome.tabs.create(
+      {
+        url: deedSearchUrl,
+        active: false,
+      },
+      (tab) => {
+        console.log('Created deed search tab:', tab.id);
+
+        const checkData = setInterval(() => {
+          chrome.storage.local.get('salePriceDataFromDeedSearch', (result) => {
+            if (result.salePriceDataFromDeedSearch) {
+              console.log(
+                'Found sale price data from deed search:',
+                result.salePriceDataFromDeedSearch
+              );
+              clearInterval(checkData);
+              chrome.storage.local.remove('salePriceDataFromDeedSearch'); // Clean up
+              resolve(result.salePriceDataFromDeedSearch);
+
+              // Close the tab
+              console.log('Closing deed search tab:', tab.id);
+              chrome.tabs.remove(tab.id);
+            }
+          });
+        }, 500);
+
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          clearInterval(checkData);
+          reject(
+            new Error(
+              'Sale price data from deed search not found after 30 seconds'
+            )
+          );
+
+          // Close the tab
+          console.log('Closing deed search tab:', tab.id);
           chrome.tabs.remove(tab.id);
         }, 30000);
       }

@@ -74,6 +74,7 @@ function updateLinks() {
         case 'Last Sale Instrument':
           console.log('valueText for instrument', valueText);
           updateDeedLink(valueCell, valueText);
+          requestAndInsertSalePrice(valueText, row);
           break;
         case 'Location':
           linkAddressToGoogleMaps(valueCell, valueText);
@@ -311,4 +312,236 @@ function requestAndInsertZoning(address, locationRow) {
     });
     insertZoningRowAfter(locationRow, classification, description);
   });
+}
+
+function requestAndInsertSalePrice(instrumentNumber, lastSaleInstrumentRow) {
+  // Prevent duplicate requests
+  if (lastSaleInstrumentRow.dataset.salePriceRequested) return;
+  lastSaleInstrumentRow.dataset.salePriceRequested = 'true';
+
+  // Extract APN from the URL
+  const apn = extractApnFromUrl();
+  if (!apn) {
+    console.error('[AppraisalBot] Could not extract APN from URL');
+    return;
+  }
+
+  // Insert the sale price row above the Last Sale Instrument row
+  insertSalePriceRowBefore(
+    lastSaleInstrumentRow,
+    '',
+    true,
+    false,
+    apn,
+    instrumentNumber
+  ); // Show loading
+
+  chrome.runtime.sendMessage(
+    {
+      action: 'getSalePriceFromDeedSearch',
+      instrumentNumber,
+    },
+    (response) => {
+      console.log('[AppraisalBot] Sale price response:', response);
+      if (!response || !response.success) {
+        insertSalePriceRowBefore(
+          lastSaleInstrumentRow,
+          '',
+          false,
+          true,
+          apn,
+          instrumentNumber
+        ); // Show error
+        console.error(
+          '[AppraisalBot] Failed to get sale price info:',
+          response?.error
+        );
+        return;
+      }
+      const { salePrice, parcels } = response.data;
+      console.log('Inserting sale price row:', { salePrice, parcels });
+      insertSalePriceRowBefore(
+        lastSaleInstrumentRow,
+        salePrice,
+        false,
+        false,
+        apn,
+        instrumentNumber
+      );
+
+      // If there are multiple parcels, add the "Last Sale Inc. Parcels" row
+      if (parcels && parcels.length > 1) {
+        // Filter out the current parcel from the list
+        const otherParcels = parcels.filter((parcel) => parcel !== apn);
+        if (otherParcels.length > 0) {
+          insertIncParcelsRow(lastSaleInstrumentRow, otherParcels);
+        }
+      }
+    }
+  );
+}
+
+function extractApnFromUrl() {
+  // Extract APN from the URL path
+  const pathMatch = window.location.pathname.match(/\/parcel\/([^\/]+)/);
+  if (pathMatch) {
+    return pathMatch[1];
+  }
+
+  // Fallback: try to extract from page title
+  const titleElement = document.querySelector('h1');
+  if (titleElement) {
+    const titleMatch = titleElement.textContent.match(/Parcel\s+([^\s]+)/);
+    if (titleMatch) {
+      return titleMatch[1];
+    }
+  }
+
+  console.error('[AppraisalBot] Could not extract APN from URL or title');
+  return null;
+}
+
+function insertSalePriceRowBefore(
+  targetRow,
+  salePrice,
+  isLoading = false,
+  isError = false,
+  apn = null,
+  instrumentNumber = null
+) {
+  // Check if sale price row already exists
+  if (
+    targetRow.previousSibling &&
+    targetRow.previousSibling.querySelector &&
+    targetRow.previousSibling.querySelector('th') &&
+    targetRow.previousSibling.querySelector('th').textContent.trim() ===
+      'Last Sale Price'
+  ) {
+    console.log('Sale price row already exists');
+    // Update value cell if needed
+    const valueCell = targetRow.previousSibling.querySelector('td');
+    const newText = isError
+      ? 'Error'
+      : isLoading
+      ? 'Loading sale price...'
+      : salePrice;
+    console.log('Updating sale price value:', newText);
+    valueCell.textContent = newText;
+    return;
+  }
+
+  const salePriceRow = document.createElement('tr');
+  const salePriceLabelCell = document.createElement('th');
+  salePriceLabelCell.textContent = 'Last Sale Price';
+  salePriceLabelCell.style.textAlign = 'left';
+
+  const salePriceValueCell = document.createElement('td');
+  salePriceValueCell.textContent = isLoading
+    ? 'Loading sale price...'
+    : isError
+    ? 'Error'
+    : salePrice;
+
+  // Add link to deed search results page if we have a valid sale price
+  if (
+    salePrice &&
+    !isLoading &&
+    !isError &&
+    salePrice !== 'Price not found' &&
+    salePrice !== 'Instrument not found' &&
+    salePrice !== 'Timeout loading table'
+  ) {
+    const deedSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrumentNumber}&type=r`;
+    const linkContainer = document.createElement('div');
+    linkContainer.style.display = 'inline-flex';
+    linkContainer.style.alignItems = 'center';
+    linkContainer.style.gap = '8px';
+
+    const priceSpan = document.createElement('span');
+    priceSpan.textContent = salePrice + ' ';
+    linkContainer.appendChild(priceSpan);
+
+    const link = document.createElement('a');
+    link.href = deedSearchUrl;
+    link.target = '_blank';
+    link.textContent = '💰';
+    link.style = `
+      color: #0044cc;
+      font-weight: bold;
+      text-decoration: underline;
+    `;
+    linkContainer.appendChild(link);
+
+    salePriceValueCell.appendChild(linkContainer);
+  }
+
+  salePriceRow.appendChild(salePriceLabelCell);
+  salePriceRow.appendChild(salePriceValueCell);
+
+  // Insert before the Last Sale Instrument row
+  targetRow.insertAdjacentElement('beforebegin', salePriceRow);
+}
+
+function insertIncParcelsRow(targetRow, parcels) {
+  // Check if the row already exists
+  if (
+    targetRow.previousSibling &&
+    targetRow.previousSibling.querySelector &&
+    targetRow.previousSibling.querySelector('th') &&
+    targetRow.previousSibling.querySelector('th').textContent.trim() ===
+      'Last Sale Inc. Parcels'
+  ) {
+    console.log('Inc Parcels row already exists');
+    return;
+  }
+
+  const incParcelsRow = document.createElement('tr');
+  const incParcelsLabelCell = document.createElement('th');
+  incParcelsLabelCell.textContent = 'Last Sale Inc. Parcels';
+  incParcelsLabelCell.style.textAlign = 'left';
+
+  const incParcelsValueCell = document.createElement('td');
+
+  // Create links for each parcel
+  const linksContainer = document.createElement('div');
+  linksContainer.style.display = 'inline-flex';
+  linksContainer.style.flexWrap = 'wrap';
+  linksContainer.style.gap = '8px';
+  linksContainer.style.alignItems = 'center';
+
+  parcels.forEach((parcel, index) => {
+    const parcelLink = document.createElement('a');
+    parcelLink.href = `https://search.ectorcad.org/parcel/${parcel}`;
+    parcelLink.target = '_blank';
+    parcelLink.textContent = parcel;
+    parcelLink.style = `
+      color: #0044cc;
+      font-weight: bold;
+      text-decoration: underline;
+    `;
+
+    linksContainer.appendChild(parcelLink);
+
+    // Add separator between links (except for the last one)
+    if (index < parcels.length - 1) {
+      const separator = document.createElement('span');
+      separator.textContent = '•';
+      separator.style.color = '#666';
+      separator.style.margin = '0 4px';
+      linksContainer.appendChild(separator);
+    }
+  });
+
+  incParcelsValueCell.appendChild(linksContainer);
+  incParcelsRow.appendChild(incParcelsLabelCell);
+  incParcelsRow.appendChild(incParcelsValueCell);
+
+  // Insert after the sale price row (which is now above the Last Sale Instrument row)
+  const salePriceRow = targetRow.previousSibling;
+  if (salePriceRow) {
+    salePriceRow.insertAdjacentElement('afterend', incParcelsRow);
+  } else {
+    // Fallback: insert before the Last Sale Instrument row
+    targetRow.insertAdjacentElement('beforebegin', incParcelsRow);
+  }
 }
