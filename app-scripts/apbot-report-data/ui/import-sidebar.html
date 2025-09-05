@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+      body {
+        padding: 15px;
+      }
+      #jsonData {
+        width: 100%;
+        height: 250px; /* Adjust height as needed */
+        margin-bottom: 10px;
+        font-size: .75rem;
+        font-family: monospace; /* Good for viewing JSON */
+      }
+      #status {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .spinner-border {
+        width: 1rem;
+        height: 1rem;
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h5>Paste JSON Data</h5>
+    <p><small>Paste the complete JSON object containing `saleData`, `parcelData`, and `parcelImprovements` arrays.</small></p>
+
+    <div class="form-group">
+      <textarea id="jsonData" class="form-control"></textarea>
+    </div>
+
+    <button id="submitButton" class="btn btn-primary btn-block">Submit Data</button>
+
+    <div id="status"></div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+
+    <script>
+      document.getElementById('submitButton').addEventListener('click', submitJson);
+
+      function submitJson() {
+        const jsonTextArea = document.getElementById('jsonData');
+        const submitButton = document.getElementById('submitButton');
+        const statusDiv = document.getElementById('status');
+        const jsonData = jsonTextArea.value;
+
+        if (!jsonData.trim()) {
+          showStatus('Please paste JSON data into the text area.', 'alert-warning');
+          return;
+        }
+
+        // Disable button and show loading indicator
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Processing... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        statusDiv.innerHTML = ''; // Clear previous status
+
+        // Call the server-side function
+        google.script.run
+          .withSuccessHandler(function(response) {
+            showStatus(response, 'alert-success'); // Show success message from server
+            jsonTextArea.value = ''; // Clear the text area on success
+            enableButton();
+          })
+          .withFailureHandler(function(error) {
+            console.error('Script execution failed:', error);
+            // Display the error message returned from the server function
+            showStatus('Error: ' + error.message, 'alert-danger');
+            enableButton();
+          })
+          .processJsonData(jsonData); // Pass the JSON string
+      }
+
+      function showStatus(message, alertClass) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerHTML = `<div class="alert ${alertClass}" role="alert">${message}</div>`;
+      }
+
+      function enableButton() {
+         const submitButton = document.getElementById('submitButton');
+         submitButton.disabled = false;
+         submitButton.innerHTML = 'Submit Data';
+      }
+    </script>
+  </body>
+</html>

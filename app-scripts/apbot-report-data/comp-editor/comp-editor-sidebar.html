@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 16px;
+        font-size: 14px;
+      }
+
+      .header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #4285f4;
+      }
+
+      .header h2 {
+        margin: 0 0 8px 0;
+        color: #1a73e8;
+        font-size: 18px;
+      }
+
+      .header p {
+        margin: 0;
+        color: #5f6368;
+        font-size: 12px;
+      }
+
+      .formula-info {
+        background: #e8f5e8;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-size: 12px;
+        color: #2e7d32;
+      }
+
+      .section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #34a853;
+      }
+
+      .section h3 {
+        margin: 0 0 12px 0;
+        color: #1e7e34;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .field-group {
+        margin-bottom: 15px;
+      }
+
+      .field-label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        color: #333;
+        font-size: 12px;
+      }
+
+      .field-value {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .field-input {
+        flex: 1;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 12px;
+        background: white;
+      }
+
+      .field-input:focus {
+        outline: none;
+        border-color: #4285f4;
+        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+      }
+
+      .field-link {
+        padding: 4px 8px;
+        background: #4285f4;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .field-link:hover {
+        background: #3367d6;
+      }
+
+      .update-button {
+        padding: 4px 8px;
+        background: #34a853;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 11px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .update-button:hover {
+        background: #2e7d32;
+      }
+
+      .update-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .status-message {
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+
+      .status-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .parcel-item {
+        background: white;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .parcel-header {
+        font-weight: 600;
+        color: #1a73e8;
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+
+      .no-data {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 20px;
+      }
+
+      .loading {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+      }
+
+      .refresh-button {
+        width: 100%;
+        padding: 10px;
+        background: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .refresh-button:hover {
+        background: #3367d6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Comp Editor</h2>
+      <p>Edit land sale data and navigate to source fields</p>
+    </div>
+
+    <div id="content">
+      <div class="loading">Loading comp data...</div>
+    </div>
+
+    <button onclick="refreshData()" class="refresh-button">Refresh Data</button>
+
+    <script type="text/javascript">
+      let currentCompData = null;
+
+      // Load data when sidebar opens
+      window.onload = function () {
+        loadCompData();
+      };
+
+      function loadCompData() {
+        document.getElementById('content').innerHTML =
+          '<div class="loading">Loading comp data...</div>';
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (result.success) {
+              currentCompData = result;
+              displayCompData(result);
+            } else {
+              document.getElementById('content').innerHTML = `
+                <div class="status-error">
+                  ${result.error}
+                </div>
+              `;
+            }
+          })
+          .withFailureHandler(function (error) {
+            document.getElementById('content').innerHTML = `
+              <div class="status-error">
+                Failed to load data: ${error.message}
+              </div>
+            `;
+          })
+          .getCurrentCompData();
+      }
+
+      function displayCompData(data) {
+        const content = document.getElementById('content');
+
+        let html = `
+          <div class="formula-info">
+            <strong>Formula Detected:</strong> ${data.activeCell.formula}<br>
+            <strong>Sale Number:</strong> ${data.saleNumber}
+          </div>
+          
+          <div class="section">
+            <h3>Comp #${data.saleNumber} - Basic Information</h3>
+            <div class="field-group">
+              <label class="field-label">Address</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Address" value="${escapeHtml(
+                  data.compData.Address || ''
+                )}" />
+                <button onclick="updateField('Address', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Address', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <label class="field-label">Sale Price</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Sale Price" value="${escapeHtml(
+                  data.compData['Sale Price'] || ''
+                )}" />
+                <button onclick="updateField('Sale Price', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Sale Price', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <label class="field-label">Date of Sale</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Date of Sale" value="${escapeHtml(
+                  data.compData['Date of Sale'] || ''
+                )}" />
+                <button onclick="updateField('Date of Sale', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Date of Sale', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <label class="field-label">Land Size (AC)</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Land Size (AC)" value="${escapeHtml(
+                  data.compData['Land Size (AC)'] || ''
+                )}" />
+                <button onclick="updateField('Land Size (AC)', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Land Size (AC)', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <label class="field-label">Zoning</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Zoning" value="${escapeHtml(
+                  data.compData.Zoning || ''
+                )}" />
+                <button onclick="updateField('Zoning', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Zoning', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <label class="field-label">Comments</label>
+              <div class="field-value">
+                <input type="text" class="field-input" id="Comments" value="${escapeHtml(
+                  data.compData.Comments || ''
+                )}" />
+                <button onclick="updateField('Comments', '${
+                  data.saleNumber
+                }')" class="update-button">Update</button>
+                <a href="#" onclick="goToField('Comments', '${
+                  data.saleNumber
+                }')" class="field-link">Go to Field</a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Add parcel information if available
+        if (data.parcelData && data.parcelData.length > 0) {
+          html += `
+            <div class="section">
+              <h3>Parcel Information</h3>
+          `;
+
+          data.parcelData.forEach((parcel, index) => {
+            html += `
+              <div class="parcel-item">
+                <div class="parcel-header">Parcel ${index + 1}: ${
+              parcel.APN || 'No APN'
+            }</div>
+                <div class="field-group">
+                  <label class="field-label">Location</label>
+                  <div class="field-value">
+                    <input type="text" class="field-input" id="parcel_${
+                      parcel.APN
+                    }_Location" value="${escapeHtml(parcel.Location || '')}" />
+                    <button onclick="updateParcelField('${
+                      parcel.APN
+                    }', 'Location')" class="update-button">Update</button>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Legal Description</label>
+                  <div class="field-value">
+                    <input type="text" class="field-input" id="parcel_${
+                      parcel.APN
+                    }_Legal" value="${escapeHtml(parcel.Legal || '')}" />
+                    <button onclick="updateParcelField('${
+                      parcel.APN
+                    }', 'Legal')" class="update-button">Update</button>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Size (AC)</label>
+                  <div class="field-value">
+                    <input type="text" class="field-input" id="parcel_${
+                      parcel.APN
+                    }_Size (AC)" value="${escapeHtml(
+              parcel['Size (AC)'] || ''
+            )}" />
+                    <button onclick="updateParcelField('${
+                      parcel.APN
+                    }', 'Size (AC)')" class="update-button">Update</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          html += '</div>';
+        }
+
+        content.innerHTML = html;
+      }
+
+      function updateField(fieldName, compNumber) {
+        const input = document.getElementById(fieldName);
+        const newValue = input.value;
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (result.success) {
+              showStatus(result.message, 'success');
+            } else {
+              showStatus('Error: ' + result.error, 'error');
+            }
+          })
+          .withFailureHandler(function (error) {
+            showStatus('Failed to update: ' + error.message, 'error');
+          })
+          .updateCompField(compNumber, fieldName, newValue);
+      }
+
+      function updateParcelField(apn, fieldName) {
+        const input = document.getElementById(`parcel_${apn}_${fieldName}`);
+        const newValue = input.value;
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (result.success) {
+              showStatus(result.message, 'success');
+            } else {
+              showStatus('Error: ' + result.error, 'error');
+            }
+          })
+          .withFailureHandler(function (error) {
+            showStatus('Failed to update: ' + error.message, 'error');
+          })
+          .updateParcelField(apn, fieldName, newValue);
+      }
+
+      function goToField(fieldName, compNumber) {
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (result.success) {
+              // This will navigate to the cell in the spreadsheet
+              google.script.host.close();
+              // You could also use a different approach to highlight the cell
+            } else {
+              showStatus('Error: ' + result.error, 'error');
+            }
+          })
+          .withFailureHandler(function (error) {
+            showStatus('Failed to navigate: ' + error.message, 'error');
+          })
+          .getFieldLocation(fieldName, compNumber);
+      }
+
+      function showStatus(message, type) {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = `status-message status-${type}`;
+        statusDiv.textContent = message;
+
+        const content = document.getElementById('content');
+        content.insertBefore(statusDiv, content.firstChild);
+
+        // Remove status message after 5 seconds
+        setTimeout(function () {
+          if (statusDiv.parentNode) {
+            statusDiv.parentNode.removeChild(statusDiv);
+          }
+        }, 5000);
+      }
+
+      function refreshData() {
+        loadCompData();
+      }
+
+      function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        return text
+          .toString()
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+    </script>
+  </body>
+</html>

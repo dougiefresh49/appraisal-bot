@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        padding: 10px 20px 5px 20px;
+        border-bottom: none;
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 0 20px 16px 20px;
+        overflow-y: auto;
+      }
+
+      .folder-path {
+        background-color: #f0f0f0;
+        padding: 8px 10px;
+        margin: 8px 0;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      .folder-path span {
+        cursor: pointer;
+        color: #4285f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+      }
+      .folder-path span:hover {
+        background-color: #e3f2fd;
+      }
+      .folder-path .separator {
+        margin: 0 8px;
+        color: #666;
+      }
+
+      .controls {
+        margin: 5px 0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .back-button {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+      }
+
+      .back-button:hover {
+        background-color: #e8e8e8;
+      }
+
+      .file-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+
+      .file-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s;
+      }
+      .file-item:hover {
+        background-color: #f8f9fa;
+      }
+      .file-item.selected {
+        background-color: #e3f2fd;
+        border-left: 3px solid #4285f4;
+      }
+      .file-item input[type='checkbox'] {
+        margin-right: 12px;
+        transform: scale(1.2);
+      }
+      .file-item .file-icon {
+        margin-right: 12px;
+        font-size: 18px;
+      }
+      .file-item .file-details {
+        flex-grow: 1;
+      }
+      .file-item .file-name {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .file-item .file-meta {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .folder-item {
+        color: #1a73e8;
+      }
+      .file-item.file-type {
+        color: #34a853;
+      }
+
+      .project-info {
+        background-color: #e8f5e8;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 6px;
+        border-left: 4px solid #34a853;
+      }
+
+      .project-info h4 {
+        margin: 0 0 8px 0;
+        color: #1e7e34;
+      }
+
+      .project-info p {
+        margin: 0;
+        color: #2e7d32;
+      }
+
+      .folder-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 12px 0;
+      }
+
+      .folder-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 18px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .folder-card:hover {
+        border-color: #4285f4;
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.15);
+        transform: translateY(-1px);
+      }
+
+      .folder-card .folder-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+        color: #1a73e8;
+      }
+
+      .folder-card .folder-name {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .folder-card .folder-desc {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .message {
+        padding: 12px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        margin: 12px 0;
+        text-align: center;
+        color: #495057;
+      }
+
+      .footer {
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        padding: 32px 20px 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        bottom: 0;
+      }
+
+      .selected-files {
+        background-color: #e8f5e8;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border-left: 4px solid #34a853;
+        flex: 1;
+        margin-right: 15px;
+      }
+
+      .selected-files h4 {
+        margin: 0;
+        color: #1e7e34;
+        font-size: 14px;
+      }
+
+      .process-button {
+        background-color: #34a853;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+      }
+
+      .process-button:hover {
+        background-color: #2e7d32;
+      }
+
+      .process-button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="initialView">
+      <div class="header">
+        <div class="controls">
+          <button onclick="loadCurrentProject()" class="primary-button">
+            Load Current Project
+          </button>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="message">
+          Click "Load Current Project" to start browsing your appraisal project
+          files
+        </div>
+      </div>
+    </div>
+
+    <div id="projectView" class="hidden">
+      <div class="header">
+        <div class="controls">
+          <button onclick="goBackToInitial()" class="back-button">
+            ← Back
+          </button>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div id="projectInfo" class="project-info"></div>
+
+        <div id="folderGrid" class="folder-grid"></div>
+      </div>
+    </div>
+
+    <div id="folderView" class="hidden">
+      <div class="header">
+        <div class="controls">
+          <button onclick="goBackToProject()" class="back-button">
+            ← Back to Project
+          </button>
+        </div>
+        <div id="folderPath" class="folder-path"></div>
+      </div>
+
+      <div class="main-content">
+        <div id="fileList" class="file-list">
+          <div id="files"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div id="selectedFiles" class="selected-files hidden">
+          <h4>Selected Files (<span id="selectedCount">0</span>)</h4>
+        </div>
+        <button
+          id="processBtn"
+          onclick="processSelectedFiles()"
+          class="process-button"
+          disabled
+        >
+          Process Files
+        </button>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      let currentFiles = [];
+      let currentFolders = [];
+      let currentFolderPath = [];
+      let selectedFiles = new Set();
+      let currentFolderId = null;
+      let currentProject = null;
+
+      function loadCurrentProject() {
+        document.getElementById('initialView').classList.add('hidden');
+        document.getElementById('projectView').classList.remove('hidden');
+
+        google.script.run
+          .withSuccessHandler((result) => {
+            if (result.success) {
+              currentProject = result;
+              displayProjectInfo(result);
+            } else {
+              document.getElementById('projectInfo').innerHTML = `
+                <div class="message" style="background-color: #f8d7da; color: #721c24; border-left-color: #dc3545;">
+                  Error: ${result.error}
+                </div>
+              `;
+            }
+          })
+          .withFailureHandler((error) => {
+            document.getElementById('projectInfo').innerHTML = `
+              <div class="message" style="background-color: #f8d7da; color: #721c24; border-left-color: #dc3545;">
+                Failed to load project: ${error.message}
+              </div>
+            `;
+          })
+          .listAvailableFolders();
+      }
+
+      function displayProjectInfo(result) {
+        const projectInfoDiv = document.getElementById('projectInfo');
+        const folderGridDiv = document.getElementById('folderGrid');
+
+        projectInfoDiv.innerHTML = `
+          <h4>Current Project: ${result.projectName}</h4>
+          <p>Select a folder to browse files</p>
+        `;
+
+        folderGridDiv.innerHTML = '';
+        result.folders.forEach((folder) => {
+          const folderCard = document.createElement('div');
+          folderCard.className = 'folder-card';
+          folderCard.onclick = () => openFolder(folder);
+
+          // Determine folder icon and description based on name
+          let icon = '📁';
+          let desc = 'Project folder';
+
+          if (folder.name.toLowerCase().includes('report')) {
+            icon = '��';
+            desc = 'Report documents and data';
+          } else if (folder.name.toLowerCase().includes('comp')) {
+            icon = '��';
+            desc = 'Comparable property data';
+          } else if (folder.name.toLowerCase().includes('subject')) {
+            icon = '��';
+            desc = 'Subject property information';
+          } else if (folder.name.toLowerCase().includes('engagement')) {
+            icon = '��';
+            desc = 'Engagement documents';
+          }
+
+          folderCard.innerHTML = `
+            <div class="folder-icon">${icon}</div>
+            <div class="folder-name">${folder.name}</div>
+            <div class="folder-desc">${desc}</div>
+          `;
+
+          folderGridDiv.appendChild(folderCard);
+        });
+      }
+
+      function openFolder(folder) {
+        currentFolderPath = [{ id: folder.id, name: folder.name }];
+        loadFolderContents(folder.id);
+
+        document.getElementById('projectView').classList.add('hidden');
+        document.getElementById('folderView').classList.remove('hidden');
+      }
+
+      function loadFolderContents(folderId) {
+        google.script.run
+          .withSuccessHandler((result) => {
+            if (result.success) {
+              currentFiles = result.files;
+              currentFolders = result.folders;
+              currentFolderId = folderId;
+              displayFolderContents(result);
+            } else {
+              document.getElementById('files').innerHTML = `
+                <div class="message" style="background-color: #f8d7da; color: #721c24; border-left-color: #dc3545;">
+                  Error loading folder: ${result.error}
+                </div>
+              `;
+            }
+          })
+          .withFailureHandler((error) => {
+            document.getElementById('files').innerHTML = `
+              <div class="message" style="background-color: #f8d7da; color: #721c24; border-left-color: #dc3545;">
+                Failed to load folder: ${error.message}
+              </div>
+            `;
+          })
+          .getFolderContents(folderId);
+      }
+
+      function displayFolderContents(result) {
+        const filesDiv = document.getElementById('files');
+
+        if (result.files.length === 0 && result.folders.length === 0) {
+          filesDiv.innerHTML =
+            '<div class="message">No files or folders found in this directory</div>';
+        } else {
+          filesDiv.innerHTML = '';
+
+          // Display folders first
+          result.folders.forEach((folder) => {
+            const folderDiv = document.createElement('div');
+            folderDiv.className = 'file-item folder-item';
+            folderDiv.innerHTML = `
+              <span class="file-icon">📁</span>
+              <div class="file-details">
+                <div class="file-name">${folder.name}</div>
+                <div class="file-meta">Folder • Updated: ${new Date(
+                  folder.lastUpdated
+                ).toLocaleDateString()}</div>
+              </div>
+            `;
+            folderDiv.onclick = () => navigateToFolder(folder);
+            filesDiv.appendChild(folderDiv);
+          });
+
+          // Display files
+          result.files.forEach((file) => {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'file-item file-type';
+            fileDiv.innerHTML = `
+              <input type="checkbox" id="file-${
+                file.id
+              }" onchange="toggleFileSelection('${file.id}', this.checked)">
+              <span class="file-icon">📄</span>
+              <div class="file-details">
+                <div class="file-name">${file.name}</div>
+                <div class="file-meta">${file.mimeType} • ${formatFileSize(
+              file.size
+            )} • Updated: ${new Date(
+              file.lastUpdated
+            ).toLocaleDateString()}</div>
+              </div>
+            `;
+            fileDiv.onclick = (e) => {
+              if (e.target.type !== 'checkbox') {
+                selectFile(file);
+              }
+            };
+            filesDiv.appendChild(fileDiv);
+          });
+        }
+      }
+
+      function displayFolderPath() {
+        const pathDiv = document.getElementById('folderPath');
+        if (currentFolderPath.length > 0) {
+          let pathHtml = '';
+          currentFolderPath.forEach((folder, index) => {
+            if (index > 0) {
+              pathHtml += '<span class="separator">></span>';
+            }
+            pathHtml += `<span onclick="navigateToPathIndex(${index})">${folder.name}</span>`;
+          });
+          pathDiv.innerHTML = pathHtml;
+        }
+      }
+
+      function navigateToFolder(folder) {
+        currentFolderPath.push({ id: folder.id, name: folder.name });
+        loadFolderContents(folder.id);
+        displayFolderPath();
+      }
+
+      function navigateToPathIndex(index) {
+        currentFolderPath = currentFolderPath.slice(0, index + 1);
+        if (currentFolderPath.length > 0) {
+          loadFolderContents(
+            currentFolderPath[currentFolderPath.length - 1].id
+          );
+          displayFolderPath();
+        }
+      }
+
+      function toggleFileSelection(fileId, isSelected) {
+        if (isSelected) {
+          selectedFiles.add(fileId);
+        } else {
+          selectedFiles.delete(fileId);
+        }
+        updateSelectedFilesDisplay();
+        updateProcessButton();
+      }
+
+      function selectFile(file) {
+        const checkbox = document.getElementById('file-' + file.id);
+        if (checkbox) {
+          checkbox.checked = !checkbox.checked;
+          toggleFileSelection(file.id, checkbox.checked);
+        }
+      }
+
+      function updateSelectedFilesDisplay() {
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedFilesDiv = document.getElementById('selectedFiles');
+
+        selectedCount.textContent = selectedFiles.size;
+
+        if (selectedFiles.size > 0) {
+          selectedFilesDiv.classList.remove('hidden');
+        } else {
+          selectedFilesDiv.classList.add('hidden');
+        }
+      }
+
+      function updateProcessButton() {
+        const processBtn = document.getElementById('processBtn');
+        processBtn.disabled = selectedFiles.size === 0;
+      }
+
+      function processSelectedFiles() {
+        const selectedFileList = Array.from(selectedFiles)
+          .map((fileId) => {
+            return currentFiles.find((f) => f.id === fileId);
+          })
+          .filter(Boolean);
+
+        if (selectedFileList.length === 0) {
+          return;
+        }
+
+        // Send file IDs to the n8n function
+        const fileIds = Array.from(selectedFiles);
+
+        google.script.run
+          .withSuccessHandler((result) => {
+            // Show success message
+            document.getElementById('files').innerHTML = `
+              <div class="message" style="background-color: #d4edda; color: #155724; border-left-color: #28a745;">
+                <h4>Files Sent Successfully!</h4>
+                <p>${result}</p>
+                <p>Selected files: ${selectedFileList
+                  .map((f) => f.name)
+                  .join(', ')}</p>
+              </div>
+            `;
+
+            // Clear selection
+            selectedFiles.clear();
+            updateSelectedFilesDisplay();
+            updateProcessButton();
+          })
+          .withFailureHandler((error) => {
+            document.getElementById('files').innerHTML = `
+              <div class="message" style="background-color: #f8d7da; color: #721c24; border-left-color: #dc3545;">
+                <h4>Error Processing Files</h4>
+                <p>${error.message}</p>
+              </div>
+            `;
+          })
+          .sendFileIdsToN8n(fileIds);
+      }
+
+      function goBackToInitial() {
+        document.getElementById('projectView').classList.add('hidden');
+        document.getElementById('initialView').classList.remove('hidden');
+        currentProject = null;
+      }
+
+      function goBackToProject() {
+        document.getElementById('folderView').classList.add('hidden');
+        document.getElementById('projectView').classList.remove('hidden');
+        currentFolderPath = [];
+        selectedFiles.clear();
+        updateSelectedFilesDisplay();
+        updateProcessButton();
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+    </script>
+  </body>
+</html>

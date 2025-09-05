@@ -31,6 +31,7 @@
     "ecad:data": "tsx --env-file=.env ./scripts/ecad/fetch-prop-data.ts",
     "realapi:details": "tsx --env-file=.env ./scripts/real-api/save-details.ts",
     "realapi:stats": "tsx --env-file=.env ./scripts/real-api/get-neighborhood-stats.ts",
-    "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts"
+    "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts",
+    "push:apbot-report-data": "clasp push --project ./app-scripts/apbot-report-data"
   }
 }

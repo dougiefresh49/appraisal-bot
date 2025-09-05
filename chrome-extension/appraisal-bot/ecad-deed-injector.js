@@ -19,12 +19,98 @@ chrome.storage.local.get(['searchState'], (result) => {
   }
 });
 
+// Function to clear all form fields
+function clearAllFormFields() {
+  console.log('Clearing all form fields...');
+
+  // List of all input fields to clear based on the form HTML
+  const fieldsToClear = [
+    '#field_BothNamesID',
+    '#field_GrantorID',
+    '#field_GranteeID',
+    '#field_RecordingDateID_DOT_StartDate',
+    '#field_RecordingDateID_DOT_EndDate',
+    '#field_DocumentNumberID',
+    '#field_BookPageID_DOT_Book',
+    '#field_BookPageID_DOT_Volume',
+    '#field_BookPageID_DOT_Page',
+    '#field_PlattedLegalID_DOT_Subdivision',
+    '#field_PlattedLegalID_DOT_Lot',
+    '#field_PlattedLegalID_DOT_Block',
+    '#field_PlattedLegalID_DOT_Tract',
+    '#field_PlattedLegalID_DOT_Unit',
+    '#field_selfservice_documentTypes',
+  ];
+
+  fieldsToClear.forEach((selector) => {
+    const field = document.querySelector(selector);
+    if (field) {
+      field.value = '';
+      console.log(`Cleared field: ${selector}`);
+    }
+  });
+
+  // Clear typeahead selected values (hidden inputs and selected tags)
+  const typeaheadFields = [
+    'field_BothNamesID',
+    'field_GrantorID',
+    'field_GranteeID',
+    'field_PlattedLegalID_DOT_Subdivision',
+    'field_selfservice_documentTypes',
+  ];
+
+  typeaheadFields.forEach((fieldId) => {
+    // Clear hidden input values
+    const holderInput = document.querySelector(`#${fieldId}-holderInput`);
+    const holderValue = document.querySelector(`#${fieldId}-holderValue`);
+
+    if (holderInput) {
+      holderInput.value = '';
+      console.log(`Cleared hidden input: ${fieldId}-holderInput`);
+    }
+    if (holderValue) {
+      holderValue.value = '';
+      console.log(`Cleared hidden input: ${fieldId}-holderValue`);
+    }
+
+    // Remove selected tag elements (the blue chips)
+    const holder = document.querySelector(`#${fieldId}-holder`);
+    if (holder) {
+      const selectedTags = holder.querySelectorAll(
+        '.cblist-input-list.transition-background'
+      );
+      selectedTags.forEach((tag) => {
+        tag.remove();
+        console.log(`Removed selected tag for: ${fieldId}`);
+      });
+    }
+  });
+
+  // Also clear any checkbox fields
+  const checkboxField = document.querySelector('#field_UseAdvancedSearch');
+  if (checkboxField) {
+    checkboxField.checked = false;
+    console.log('Cleared advanced search checkbox');
+  }
+
+  console.log('All form fields cleared successfully');
+}
+
 // Function to auto-fill the search field and click the search button
 function autoFillAndSearch() {
   const params = new URLSearchParams(window.location.search);
   const instrumentNumber = params.get('doc');
   const volume = params.get('volume');
   const page = params.get('page');
+
+  // Only proceed if we have parameters to auto-fill
+  if (!instrumentNumber && !(volume && page)) {
+    console.log('No auto-fill parameters found, skipping...');
+    return;
+  }
+
+  // Clear all fields first to ensure clean state
+  clearAllFormFields();
 
   if (!!instrumentNumber) {
     console.log(`Auto-filling document number: ${instrumentNumber}`);
