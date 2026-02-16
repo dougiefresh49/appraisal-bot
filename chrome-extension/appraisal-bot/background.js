@@ -39,6 +39,7 @@ function setPersistentCookies() {
     }
   );
 
+  // TODO: fix this when updating to Midland GIS autofil
   // Midland GIS splash cookie
   chrome.cookies.set(
     {
@@ -115,33 +116,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       console.error('Invalid zoning data received:', request.data);
     }
-  } else if (request.action === 'getSalePriceFromDeedSearch') {
-    console.log('Received sale price from deed search request:', request);
-    getSalePriceFromDeedSearch(request.instrumentNumber, sender)
+  } else if (request.action === 'getParcelsFromAdvSearch') {
+    console.log('Received parcels request from adv search:', request);
+    getParcelsFromAdvSearch(request.instrumentNumber, sender)
       .then((data) => {
-        console.log('Sending back sale price data from deed search:', data);
+        console.log('Sending back parcels data from adv search:', data);
         sendResponse({ success: true, data });
       })
       .catch((error) => {
-        console.error('Sale price from deed search failed:', error);
+        console.error('Parcels from adv search failed:', error);
         sendResponse({ success: false, error: error.message });
       });
     return true;
-  } else if (request.action === 'salePriceDataFromDeedSearch') {
+  } else if (request.action === 'parcelsFromAdvSearch') {
     console.log(
-      'Received sale price data from deed-search-injector:',
+      'Received parcels data from adv-search-injector:',
       request.data
     );
     if (request.data && typeof request.data === 'object') {
-      chrome.storage.local.set(
-        { salePriceDataFromDeedSearch: request.data },
-        () => {
-          console.log('Sale price data from deed search stored successfully');
-        }
-      );
+      chrome.storage.local.set({ parcelsFromAdvSearch: request.data }, () => {
+        console.log('Parcels data from adv search stored successfully');
+      });
     } else {
       console.error(
-        'Invalid sale price data from deed search received:',
+        'Invalid parcels data from adv search received:',
         request.data
       );
     }
@@ -230,37 +228,37 @@ async function getZoning(address, sender) {
   });
 }
 
-async function getSalePriceFromDeedSearch(instrumentNumber, sender) {
+async function getParcelsFromAdvSearch(instrumentNumber, sender) {
   return new Promise((resolve, reject) => {
     console.log(
-      'Starting sale price search from deed search for Instrument:',
+      'Starting parcels search from adv search for Instrument:',
       instrumentNumber
     );
 
-    // Create the deed search URL (same as the advSearchUrl in ecad-injector.js)
-    const deedSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrumentNumber}&type=r`;
+    // Create the adv search URL (same as the advSearchUrl in ecad-injector.js)
+    const advSearchUrl = `https://search.ectorcad.org/search/adv?query[sale][instr_num]=${instrumentNumber}&type=r`;
 
     chrome.tabs.create(
       {
-        url: deedSearchUrl,
+        url: advSearchUrl,
         active: false,
       },
       (tab) => {
-        console.log('Created deed search tab:', tab.id);
+        console.log('Created adv search tab:', tab.id);
 
         const checkData = setInterval(() => {
-          chrome.storage.local.get('salePriceDataFromDeedSearch', (result) => {
-            if (result.salePriceDataFromDeedSearch) {
+          chrome.storage.local.get('parcelsFromAdvSearch', (result) => {
+            if (result.parcelsFromAdvSearch) {
               console.log(
-                'Found sale price data from deed search:',
-                result.salePriceDataFromDeedSearch
+                'Found parcels data from adv search:',
+                result.parcelsFromAdvSearch
               );
               clearInterval(checkData);
-              chrome.storage.local.remove('salePriceDataFromDeedSearch'); // Clean up
-              resolve(result.salePriceDataFromDeedSearch);
+              chrome.storage.local.remove('parcelsFromAdvSearch'); // Clean up
+              resolve(result.parcelsFromAdvSearch);
 
               // Close the tab
-              console.log('Closing deed search tab:', tab.id);
+              console.log('Closing adv search tab:', tab.id);
               chrome.tabs.remove(tab.id);
             }
           });
@@ -270,13 +268,11 @@ async function getSalePriceFromDeedSearch(instrumentNumber, sender) {
         setTimeout(() => {
           clearInterval(checkData);
           reject(
-            new Error(
-              'Sale price data from deed search not found after 30 seconds'
-            )
+            new Error('Parcels data from adv search not found after 30 seconds')
           );
 
           // Close the tab
-          console.log('Closing deed search tab:', tab.id);
+          console.log('Closing adv search tab:', tab.id);
           chrome.tabs.remove(tab.id);
         }, 30000);
       }

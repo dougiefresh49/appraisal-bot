@@ -108,6 +108,32 @@ function linkAddressToGoogleMaps(address, addressElement) {
   googleMapsLink.style =
     'color: #0044cc; font-weight: bold; text-decoration: underline; margin-left: 8px;';
   addressElement.insertAdjacentElement('afterend', googleMapsLink);
+
+  // Update page title with property address
+  updatePageTitle(address);
+}
+
+function updatePageTitle(fullAddress) {
+  try {
+    // Extract street address (remove city, state, zip)
+    // Common patterns: "1234 Some St, Midland, TX 79703" or "1234 Some St, Midland, TX"
+    const addressMatch = fullAddress.match(
+      /^(.+?)(?:\s*,\s*[^,]+(?:\s*,\s*[A-Z]{2}\s*\d{5})?)?$/
+    );
+
+    if (addressMatch && addressMatch[1]) {
+      const streetAddress = addressMatch[1].trim();
+      const newTitle = `${streetAddress} - MLS`;
+
+      // Update the document title
+      document.title = newTitle;
+      console.log(`📝 Updated page title to: "${newTitle}"`);
+    } else {
+      console.warn('Could not parse address for title update:', fullAddress);
+    }
+  } catch (error) {
+    console.error('Error updating page title:', error);
+  }
 }
 
 function updateMlsAddressLink() {

@@ -1067,6 +1067,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Initialize Navica Tools
+  initializeNavicaTools();
+
   // Handle file selection
   // selectFolderBtn.addEventListener('click', async () => {
   //   try {
@@ -1121,4 +1124,687 @@ document.addEventListener('DOMContentLoaded', () => {
       // This could send a message to the active tab to extract MLS data
     });
   }
+
+  // Report Data Event Listeners
+  const generateReportDataBtn = document.getElementById(
+    'generate-report-data-btn'
+  );
+  const saveReportDataBtn = document.getElementById('save-report-data-btn');
+  const backToReportInputBtn = document.getElementById(
+    'back-to-report-input-btn'
+  );
+  const selectReportFileBtn = document.getElementById('select-report-file-btn');
+  const reportFileInput = document.getElementById('report-file-input');
+
+  if (generateReportDataBtn) {
+    generateReportDataBtn.addEventListener('click', generateReportData);
+  }
+
+  if (saveReportDataBtn) {
+    saveReportDataBtn.addEventListener('click', saveReportData);
+  }
+
+  if (backToReportInputBtn) {
+    backToReportInputBtn.addEventListener('click', backToReportInput);
+  }
+
+  // Handle Report JSON file selection
+  if (selectReportFileBtn) {
+    selectReportFileBtn.addEventListener('click', () => {
+      reportFileInput.click();
+    });
+  }
+
+  if (reportFileInput) {
+    reportFileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        console.log('📁 Report JSON file selected:', {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+        });
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          document.getElementById('report-data-input').value = content;
+
+          // Save the loaded content
+          chrome.storage.local.set({
+            apbotReportData: content,
+          });
+
+          console.log('📁 Report JSON file loaded successfully');
+        };
+
+        reader.onerror = () => {
+          console.error('❌ Error reading report JSON file');
+          alert('Error reading the selected file. Please try again.');
+        };
+
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  // Load saved report data
+  chrome.storage.local.get(['apbotReportData'], (result) => {
+    if (result.apbotReportData) {
+      document.getElementById('report-data-input').value =
+        result.apbotReportData;
+    }
+  });
 });
+
+// Report Data Functions
+function generateReportData() {
+  const jsonInput = document.getElementById('report-data-input').value.trim();
+  if (!jsonInput) {
+    alert('Please paste your Google Sheets export JSON data first.');
+    return;
+  }
+
+  try {
+    const reportData = JSON.parse(jsonInput);
+    console.log('Parsed report data:', reportData);
+    displayReportData(reportData);
+
+    // Show the display section and hide the input section
+    document
+      .getElementById('report-data-input-section')
+      .classList.add('hidden');
+    document
+      .getElementById('report-data-display-section')
+      .classList.remove('hidden');
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+    alert('Invalid JSON data. Please check your input and try again.');
+  }
+}
+
+function displayReportData(reportData) {
+  const container = document.getElementById('report-data-container');
+  container.innerHTML = '';
+
+  // Define the order and display names for sections
+  const sectionOrder = [
+    { key: 'ClientDataRange', title: 'Client Data' },
+    { key: 'NeighborhoodBoundariesRange', title: 'Neighborhood Boundaries' },
+    { key: 'ReportInputsRange', title: 'Report Inputs' },
+    { key: 'SubjectRange', title: 'Subject' },
+    { key: 'CompsLandSummaryRange', title: 'Comps Land Summary' },
+    { key: 'CompsSalesSummaryRange', title: 'Comps Sales Summary' },
+    { key: 'CompsRentalsSummaryRange', title: 'Comps Rentals Summary' },
+    { key: 'TaxEntitiesRange', title: 'Tax Entities' },
+    { key: 'FemaDataRange', title: 'FEMA Data' },
+  ];
+
+  sectionOrder.forEach(({ key, title }) => {
+    if (
+      reportData[key] &&
+      Array.isArray(reportData[key]) &&
+      reportData[key].length > 0
+    ) {
+      const sectionDiv = createReportSection(title, reportData[key]);
+      container.appendChild(sectionDiv);
+    }
+  });
+}
+
+function createReportSection(title, dataArray) {
+  const sectionDiv = document.createElement('div');
+  sectionDiv.className = 'report-section';
+
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'report-section-title';
+  titleDiv.textContent = title;
+  sectionDiv.appendChild(titleDiv);
+
+  // Special handling for Comp Summary sections
+  if (title.includes('Comps') && title.includes('Summary')) {
+    return createCompSummarySection(title, dataArray, sectionDiv);
+  }
+
+  // Special handling for Subject data
+  if (title === 'Subject' && dataArray.length === 1) {
+    const subjectData = dataArray[0];
+    const keys = Object.keys(subjectData);
+
+    // Sort keys to show most important fields first
+    const importantFields = [
+      'Address',
+      'APN',
+      'Legal',
+      'Property Rights',
+      'Type',
+      'County',
+      'City',
+      'State',
+      'Zip',
+    ];
+    const sortedKeys = [
+      ...importantFields.filter((key) => keys.includes(key)),
+      ...keys.filter((key) => !importantFields.includes(key)),
+    ];
+
+    sortedKeys.forEach((key) => {
+      const value = subjectData[key];
+      if (value !== undefined && value !== null && value !== '') {
+        const itemDiv = createSubjectDataItem(key, String(value));
+        sectionDiv.appendChild(itemDiv);
+      }
+    });
+  } else {
+    // Standard handling for other data types
+    dataArray.forEach((item) => {
+      const itemDiv = createReportDataItem(item);
+      sectionDiv.appendChild(itemDiv);
+    });
+  }
+
+  return sectionDiv;
+}
+
+function createCompSummarySection(title, dataArray, sectionDiv) {
+  if (!dataArray || dataArray.length === 0) {
+    return sectionDiv;
+  }
+
+  // Create navigation container using existing comp grid styles
+  const navContainer = document.createElement('div');
+  navContainer.className = 'comp-navigation';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.innerHTML = '←';
+  prevBtn.disabled = true;
+
+  const counterSpan = document.createElement('span');
+  counterSpan.id = 'comp-counter';
+  counterSpan.textContent = `Row 1 of ${dataArray.length}`;
+
+  const nextBtn = document.createElement('button');
+  nextBtn.innerHTML = '→';
+  nextBtn.disabled = dataArray.length <= 1;
+
+  navContainer.appendChild(prevBtn);
+  navContainer.appendChild(counterSpan);
+  navContainer.appendChild(nextBtn);
+
+  // Create data container using existing comp grid styles
+  const dataContainer = document.createElement('div');
+  dataContainer.className = 'space-y-2';
+
+  // Store current index
+  let currentIndex = 0;
+
+  // Function to update display
+  function updateDisplay() {
+    const currentItem = dataArray[currentIndex];
+    dataContainer.innerHTML = '';
+
+    // Sort keys to show important fields first
+    const keys = Object.keys(currentItem);
+    const importantFields = ['#', 'Address', 'Property Rights', 'Date of Sale'];
+    const sortedKeys = [
+      ...importantFields.filter((key) => keys.includes(key)),
+      ...keys.filter((key) => !importantFields.includes(key)),
+    ];
+
+    sortedKeys.forEach((key) => {
+      const value = currentItem[key];
+      if (value !== undefined && value !== null && value !== '') {
+        const itemDiv = createCompDataItem(key, String(value));
+        dataContainer.appendChild(itemDiv);
+      }
+    });
+
+    // Update counter
+    counterSpan.textContent = `Row ${currentIndex + 1} of ${dataArray.length}`;
+
+    // Update navigation buttons
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === dataArray.length - 1;
+  }
+
+  // Event listeners for navigation
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateDisplay();
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < dataArray.length - 1) {
+      currentIndex++;
+      updateDisplay();
+    }
+  });
+
+  // Initial display
+  updateDisplay();
+
+  sectionDiv.appendChild(navContainer);
+  sectionDiv.appendChild(dataContainer);
+
+  return sectionDiv;
+}
+
+function createCompDataItem(label, value) {
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'comp-data-item';
+
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'comp-data-label';
+  labelSpan.textContent = label;
+
+  const valueSpan = document.createElement('div');
+  valueSpan.className = 'comp-data-value';
+  valueSpan.textContent = value;
+  valueSpan.setAttribute('data-value', value);
+  valueSpan.addEventListener('click', () => copyToClipboard(value, valueSpan));
+
+  itemDiv.appendChild(labelSpan);
+  itemDiv.appendChild(valueSpan);
+
+  return itemDiv;
+}
+
+function createReportDataItem(item) {
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'report-data-item';
+
+  // Handle different data structures
+  let label, value, variableName;
+
+  if (item.label && item.value !== undefined) {
+    // Standard format: { label: "Client Name", value: "John Doe", variableName: "ClientName" }
+    label = item.label;
+    value = String(item.value);
+    variableName = item.variableName;
+  } else if (item.Side && item['Street Name']) {
+    // Neighborhood boundaries format: { Side: "North", Street Name: "Business 20" }
+    label = item.Side;
+    value = item['Street Name'];
+  } else if (item.Entity && item.Rate) {
+    // Tax entities format: { Entity: "ECTOR COUNTY", Rate: "$0.35" }
+    label = item.Entity;
+    value = item.Rate;
+  } else {
+    // Subject data format: { Address: "360 SE LOOP 338...", Type: "Improvements", etc. }
+    // Use the first property as label and second as value
+    const keys = Object.keys(item);
+    if (keys.length >= 2) {
+      label = keys[0];
+      value = String(item[keys[1]] || '');
+    } else if (keys.length === 1) {
+      label = keys[0];
+      value = String(item[keys[0]] || '');
+    } else {
+      label = 'Unknown';
+      value = '';
+    }
+  }
+
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'report-data-label';
+  labelSpan.textContent = label;
+
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'report-data-value';
+  valueSpan.textContent = value;
+  valueSpan.setAttribute('data-value', value);
+  valueSpan.addEventListener('click', () => copyReportValue(valueSpan));
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'report-copy-btn';
+  copyBtn.innerHTML = `
+    <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+    </svg>`;
+  copyBtn.title = 'Copy value';
+  copyBtn.addEventListener('click', () => copyReportValue(valueSpan));
+
+  // Clear any existing content and append elements properly
+  itemDiv.innerHTML = '';
+  itemDiv.appendChild(labelSpan);
+  itemDiv.appendChild(valueSpan);
+  itemDiv.appendChild(copyBtn);
+
+  return itemDiv;
+}
+
+function createSubjectDataItem(label, value) {
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'report-data-item';
+
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'report-data-label';
+  labelSpan.textContent = label;
+
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'report-data-value';
+  valueSpan.textContent = value;
+  valueSpan.setAttribute('data-value', value);
+  valueSpan.addEventListener('click', () => copyReportValue(valueSpan));
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'report-copy-btn';
+  copyBtn.innerHTML = `
+    <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+    </svg>`;
+  copyBtn.title = 'Copy value';
+  copyBtn.addEventListener('click', () => copyReportValue(valueSpan));
+
+  itemDiv.appendChild(labelSpan);
+  itemDiv.appendChild(valueSpan);
+  itemDiv.appendChild(copyBtn);
+
+  return itemDiv;
+}
+
+function copyReportValue(element) {
+  const value = element.getAttribute('data-value');
+  if (!value) return;
+
+  navigator.clipboard
+    .writeText(value)
+    .then(() => {
+      // Find the copy button in the same item
+      const copyBtn = element.parentElement.querySelector('.report-copy-btn');
+      if (copyBtn) {
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>`;
+        copyBtn.classList.add('copied');
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.classList.remove('copied');
+        }, 1500);
+      }
+    })
+    .catch((err) => {
+      console.error('Failed to copy:', err);
+      const copyBtn = element.parentElement.querySelector('.report-copy-btn');
+      if (copyBtn) {
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>`;
+        copyBtn.classList.add('error');
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.classList.remove('error');
+        }, 2000);
+      }
+    });
+}
+
+function saveReportData() {
+  const jsonInput = document.getElementById('report-data-input').value.trim();
+  if (!jsonInput) {
+    alert('Please paste your Google Sheets export JSON data first.');
+    return;
+  }
+
+  try {
+    // Validate JSON
+    JSON.parse(jsonInput);
+
+    chrome.storage.local.set({ apbotReportData: jsonInput }, () => {
+      console.log('Report data saved successfully');
+      showReportSaveSuccess();
+    });
+  } catch (error) {
+    console.error('Error saving report data:', error);
+    alert('Invalid JSON data. Please check your input and try again.');
+  }
+}
+
+function showReportSaveSuccess() {
+  const saveBtn = document.getElementById('save-report-data-btn');
+  const originalText = saveBtn.textContent;
+  const originalClass = saveBtn.className;
+
+  saveBtn.textContent = 'Saved!';
+  saveBtn.className = originalClass.replace(
+    'bg-green-600 hover:bg-green-700',
+    'bg-green-500'
+  );
+
+  setTimeout(() => {
+    saveBtn.textContent = originalText;
+    saveBtn.className = originalClass;
+  }, 2000);
+}
+
+function backToReportInput() {
+  document
+    .getElementById('report-data-display-section')
+    .classList.add('hidden');
+  document
+    .getElementById('report-data-input-section')
+    .classList.remove('hidden');
+}
+
+// Navica Tools Functions
+function initializeNavicaTools() {
+  console.log('🔧 Initializing Navica Tools...');
+
+  // Get current active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      updateNavicaButtonStates(tabs[0].url);
+    }
+  });
+
+  // Listen for tab updates
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url) {
+      updateNavicaButtonStates(tab.url);
+    }
+  });
+
+  // Listen for tab activation changes
+  chrome.tabs.onActivated.addListener((activeInfo) => {
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (tab.url) {
+        updateNavicaButtonStates(tab.url);
+      }
+    });
+  });
+
+  // Add event listeners for Navica Tools buttons
+  const addSearchCriteriaCompsBtn = document.getElementById(
+    'add-search-criteria-comps'
+  );
+  const addSearchCriteriaNbhBtn = document.getElementById(
+    'add-search-criteria-nbh'
+  );
+  const saveStatsBtn = document.getElementById('save-stats');
+  const saveMcReportBtn = document.getElementById('save-mc-report');
+  const exportCsvBtn = document.getElementById('export-csv');
+  const highlightListingsBtn = document.getElementById('highlight-listings');
+
+  if (addSearchCriteriaCompsBtn) {
+    addSearchCriteriaCompsBtn.addEventListener('click', () => {
+      executeNavicaAction('addSearchCriteriaComps');
+    });
+  }
+
+  if (addSearchCriteriaNbhBtn) {
+    addSearchCriteriaNbhBtn.addEventListener('click', () => {
+      executeNavicaAction('addSearchCriteriaNbh');
+    });
+  }
+
+  if (saveStatsBtn) {
+    saveStatsBtn.addEventListener('click', () => {
+      executeNavicaAction('saveStats');
+    });
+  }
+
+  if (saveMcReportBtn) {
+    saveMcReportBtn.addEventListener('click', () => {
+      executeNavicaAction('saveMcReport');
+    });
+  }
+
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', () => {
+      executeNavicaAction('exportCsv');
+    });
+  }
+
+  if (highlightListingsBtn) {
+    highlightListingsBtn.addEventListener('click', () => {
+      executeNavicaAction('highlightListings');
+    });
+  }
+}
+
+function updateNavicaButtonStates(currentUrl) {
+  const isSearchPage =
+    currentUrl &&
+    currentUrl.includes('https://next.navicamls.net/381/Search/CriteriaFull');
+  const isResultsPage =
+    currentUrl &&
+    currentUrl.includes('https://next.navicamls.net/381/Search/ResultsFull');
+  const isNavica = currentUrl && currentUrl.includes('next.navicamls.net/381');
+
+  // Update status text
+  const statusText = document.getElementById('navica-status-text');
+  const statusContainer = document.querySelector('.navica-status');
+
+  if (statusText && statusContainer) {
+    if (isNavica) {
+      statusText.textContent = 'On Navica MLS';
+      statusContainer.classList.add('active');
+    } else {
+      statusText.textContent = 'Not on Navica MLS';
+      statusContainer.classList.remove('active');
+    }
+  }
+
+  // Enable/disable buttons based on current page
+  const addSearchCriteriaCompsBtn = document.getElementById(
+    'add-search-criteria-comps'
+  );
+  const addSearchCriteriaNbhBtn = document.getElementById(
+    'add-search-criteria-nbh'
+  );
+  const saveStatsBtn = document.getElementById('save-stats');
+  const saveMcReportBtn = document.getElementById('save-mc-report');
+  const exportCsvBtn = document.getElementById('export-csv');
+  const highlightListingsBtn = document.getElementById('highlight-listings');
+
+  // COMMENTED OUT RESTRICTIVE LOGIC - Enable all buttons if on Navica
+  if (isNavica) {
+    // Enable all buttons if on any Navica page
+    if (addSearchCriteriaCompsBtn) addSearchCriteriaCompsBtn.disabled = false;
+    if (addSearchCriteriaNbhBtn) addSearchCriteriaNbhBtn.disabled = false;
+    if (saveStatsBtn) saveStatsBtn.disabled = false;
+    if (saveMcReportBtn) saveMcReportBtn.disabled = false;
+    if (exportCsvBtn) exportCsvBtn.disabled = false;
+    if (highlightListingsBtn) highlightListingsBtn.disabled = false;
+  } else {
+    // Disable all buttons if not on Navica
+    if (addSearchCriteriaCompsBtn) addSearchCriteriaCompsBtn.disabled = true;
+    if (addSearchCriteriaNbhBtn) addSearchCriteriaNbhBtn.disabled = true;
+    if (saveStatsBtn) saveStatsBtn.disabled = true;
+    if (saveMcReportBtn) saveMcReportBtn.disabled = true;
+    if (exportCsvBtn) exportCsvBtn.disabled = true;
+    if (highlightListingsBtn) highlightListingsBtn.disabled = true;
+  }
+
+  /* ORIGINAL RESTRICTIVE LOGIC - COMMENTED OUT
+  if (addSearchCriteriaCompsBtn)
+    addSearchCriteriaCompsBtn.disabled = !isSearchPage;
+  if (addSearchCriteriaNbhBtn) addSearchCriteriaNbhBtn.disabled = !isSearchPage;
+
+  // For results page buttons, check if we're on results page AND table exists
+  if (isResultsPage) {
+    // Check for results table with a delay to account for slow loading
+    setTimeout(() => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (
+          tabs[0] &&
+          tabs[0].url.includes('next.navicamls.net/381/Search/ResultsFull')
+        ) {
+          chrome.tabs.sendMessage(
+            tabs[0].id,
+            { action: 'checkResultsTable' },
+            (response) => {
+              const hasResultsTable = response && response.hasTable;
+
+              if (saveStatsBtn) saveStatsBtn.disabled = !hasResultsTable;
+              if (saveMcReportBtn) saveMcReportBtn.disabled = !hasResultsTable;
+              if (exportCsvBtn) exportCsvBtn.disabled = !hasResultsTable;
+              if (highlightListingsBtn)
+                highlightListingsBtn.disabled = !hasResultsTable;
+
+              // Update status text to show table status
+              if (statusText) {
+                if (hasResultsTable) {
+                  statusText.textContent = 'On Navica MLS - Results Loaded';
+                } else {
+                  statusText.textContent = 'On Navica MLS - Loading Results...';
+                }
+              }
+            }
+          );
+        }
+      });
+    }, 2000); // Wait 2 seconds for page to load
+
+    // Initially disable results buttons while checking
+    if (saveStatsBtn) saveStatsBtn.disabled = true;
+    if (saveMcReportBtn) saveMcReportBtn.disabled = true;
+    if (exportCsvBtn) exportCsvBtn.disabled = true;
+    if (highlightListingsBtn) highlightListingsBtn.disabled = true;
+  } else {
+    // Not on results page, disable all results buttons
+    if (saveStatsBtn) saveStatsBtn.disabled = true;
+    if (saveMcReportBtn) saveMcReportBtn.disabled = true;
+    if (exportCsvBtn) exportCsvBtn.disabled = true;
+    if (highlightListingsBtn) highlightListingsBtn.disabled = true;
+  }
+  */
+}
+
+function executeNavicaAction(action) {
+  // Send message to content script to execute the action
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].url.includes('next.navicamls.net/381')) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: action }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            'Error sending message to content script:',
+            chrome.runtime.lastError
+          );
+          // Don't show alert for stats page navigation - it's expected
+          if (
+            action !== 'saveStats' &&
+            action !== 'saveMcReport' &&
+            action !== 'exportCsv'
+          ) {
+            alert(
+              'Error executing action. Please ensure you are on the correct Navica MLS page.'
+            );
+          }
+        } else {
+          console.log('Action executed:', action, response);
+        }
+      });
+    } else {
+      alert('Please navigate to the Navica MLS website first.');
+    }
+  });
+}

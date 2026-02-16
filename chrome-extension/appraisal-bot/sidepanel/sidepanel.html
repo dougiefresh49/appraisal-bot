@@ -412,6 +412,124 @@
             </div>
           </div>
         </div>
+
+        <!-- Navica Tools Section -->
+        <div class="section">
+          <div class="section-header main-section" data-section="navica-tools">
+            <h2>Navica Tools</h2>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <div class="section-content collapsed" data-section="navica-tools">
+            <div class="navica-tools-container">
+              <div class="tool-button-group">
+                <button
+                  id="add-search-criteria-comps"
+                  class="navica-tool-btn"
+                  disabled
+                >
+                  <span class="tool-icon">🔍</span>
+                  <span class="tool-text">Add Search Criteria for Comps</span>
+                </button>
+                <button
+                  id="add-search-criteria-nbh"
+                  class="navica-tool-btn"
+                  disabled
+                >
+                  <span class="tool-icon">🏘️</span>
+                  <span class="tool-text">Add Search Criteria for NBH</span>
+                </button>
+              </div>
+
+              <div class="tool-button-group">
+                <button id="save-stats" class="navica-tool-btn" disabled>
+                  <span class="tool-icon">📊</span>
+                  <span class="tool-text">Save Stats</span>
+                </button>
+                <button id="save-mc-report" class="navica-tool-btn" disabled>
+                  <span class="tool-icon">📋</span>
+                  <span class="tool-text">Save MC Report</span>
+                </button>
+                <button id="export-csv" class="navica-tool-btn" disabled>
+                  <span class="tool-icon">📤</span>
+                  <span class="tool-text">Export CSV</span>
+                </button>
+                <button
+                  id="highlight-listings"
+                  class="navica-tool-btn"
+                  disabled
+                >
+                  <span class="tool-icon">🎯</span>
+                  <span class="tool-text">Highlight Best Comps</span>
+                </button>
+              </div>
+
+              <div class="navica-status">
+                <div id="navica-status-text" class="status-text">
+                  Not on Navica MLS
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Data Section -->
+        <div class="section">
+          <div class="section-header main-section" data-section="report-data">
+            <h2>Report Data</h2>
+            <span class="toggle-icon">▶</span>
+          </div>
+          <div class="section-content collapsed" data-section="report-data">
+            <!-- Report Data Input Section -->
+            <div id="report-data-input-section">
+              <label
+                for="report-data-input"
+                class="block text-sm font-medium mb-2"
+                >Paste Google Sheets Export JSON Data or Select File:</label
+              >
+              <div class="flex gap-2 mb-2">
+                <button id="select-report-file-btn">📁 Select JSON File</button>
+                <input
+                  type="file"
+                  id="report-file-input"
+                  accept=".json"
+                  style="display: none"
+                />
+              </div>
+              <textarea
+                id="report-data-input"
+                rows="8"
+                placeholder="Paste your Google Sheets export JSON data here..."
+              ></textarea>
+              <button
+                id="generate-report-data-btn"
+                class="w-full mt-3 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Generate Report Data
+              </button>
+              <button
+                id="save-report-data-btn"
+                class="w-full mt-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Save Report Data
+              </button>
+            </div>
+
+            <!-- Report Data Display Section -->
+            <div id="report-data-display-section" class="hidden">
+              <div id="report-data-container" class="space-y-4">
+                <!-- Report data sections will be populated here -->
+              </div>
+
+              <!-- Back to Input Button -->
+              <button
+                id="back-to-report-input-btn"
+                class="w-full mt-4 p-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Back to Input
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
