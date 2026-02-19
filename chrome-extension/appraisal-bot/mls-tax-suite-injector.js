@@ -13,7 +13,7 @@ function formatEctorCadNumber(cadNumber) {
   // Format as xxxxx.xxxxx.xxxxx
   return `${cleanNumber.substring(0, 5)}.${cleanNumber.substring(
     5,
-    10
+    10,
   )}.${cleanNumber.substring(10)}`;
 }
 
@@ -24,7 +24,7 @@ function updateMLSPropertyLinks() {
     document,
     null,
     XPathResult.FIRST_ORDERED_NODE_TYPE,
-    null
+    null,
   ).singleNodeValue;
 
   if (!cadRow) {
@@ -54,7 +54,7 @@ function updateMLSPropertyLinks() {
 
   // Try to extract the existing county CAD link
   const existingCadLinkElement = document.querySelector(
-    '.link-listing.donotprint a'
+    '.link-listing.donotprint a',
   );
   let countyCadUrl = existingCadLinkElement
     ?.getAttribute('onclick')
@@ -63,7 +63,7 @@ function updateMLSPropertyLinks() {
   if (!countyCadUrl) {
     console.log('❌ No existing county CAD link found, generating manually.');
     // Default to Midland CAD (MCAD) if no link found
-    countyCadUrl = `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${propertyId}`;
+    countyCadUrl = `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${propertyId}`;
   }
 
   // Create a new clickable link

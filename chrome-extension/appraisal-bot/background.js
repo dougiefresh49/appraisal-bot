@@ -143,6 +143,66 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         request.data
       );
     }
+  } else if (request.action === 'debuggerAttach') {
+    const tabId = request.tabId || sender.tab.id;
+    chrome.debugger.attach({ tabId }, '1.3', () => {
+      if (chrome.runtime.lastError) {
+        console.error('Debugger attach failed:', chrome.runtime.lastError.message);
+        sendResponse({ success: false, error: chrome.runtime.lastError.message });
+      } else {
+        console.log('Debugger attached to tab', tabId);
+        sendResponse({ success: true });
+      }
+    });
+    return true;
+  } else if (request.action === 'debuggerDetach') {
+    const tabId = request.tabId || sender.tab.id;
+    chrome.debugger.detach({ tabId }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn('Debugger detach warning:', chrome.runtime.lastError.message);
+      } else {
+        console.log('Debugger detached from tab', tabId);
+      }
+      sendResponse({ success: true });
+    });
+    return true;
+  } else if (request.action === 'printToPdf') {
+    const tabId = request.tabId || sender.tab.id;
+    const filename = request.filename || 'listing.pdf';
+    chrome.debugger.sendCommand({ tabId }, 'Page.printToPDF', {
+      printBackground: true,
+      landscape: false,
+      preferCSSPageSize: true,
+      marginTop: 0.4,
+      marginBottom: 0.4,
+      marginLeft: 0.4,
+      marginRight: 0.4,
+    }, (result) => {
+      if (chrome.runtime.lastError || !result || !result.data) {
+        const errMsg = chrome.runtime.lastError
+          ? chrome.runtime.lastError.message
+          : 'No PDF data returned';
+        console.error('printToPDF failed:', errMsg);
+        sendResponse({ success: false, error: errMsg });
+        return;
+      }
+      const dataUrl = 'data:application/pdf;base64,' + result.data;
+      chrome.downloads.download({
+        url: dataUrl,
+        filename: filename,
+        saveAs: false,
+        conflictAction: 'uniquify',
+      }, (downloadId) => {
+        if (chrome.runtime.lastError) {
+          console.error('Download failed:', chrome.runtime.lastError.message);
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('PDF saved, download ID:', downloadId, 'filename:', filename);
+          sendResponse({ success: true, downloadId });
+        }
+      });
+    });
+    return true;
   }
 });
 

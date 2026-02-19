@@ -1,3 +1,6 @@
+// Global reference for subject data (set from DOMContentLoaded scope)
+let _subjectDataObj = null;
+
 // Utility functions for generating links based on county and APN format
 
 // Function to check if text matches Ector CAD format (xxxxx.xxxxx.xxxxx)
@@ -39,9 +42,9 @@ function getCadUrl(apn, county) {
 
     case 'midland':
       if (isMidlandCAD(apn)) {
-        return `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${apn}`;
+        return `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${apn}`;
       }
-      return 'https://iswdataclient.azurewebsites.net/webSearchAddress.aspx?dbkey=MIDLANDCAD';
+      return 'https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD';
 
     case 'upton':
       if (isUptonAPN(apn)) {
@@ -124,7 +127,7 @@ function getDeedsUrl(apn, county) {
 function getGoogleMapsUrl(address) {
   if (!address) return null;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    address
+    address,
   )}`;
 }
 
@@ -160,23 +163,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const generateSubjectBtn = document.getElementById('generate-subject-btn');
   const saveSubjectDataBtn = document.getElementById('save-subject-data-btn');
   const selectSubjectCsvFileBtn = document.getElementById(
-    'select-subject-csv-file-btn'
+    'select-subject-csv-file-btn',
   );
   const subjectCsvFileInput = document.getElementById('subject-csv-file-input');
   const subjectDisplaySection = document.getElementById(
-    'subject-display-section'
+    'subject-display-section',
   );
   const subjectCsvInputSection = document.getElementById(
-    'subject-csv-input-section'
+    'subject-csv-input-section',
   );
   const subjectData = document.getElementById('subject-data');
   const backToSubjectInputBtn = document.getElementById(
-    'back-to-subject-input-btn'
+    'back-to-subject-input-btn',
   );
   const subjectGridDataTab = document.getElementById('subject-grid-data-tab');
   const subjectMlsTab = document.getElementById('subject-mls-tab');
   const subjectGridDataContent = document.getElementById(
-    'subject-grid-data-content'
+    'subject-grid-data-content',
   );
   const subjectMlsContent = document.getElementById('subject-mls-content');
   const subjectMlsIframe = document.getElementById('subject-mls-iframe');
@@ -185,11 +188,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectGisLink = document.getElementById('subject-gis-link');
   const subjectMapsLink = document.getElementById('subject-maps-link');
 
+  const compAddressBar = document.getElementById('comp-address-bar');
+  const compReorderBtn = document.getElementById('comp-reorder-btn');
+  const compEditBtn = document.getElementById('comp-edit-btn');
+  const compReorderPanel = document.getElementById('comp-reorder-panel');
+  const compReorderList = document.getElementById('comp-reorder-list');
+  const compReorderSave = document.getElementById('comp-reorder-save');
+  const compReorderCancel = document.getElementById('comp-reorder-cancel');
+
   let compsData = { headers: [], data: [] };
   let currentCompIndex = 0;
   let currentCompFilePath = '';
   let csvFilePath = ''; // Store the path of the selected CSV file
   let csvBasePath = ''; // Store the manual base path
+  let compEditMode = false;
+
+  // Effective date
+  const effectiveDateInput = document.getElementById('effective-date-input');
 
   // Subject data variables
   let subjectDataObj = { headers: [], data: [] };
@@ -204,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'apbotCsvBasePath',
       'apbotSubjectData',
       'apbotSubjectCsvFilePath',
+      'apbotEffectiveDate',
     ],
     (result) => {
       if (result.apbotCompGridData) {
@@ -227,11 +243,23 @@ document.addEventListener('DOMContentLoaded', () => {
         subjectCsvFilePath = result.apbotSubjectCsvFilePath;
         console.log(
           '📁 Loaded saved subject CSV file path:',
-          subjectCsvFilePath
+          subjectCsvFilePath,
         );
       }
-    }
+      if (result.apbotEffectiveDate) {
+        effectiveDateInput.value = result.apbotEffectiveDate;
+        console.log('📅 Loaded saved effective date:', result.apbotEffectiveDate);
+      }
+    },
   );
+
+  // Save effective date to storage on change
+  effectiveDateInput.addEventListener('change', () => {
+    const dateValue = effectiveDateInput.value;
+    chrome.storage.local.set({ apbotEffectiveDate: dateValue }, () => {
+      console.log('📅 Saved effective date:', dateValue);
+    });
+  });
 
   // Handle CSV file selection
   selectCsvFileBtn.addEventListener('click', () => {
@@ -261,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // If we don't have a path, try to construct one from the file name
         if (!csvFilePath) {
           console.warn(
-            '⚠️ No file path available, using file name as fallback'
+            '⚠️ No file path available, using file name as fallback',
           );
           csvFilePath = file.name;
         }
@@ -274,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           () => {
             console.log('💾 Saved CSV data and file path to storage');
-          }
+          },
         );
       };
       reader.readAsText(file);
@@ -309,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // If we don't have a path, try to construct one from the file name
         if (!subjectCsvFilePath) {
           console.warn(
-            '⚠️ No subject file path available, using file name as fallback'
+            '⚠️ No subject file path available, using file name as fallback',
           );
           subjectCsvFilePath = file.name;
         }
@@ -322,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           () => {
             console.log('💾 Saved subject data and file path to storage');
-          }
+          },
         );
       };
       reader.readAsText(file);
@@ -342,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         () => {
           console.log('💾 Saved CSV data and base path to storage');
           showSaveSuccess();
-        }
+        },
       );
     } else {
       console.warn('⚠️ No CSV data to save');
@@ -361,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         () => {
           console.log('💾 Saved subject data to storage');
           showSubjectSaveSuccess();
-        }
+        },
       );
     } else {
       console.warn('⚠️ No subject data to save');
@@ -459,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
       console.log(
-        '⚙️ Settings button clicked, opening extension management page'
+        '⚙️ Settings button clicked, opening extension management page',
       );
       // Open the Chrome extension management page
       chrome.tabs.create({
@@ -474,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
     header.addEventListener('click', () => {
       const sectionName = header.getAttribute('data-section');
       const content = document.querySelector(
-        `.section-content[data-section="${sectionName}"]`
+        `.section-content[data-section="${sectionName}"]`,
       );
       const icon = header.querySelector('.toggle-icon');
 
@@ -510,10 +538,10 @@ document.addEventListener('DOMContentLoaded', () => {
           .replace('section_', '')
           .replace('_expanded', '');
         const header = document.querySelector(
-          `.section-header[data-section="${sectionName}"]`
+          `.section-header[data-section="${sectionName}"]`,
         );
         const content = document.querySelector(
-          `.section-content[data-section="${sectionName}"]`
+          `.section-content[data-section="${sectionName}"]`,
         );
         const icon = header?.querySelector('.toggle-icon');
 
@@ -558,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
       arr[row][col] += cc;
     }
     return arr.map((row) =>
-      row.map((cell) => cell.trim().replace(/^"|"$/g, ''))
+      row.map((cell) => cell.trim().replace(/^"|"$/g, '')),
     );
   }
 
@@ -588,6 +616,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1500);
   }
 
+  function getCompAddress(comp) {
+    const headers = compsData.headers;
+    const addrIdx = headers.findIndex(
+      (h) => h.toLowerCase() === 'property address',
+    );
+    return addrIdx >= 0 ? (comp[addrIdx] || '').trim() : '';
+  }
+
   function displayComp(index) {
     if (
       !compsData.data ||
@@ -603,61 +639,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
     compData.innerHTML = '';
 
+    // Populate address bar
+    const address = getCompAddress(comp);
+    compAddressBar.textContent = address || `Comp ${index + 1}`;
+    compAddressBar.title = address ? 'Click to copy address' : '';
+
     // Look for the mls-url column specifically
     const filePathIndex = headers.findIndex(
-      (header) => header.toLowerCase() === 'mls-url'
+      (header) => header.toLowerCase() === 'mls-url',
     );
 
     // Get the MLS URL and resolve relative paths
     const mlsUrlValue = filePathIndex >= 0 ? comp[filePathIndex] || '' : '';
-    console.log('📄 MLS URL value from CSV:', mlsUrlValue);
-    console.log('📁 Current CSV file path:', csvFilePath);
-
     currentCompFilePath = resolveRelativePath(mlsUrlValue);
-    console.log('🎯 Final resolved path:', currentCompFilePath);
 
     headers.forEach((header, i) => {
       const value = comp[i] || '';
       const dataItem = document.createElement('div');
       dataItem.className = 'comp-data-item';
-
-      // Check if this is the mls-url field
       const isMlsUrl = header.toLowerCase() === 'mls-url';
 
-      dataItem.innerHTML = `
-        <span class="comp-data-label">${header}</span>
-        <div class="comp-data-value ${
-          isMlsUrl ? 'mls-url-value' : ''
-        }" data-value="${value.replace(/"/g, '&quot;')}" title="${
-        isMlsUrl ? 'Click to open in new tab' : 'Click to copy'
-      }">
-          ${value}
-        </div>
-      `;
-
-      // Add click event listener to the value element
-      const valueElement = dataItem.querySelector('.comp-data-value');
-      valueElement.addEventListener('click', () => {
-        if (isMlsUrl) {
-          // Open MLS URL in new tab using resolved path
-          const fileUrl = `file://${currentCompFilePath}`;
-          chrome.tabs.create({ url: fileUrl });
-        } else {
-          // Copy other values to clipboard
-          copyToClipboard(value, valueElement);
-        }
-      });
+      if (compEditMode && !isMlsUrl) {
+        dataItem.innerHTML = `
+          <span class="comp-data-label">${header}</span>
+          <input class="comp-data-edit-input" type="text"
+            data-header-index="${i}"
+            value="${value.replace(/"/g, '&quot;')}" />
+        `;
+        const input = dataItem.querySelector('.comp-data-edit-input');
+        input.addEventListener('change', () => {
+          compsData.data[currentCompIndex][i] = input.value;
+        });
+      } else {
+        dataItem.innerHTML = `
+          <span class="comp-data-label">${header}</span>
+          <div class="comp-data-value ${
+            isMlsUrl ? 'mls-url-value' : ''
+          }" data-value="${value.replace(/"/g, '&quot;')}" title="${
+            isMlsUrl ? 'Click to open in new tab' : 'Click to copy'
+          }">
+            ${value}
+          </div>
+        `;
+        const valueElement = dataItem.querySelector('.comp-data-value');
+        valueElement.addEventListener('click', () => {
+          if (isMlsUrl) {
+            const fileUrl = `file://${currentCompFilePath}`;
+            chrome.tabs.create({ url: fileUrl });
+          } else {
+            copyToClipboard(value, valueElement);
+          }
+        });
+      }
 
       compData.appendChild(dataItem);
     });
 
     compCounter.textContent = `Comp ${index + 1} of ${compsData.data.length}`;
-
-    // Update navigation buttons
     prevCompBtn.disabled = index === 0;
     nextCompBtn.disabled = index === compsData.data.length - 1;
 
-    // If currently on MLS tab, reload the PDF
+    // Update edit button visual state
+    if (compEditBtn) {
+      compEditBtn.classList.toggle('active', compEditMode);
+    }
+
     if (mlsContent.classList.contains('active')) {
       loadMLSPDF();
     }
@@ -674,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const parsedData = parseCSV(csvText);
       if (parsedData.length < 2) {
         alert(
-          'Invalid CSV data. Please provide at least a header and one row of data.'
+          'Invalid CSV data. Please provide at least a header and one row of data.',
         );
         return;
       }
@@ -713,10 +759,150 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function backToInput() {
+    compEditMode = false;
     csvInputSection.classList.remove('hidden');
     compDisplaySection.classList.add('hidden');
     compsData = [];
     currentCompIndex = 0;
+  }
+
+  // --- Address bar click to copy ---
+  if (compAddressBar) {
+    compAddressBar.addEventListener('click', () => {
+      const addr = compAddressBar.textContent.trim();
+      if (addr) {
+        copyToClipboard(addr, compAddressBar);
+      }
+    });
+  }
+
+  // --- Edit mode toggle ---
+  if (compEditBtn) {
+    compEditBtn.addEventListener('click', () => {
+      compEditMode = !compEditMode;
+      if (!compEditMode) {
+        // Exiting edit mode: persist changes to storage
+        saveCompsDataToStorage();
+      }
+      displayComp(currentCompIndex);
+    });
+  }
+
+  // --- Reorder mode ---
+  function showReorderPanel() {
+    if (!compsData.data || compsData.data.length === 0) return;
+
+    compReorderPanel.classList.remove('hidden');
+    compReorderBtn.classList.add('active');
+    renderReorderList();
+  }
+
+  function hideReorderPanel() {
+    compReorderPanel.classList.add('hidden');
+    compReorderBtn.classList.remove('active');
+  }
+
+  function renderReorderList() {
+    compReorderList.innerHTML = '';
+    compsData.data.forEach((comp, idx) => {
+      const item = document.createElement('div');
+      item.className = 'comp-reorder-item';
+      item.setAttribute('data-idx', idx);
+
+      const numSpan = document.createElement('span');
+      numSpan.className = 'reorder-num';
+      numSpan.textContent = idx + 1;
+
+      const addrSpan = document.createElement('span');
+      addrSpan.className = 'reorder-addr';
+      addrSpan.textContent = getCompAddress(comp) || `Comp ${idx + 1}`;
+
+      const arrows = document.createElement('span');
+      arrows.className = 'reorder-arrows';
+
+      const upBtn = document.createElement('button');
+      upBtn.className = 'reorder-arrow-btn';
+      upBtn.textContent = '▲';
+      upBtn.disabled = idx === 0;
+      upBtn.addEventListener('click', () => moveComp(idx, idx - 1));
+
+      const downBtn = document.createElement('button');
+      downBtn.className = 'reorder-arrow-btn';
+      downBtn.textContent = '▼';
+      downBtn.disabled = idx === compsData.data.length - 1;
+      downBtn.addEventListener('click', () => moveComp(idx, idx + 1));
+
+      arrows.appendChild(upBtn);
+      arrows.appendChild(downBtn);
+
+      item.appendChild(numSpan);
+      item.appendChild(addrSpan);
+      item.appendChild(arrows);
+      compReorderList.appendChild(item);
+    });
+  }
+
+  function moveComp(fromIdx, toIdx) {
+    if (toIdx < 0 || toIdx >= compsData.data.length) return;
+    const [moved] = compsData.data.splice(fromIdx, 1);
+    compsData.data.splice(toIdx, 0, moved);
+    renderReorderList();
+  }
+
+  if (compReorderBtn) {
+    compReorderBtn.addEventListener('click', () => {
+      if (compReorderPanel.classList.contains('hidden')) {
+        showReorderPanel();
+      } else {
+        hideReorderPanel();
+      }
+    });
+  }
+
+  if (compReorderSave) {
+    compReorderSave.addEventListener('click', () => {
+      hideReorderPanel();
+      currentCompIndex = 0;
+      displayComp(currentCompIndex);
+      saveCompsDataToStorage();
+    });
+  }
+
+  if (compReorderCancel) {
+    compReorderCancel.addEventListener('click', () => {
+      hideReorderPanel();
+    });
+  }
+
+  // --- Save comps data back to storage ---
+  function saveCompsDataToStorage() {
+    if (!compsData.headers || !compsData.data) return;
+    // Rebuild CSV text from compsData
+    const escapeCell = (val) => {
+      if (val == null) val = '';
+      val = String(val);
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+        return '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    };
+    const headerLine = compsData.headers.map(escapeCell).join(',');
+    const dataLines = compsData.data.map((row) =>
+      row.map(escapeCell).join(','),
+    );
+    const csvText = [headerLine, ...dataLines].join('\n');
+
+    csvInput.value = csvText;
+    chrome.storage.local.set(
+      {
+        apbotCompGridData: csvText,
+        apbotCsvFilePath: csvFilePath,
+        apbotCsvBasePath: csvBasePath,
+      },
+      () => {
+        console.log('💾 Saved updated comp data to storage');
+      },
+    );
   }
 
   // Subject Data Functions
@@ -732,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Look for the mls-url column specifically
     const filePathIndex = headers.findIndex(
-      (header) => header.toLowerCase() === 'mls-url'
+      (header) => header.toLowerCase() === 'mls-url',
     );
 
     // Get the MLS URL and resolve relative paths
@@ -758,8 +944,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="comp-data-value ${
           isMlsUrl ? 'mls-url-value' : ''
         }" data-value="${value.replace(/"/g, '&quot;')}" title="${
-        isMlsUrl ? 'Click to open in new tab' : 'Click to copy'
-      }">
+          isMlsUrl ? 'Click to open in new tab' : 'Click to copy'
+        }">
           ${value}
         </div>
       `;
@@ -789,15 +975,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateSubjectQuickLinks(subject, headers) {
     // Find APN and county fields
     const apnIndex = headers.findIndex(
-      (header) => header.toLowerCase() === 'apn'
+      (header) => header.toLowerCase() === 'apn',
     );
     const countyIndex = headers.findIndex(
-      (header) => header.toLowerCase() === 'county'
+      (header) => header.toLowerCase() === 'county',
     );
     const addressIndex = headers.findIndex(
       (header) =>
         header.toLowerCase().includes('address') ||
-        header.toLowerCase().includes('property')
+        header.toLowerCase().includes('property'),
     );
 
     const apn = apnIndex >= 0 ? subject[apnIndex] || '' : '';
@@ -870,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const parsedData = parseCSV(csvText);
       if (parsedData.length < 2) {
         alert(
-          'Invalid CSV data. Please provide at least a header and one row of data.'
+          'Invalid CSV data. Please provide at least a header and one row of data.',
         );
         return;
       }
@@ -879,12 +1065,14 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: parsedData[0],
         data: parsedData.slice(1),
       };
+      _subjectDataObj = subjectDataObj;
 
       // Switch to display mode
       subjectCsvInputSection.classList.add('hidden');
       subjectDisplaySection.classList.remove('hidden');
 
       displaySubjectData();
+      loadCompsSearchConfig();
 
       console.log('Generated subject data:', subjectDataObj);
     } catch (error) {
@@ -991,13 +1179,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (subjectGridDataTab) {
     subjectGridDataTab.addEventListener('click', () =>
-      switchSubjectTab('subject-grid-data')
+      switchSubjectTab('subject-grid-data'),
     );
   }
 
   if (subjectMlsTab) {
     subjectMlsTab.addEventListener('click', () =>
-      switchSubjectTab('subject-mls')
+      switchSubjectTab('subject-mls'),
     );
   }
 
@@ -1127,11 +1315,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Report Data Event Listeners
   const generateReportDataBtn = document.getElementById(
-    'generate-report-data-btn'
+    'generate-report-data-btn',
   );
   const saveReportDataBtn = document.getElementById('save-report-data-btn');
   const backToReportInputBtn = document.getElementById(
-    'back-to-report-input-btn'
+    'back-to-report-input-btn',
   );
   const selectReportFileBtn = document.getElementById('select-report-file-btn');
   const reportFileInput = document.getElementById('report-file-input');
@@ -1576,7 +1764,7 @@ function showReportSaveSuccess() {
   saveBtn.textContent = 'Saved!';
   saveBtn.className = originalClass.replace(
     'bg-green-600 hover:bg-green-700',
-    'bg-green-500'
+    'bg-green-500',
   );
 
   setTimeout(() => {
@@ -1623,10 +1811,10 @@ function initializeNavicaTools() {
 
   // Add event listeners for Navica Tools buttons
   const addSearchCriteriaCompsBtn = document.getElementById(
-    'add-search-criteria-comps'
+    'add-search-criteria-comps',
   );
   const addSearchCriteriaNbhBtn = document.getElementById(
-    'add-search-criteria-nbh'
+    'add-search-criteria-nbh',
   );
   const saveStatsBtn = document.getElementById('save-stats');
   const saveMcReportBtn = document.getElementById('save-mc-report');
@@ -1635,12 +1823,14 @@ function initializeNavicaTools() {
 
   if (addSearchCriteriaCompsBtn) {
     addSearchCriteriaCompsBtn.addEventListener('click', () => {
+      saveCompsSearchConfig();
       executeNavicaAction('addSearchCriteriaComps');
     });
   }
 
   if (addSearchCriteriaNbhBtn) {
     addSearchCriteriaNbhBtn.addEventListener('click', () => {
+      saveCompsSearchConfig();
       executeNavicaAction('addSearchCriteriaNbh');
     });
   }
@@ -1668,6 +1858,100 @@ function initializeNavicaTools() {
       executeNavicaAction('highlightListings');
     });
   }
+
+  const downloadListingsBtn = document.getElementById('download-listings');
+  if (downloadListingsBtn) {
+    downloadListingsBtn.addEventListener('click', () => {
+      executeNavicaAction('downloadListings');
+    });
+  }
+
+  // Comps search config panel
+  initCompsSearchConfig();
+}
+
+// --- Comps Search Config ---
+const COMPS_CONFIG_DEFAULTS = { glaPercent: 15, yearRange: 10, monthsBack: 12 };
+
+function getSubjectApn() {
+  if (_subjectDataObj && _subjectDataObj.data && _subjectDataObj.data.length > 0) {
+    const subject = _subjectDataObj.data[0];
+    const headers = _subjectDataObj.headers;
+    const apnIdx = headers.findIndex(
+      (h) => h.toLowerCase() === 'apn',
+    );
+    if (apnIdx !== -1) return (subject[apnIdx] || '').trim();
+  }
+  return '';
+}
+
+function initCompsSearchConfig() {
+  const toggleBtn = document.getElementById('comps-config-toggle');
+  const panel = document.getElementById('comps-config-panel');
+  const glaInput = document.getElementById('config-gla-percent');
+  const yearInput = document.getElementById('config-year-range');
+  const monthsInput = document.getElementById('config-months-back');
+
+  if (!toggleBtn || !panel) return;
+
+  // Toggle panel visibility
+  toggleBtn.addEventListener('click', () => {
+    const isHidden = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden');
+    toggleBtn.classList.toggle('active', isHidden);
+  });
+
+  // Save config on any input change
+  [glaInput, yearInput, monthsInput].forEach((input) => {
+    if (input) {
+      input.addEventListener('change', () => saveCompsSearchConfig());
+    }
+  });
+
+  // Load saved config
+  loadCompsSearchConfig();
+}
+
+function loadCompsSearchConfig() {
+  const glaInput = document.getElementById('config-gla-percent');
+  const yearInput = document.getElementById('config-year-range');
+  const monthsInput = document.getElementById('config-months-back');
+
+  chrome.storage.local.get(['apbotSearchConfig'], (result) => {
+    const config = result.apbotSearchConfig;
+    const currentApn = getSubjectApn();
+
+    if (config && config.apn && config.apn === currentApn && currentApn !== '') {
+      if (glaInput) glaInput.value = config.glaPercent ?? COMPS_CONFIG_DEFAULTS.glaPercent;
+      if (yearInput) yearInput.value = config.yearRange ?? COMPS_CONFIG_DEFAULTS.yearRange;
+      if (monthsInput) monthsInput.value = config.monthsBack ?? COMPS_CONFIG_DEFAULTS.monthsBack;
+      console.log('⚙️ Loaded search config for APN:', currentApn, config);
+    } else {
+      // APN mismatch or no config - use defaults
+      if (glaInput) glaInput.value = COMPS_CONFIG_DEFAULTS.glaPercent;
+      if (yearInput) yearInput.value = COMPS_CONFIG_DEFAULTS.yearRange;
+      if (monthsInput) monthsInput.value = COMPS_CONFIG_DEFAULTS.monthsBack;
+      console.log('⚙️ Using default search config (APN mismatch or no saved config)');
+    }
+  });
+}
+
+function saveCompsSearchConfig() {
+  const glaInput = document.getElementById('config-gla-percent');
+  const yearInput = document.getElementById('config-year-range');
+  const monthsInput = document.getElementById('config-months-back');
+  const currentApn = getSubjectApn();
+
+  const config = {
+    apn: currentApn,
+    glaPercent: parseInt(glaInput?.value) || COMPS_CONFIG_DEFAULTS.glaPercent,
+    yearRange: parseInt(yearInput?.value) || COMPS_CONFIG_DEFAULTS.yearRange,
+    monthsBack: parseInt(monthsInput?.value) || COMPS_CONFIG_DEFAULTS.monthsBack,
+  };
+
+  chrome.storage.local.set({ apbotSearchConfig: config }, () => {
+    console.log('⚙️ Saved search config:', config);
+  });
 }
 
 function updateNavicaButtonStates(currentUrl) {
@@ -1677,7 +1961,7 @@ function updateNavicaButtonStates(currentUrl) {
   const isResultsPage =
     currentUrl &&
     currentUrl.includes('https://next.navicamls.net/381/Search/ResultsFull');
-  const isNavica = currentUrl && currentUrl.includes('next.navicamls.net/381');
+  const isNavica = currentUrl && currentUrl.includes('next.navicamls.net/');
 
   // Update status text
   const statusText = document.getElementById('navica-status-text');
@@ -1695,15 +1979,16 @@ function updateNavicaButtonStates(currentUrl) {
 
   // Enable/disable buttons based on current page
   const addSearchCriteriaCompsBtn = document.getElementById(
-    'add-search-criteria-comps'
+    'add-search-criteria-comps',
   );
   const addSearchCriteriaNbhBtn = document.getElementById(
-    'add-search-criteria-nbh'
+    'add-search-criteria-nbh',
   );
   const saveStatsBtn = document.getElementById('save-stats');
   const saveMcReportBtn = document.getElementById('save-mc-report');
   const exportCsvBtn = document.getElementById('export-csv');
   const highlightListingsBtn = document.getElementById('highlight-listings');
+  const downloadListingsBtn2 = document.getElementById('download-listings');
 
   // COMMENTED OUT RESTRICTIVE LOGIC - Enable all buttons if on Navica
   if (isNavica) {
@@ -1714,6 +1999,7 @@ function updateNavicaButtonStates(currentUrl) {
     if (saveMcReportBtn) saveMcReportBtn.disabled = false;
     if (exportCsvBtn) exportCsvBtn.disabled = false;
     if (highlightListingsBtn) highlightListingsBtn.disabled = false;
+    if (downloadListingsBtn2) downloadListingsBtn2.disabled = false;
   } else {
     // Disable all buttons if not on Navica
     if (addSearchCriteriaCompsBtn) addSearchCriteriaCompsBtn.disabled = true;
@@ -1722,6 +2008,7 @@ function updateNavicaButtonStates(currentUrl) {
     if (saveMcReportBtn) saveMcReportBtn.disabled = true;
     if (exportCsvBtn) exportCsvBtn.disabled = true;
     if (highlightListingsBtn) highlightListingsBtn.disabled = true;
+    if (downloadListingsBtn2) downloadListingsBtn2.disabled = true;
   }
 
   /* ORIGINAL RESTRICTIVE LOGIC - COMMENTED OUT
@@ -1782,23 +2069,14 @@ function updateNavicaButtonStates(currentUrl) {
 function executeNavicaAction(action) {
   // Send message to content script to execute the action
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0] && tabs[0].url.includes('next.navicamls.net/381')) {
+    if (tabs[0] && tabs[0].url.includes('next.navicamls.net/')) {
       chrome.tabs.sendMessage(tabs[0].id, { action: action }, (response) => {
         if (chrome.runtime.lastError) {
-          console.error(
-            'Error sending message to content script:',
-            chrome.runtime.lastError
+          console.warn(
+            'Navica Tools: Could not reach content script for action:',
+            action,
+            chrome.runtime.lastError.message,
           );
-          // Don't show alert for stats page navigation - it's expected
-          if (
-            action !== 'saveStats' &&
-            action !== 'saveMcReport' &&
-            action !== 'exportCsv'
-          ) {
-            alert(
-              'Error executing action. Please ensure you are on the correct Navica MLS page.'
-            );
-          }
         } else {
           console.log('Action executed:', action, response);
         }

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.11.34",
+  "version": "1.11.40",
   "description": "Turns the 'Last Sale Instrument' field into a clickable link and adds MLS Tax ID links.",
   "icons": {
     "16": "logos/logo16.png",
@@ -25,13 +25,15 @@
     "scripting",
     "webRequest",
     "contextMenus",
-    "sidePanel"
+    "sidePanel",
+    "debugger",
+    "downloads"
   ],
   "host_permissions": [
     "https://ectorcountytx-web.tylerhost.net/*",
     "https://search.ectorcad.org/*",
     "https://next.navicamls.net/*",
-    "https://iswdataclient.azurewebsites.net/webProperty.aspx*",
+    "https://www.southwestdatasolution.com/webProperty.aspx*",
     "https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47*",
     "maps.midlandtexas.gov/*",
     "https://midland.tx.publicsearch.us/*",
@@ -61,16 +63,31 @@
     },
     {
       "matches": ["https://next.navicamls.net/377/*"],
-      "js": ["mls-injector-obr.js"],
+      "js": ["navica-tools.js", "mls-injector-obr.js"],
       "run_at": "document_end"
+    },
+    {
+      "matches": ["https://next.navicamls.net/377/Mapping/GoogleMapSearch*"],
+      "js": ["navica-map-tools.js", "mls-map-search-obr.js"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://next.navicamls.net/377/*",
+        "https://next.navicamls.net/381/*"
+      ],
+      "js": ["navica-map-tools.js", "mls-map-dialog-overlay.js"],
+      "run_at": "document_end",
+      "world": "MAIN"
     },
     {
       "matches": ["https://next.navicamls.net/381/*"],
-      "js": ["mls-injector-pbbr.js"],
+      "js": ["navica-tools.js", "mls-injector-pbbr.js"],
       "run_at": "document_end"
     },
     {
-      "matches": ["https://iswdataclient.azurewebsites.net/webProperty.aspx*"],
+      "matches": ["https://www.southwestdatasolution.com/webProperty.aspx*"],
       "js": ["mcad-injector.js"],
       "run_at": "document_end"
     },

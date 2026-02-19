@@ -37,7 +37,7 @@ function addMCADLinkToPopup() {
   console.log(`📌 Found LONG_R: ${shortR}`);
 
   // Create MCAD search URL
-  const mcadUrl = `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${shortR}`;
+  const mcadUrl = `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${shortR}`;
 
   // Create MCAD link element
   const mcadLink = document.createElement('a');

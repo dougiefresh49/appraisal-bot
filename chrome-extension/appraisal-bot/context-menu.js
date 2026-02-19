@@ -166,10 +166,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     case 'midland-cad':
       if (selectedText && isMidlandCAD(selectedText)) {
-        url = `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${selectedText}`;
+        url = `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${selectedText}`;
       } else {
         url =
-          'https://iswdataclient.azurewebsites.net/webSearchAddress.aspx?dbkey=MIDLANDCAD';
+          'https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD';
       }
       break;
 

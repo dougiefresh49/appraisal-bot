@@ -60,7 +60,6 @@ Map does not work great
 ### On ECAD,
 
 - add ability to show a link to other parcels with the same Instrument Number.
-
   - Example: https://search.ectorcad.org/parcel/01050.00010.00000 has other parcels with Instrument Number 2023-00017387
   - The advanced search has a filter for Instrument Number with url like: `https://search.ectorcad.org/search/adv?query[sale][instr_num]=2023-00017387&type=r`
   - Maybe can use stagehand to run the advanced search and get the results and display them below the last sale instrument.
@@ -75,7 +74,6 @@ Map does not work great
 ### On MLS Tax Suite
 
 - add links to ecad deed site in the table
-
   - Example: https://pbbr.crsdata.com/mls/Property/~gtpb3DQ3mnhhe5Nfv2TL4UAauJgAK1R8xUIRzcwDLSVeFesfZ4VIz0Ol85M5gHz5Igih0a4NSdlV5Cnre~sVA2#EXPMAP
   - APN: 05730.00790.00000
 

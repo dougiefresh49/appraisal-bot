@@ -16,7 +16,7 @@ function formatEctorCadNumber(cadNumber) {
   // Format as xxxxx.xxxxx.xxxxx
   return `${cleanNumber.substring(0, 5)}.${cleanNumber.substring(
     5,
-    10
+    10,
   )}.${cleanNumber.substring(10)}`;
 }
 
@@ -67,7 +67,7 @@ function detectCounty() {
 function getCadUrl(parcelId, county) {
   switch (county) {
     case 'Midland':
-      return `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${parcelId}`;
+      return `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${parcelId}`;
     case 'Ector':
       return `https://search.ectorcad.org/parcel/${parcelId}`;
     case 'Ward':
@@ -99,7 +99,7 @@ function addGisLink(valueSpan, parcelId, county) {
 
 function linkAddressToGoogleMaps(address, addressElement) {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    address
+    address,
   )}`;
   const googleMapsLink = document.createElement('a');
   googleMapsLink.href = googleMapsUrl;
@@ -118,7 +118,7 @@ function updatePageTitle(fullAddress) {
     // Extract street address (remove city, state, zip)
     // Common patterns: "1234 Some St, Midland, TX 79703" or "1234 Some St, Midland, TX"
     const addressMatch = fullAddress.match(
-      /^(.+?)(?:\s*,\s*[^,]+(?:\s*,\s*[A-Z]{2}\s*\d{5})?)?$/
+      /^(.+?)(?:\s*,\s*[^,]+(?:\s*,\s*[A-Z]{2}\s*\d{5})?)?$/,
     );
 
     if (addressMatch && addressMatch[1]) {
@@ -156,7 +156,7 @@ function updateMlsAddressLink() {
 function updateMlsTaxIdLink() {
   const county = detectCounty();
   const taxIdContainers = document.querySelectorAll(
-    '.exp-HeaderAndFieldContainer'
+    '.exp-HeaderAndFieldContainer',
   );
 
   taxIdContainers.forEach((container) => {
