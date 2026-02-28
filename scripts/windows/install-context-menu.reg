@@ -1,0 +1,11 @@
+Windows Registry Editor Version 5.00
+
+; Before importing, update the path in [command] below to match your Google Drive location.
+; Example: G:\\My Drive\\AppraisalBot-Shared\\scripts\\create-residential-folders.ps1
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\AppraisalBotScaffold]
+@="Scaffold Appraisal Workfile"
+"Icon"="powershell.exe"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\AppraisalBotScaffold\command]
+@="powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\\\PATH\\\\TO\\\\AppraisalBot-Shared\\\\scripts\\\\create-residential-folders.ps1\" \"%1\""

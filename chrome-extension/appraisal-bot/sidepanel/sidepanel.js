@@ -483,18 +483,119 @@ document.addEventListener('DOMContentLoaded', () => {
     return absolutePath;
   }
 
-  // Handle settings button click
-  if (settingsBtn) {
-    settingsBtn.addEventListener('click', () => {
-      console.log(
-        '⚙️ Settings button clicked, opening extension management page',
-      );
-      // Open the Chrome extension management page
-      chrome.tabs.create({
-        url: 'chrome://extensions/?id=' + chrome.runtime.id,
+  // --- Edition / Feature Toggle System ---
+  const EDITION_DEFAULTS = {
+    pro: { 'comp-grid': true, 'subject-data': true, 'report-data': true, 'navica-tools': true },
+    standard: { 'comp-grid': false, 'subject-data': false, 'report-data': false, 'navica-tools': true },
+  };
+  const SECTION_IDS = ['comp-grid', 'subject-data', 'report-data', 'navica-tools'];
+
+  const settingsPanel = document.getElementById('settings-panel');
+  const editionSelect = document.getElementById('edition-select');
+  const settingsSaveBtn = document.getElementById('settings-save');
+  const settingsExtLink = document.getElementById('settings-ext-link');
+
+  function applySectionVisibility(visibility) {
+    SECTION_IDS.forEach((id) => {
+      const sectionEl = document.querySelector(`[data-section-id="${id}"]`);
+      if (sectionEl) {
+        sectionEl.classList.toggle('hidden', !visibility[id]);
+      }
+    });
+  }
+
+  function syncCheckboxes(visibility) {
+    SECTION_IDS.forEach((id) => {
+      const cb = document.getElementById(`vis-${id}`);
+      if (cb) cb.checked = !!visibility[id];
+    });
+  }
+
+  chrome.storage.local.get(['apbotEdition', 'apbotSectionVisibility'], (result) => {
+    const edition = result.apbotEdition || 'pro';
+    const visibility = result.apbotSectionVisibility || EDITION_DEFAULTS[edition];
+    if (editionSelect) editionSelect.value = edition;
+    syncCheckboxes(visibility);
+    applySectionVisibility(visibility);
+  });
+
+  if (editionSelect) {
+    editionSelect.addEventListener('change', () => {
+      const vis = EDITION_DEFAULTS[editionSelect.value] || EDITION_DEFAULTS.pro;
+      syncCheckboxes(vis);
+    });
+  }
+
+  if (settingsSaveBtn) {
+    settingsSaveBtn.addEventListener('click', () => {
+      const edition = editionSelect ? editionSelect.value : 'pro';
+      const visibility = {};
+      SECTION_IDS.forEach((id) => {
+        const cb = document.getElementById(`vis-${id}`);
+        visibility[id] = cb ? cb.checked : true;
+      });
+      chrome.storage.local.set({ apbotEdition: edition, apbotSectionVisibility: visibility }, () => {
+        applySectionVisibility(visibility);
+        if (settingsPanel) settingsPanel.classList.add('hidden');
+        console.log('⚙️ Settings saved:', { edition, visibility });
       });
     });
   }
+
+  if (settingsExtLink) {
+    settingsExtLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      chrome.tabs.create({ url: 'chrome://extensions/?id=' + chrome.runtime.id });
+    });
+  }
+
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      settingsPanel.classList.toggle('hidden');
+    });
+  }
+
+  // --- Quick Links Search Buttons ---
+  document.querySelectorAll('.link[data-search-url]').forEach((linkEl) => {
+    const searchUrl = linkEl.getAttribute('data-search-url');
+    const placeholder = linkEl.getAttribute('data-search-placeholder') || '';
+    const parent = linkEl.parentNode;
+
+    const row = document.createElement('div');
+    row.className = 'link-row';
+    parent.insertBefore(row, linkEl);
+    row.appendChild(linkEl);
+
+    const btn = document.createElement('button');
+    btn.className = 'link-search-btn';
+    btn.textContent = '🔍';
+    btn.title = 'Search by ' + placeholder;
+    row.appendChild(btn);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'link-search-input';
+    input.placeholder = placeholder;
+    parent.insertBefore(input, row.nextSibling);
+
+    btn.addEventListener('click', () => {
+      const isVisible = input.classList.toggle('visible');
+      btn.classList.toggle('active', isVisible);
+      if (isVisible) input.focus();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = input.value.trim();
+        if (val) {
+          const url = searchUrl.replace('{q}', encodeURIComponent(val));
+          chrome.tabs.create({ url });
+        }
+      }
+    });
+  });
+
+  // Non-searchable links remain as plain links (no wrapping needed)
 
   // Handle collapsible sections
   const sectionHeaders = document.querySelectorAll('.section-header');

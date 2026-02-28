@@ -32,6 +32,12 @@
     "realapi:details": "tsx --env-file=.env ./scripts/real-api/save-details.ts",
     "realapi:stats": "tsx --env-file=.env ./scripts/real-api/get-neighborhood-stats.ts",
     "total:ql:create": "tsx --env-file=.env ./scripts/total/create-quicklist.ts",
-    "push:apbot-report-data": "clasp push --project ./app-scripts/apbot-report-data"
+    "push:apbot-report-data": "clasp push --project ./app-scripts/apbot-report-data",
+    "pull:apbot-report-data": "clasp pull --project ./app-scripts/apbot-report-data",
+    "push:apbot-report-doc": "clasp push --project ./app-scripts/apbot-report-doc",
+    "pull:apbot-report-doc": "clasp pull --project ./app-scripts/apbot-report-doc",
+    "push:apbot2": "clasp push --project ./app-scripts/ApBot2",
+    "pull:apbot2": "clasp pull --project ./app-scripts/ApBot2",
+    "ext:bundle": "node scripts/bundle-extension.js"
   }
 }

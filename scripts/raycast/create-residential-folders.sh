@@ -32,11 +32,8 @@ folders=("comps" "reports" "subject" "neighborhood" "engagement-docs")
 
 # Array of subfolders with their respective parent folders
 subfolders=(
-    "comps/data"
-    "neighborhood/data"
-    "reports/analysis"
-    "reports/analysis/propmts"
-    "reports/analysis/results"
+    "comps/_data"
+    "neighborhood/_data"
 )
 
 # Create top-level folders

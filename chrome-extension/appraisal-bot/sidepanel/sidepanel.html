@@ -14,6 +14,28 @@
         <button class="settings-btn" id="settings-btn">⚙️</button>
       </div>
 
+      <!-- Settings Panel (hidden by default) -->
+      <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-group">
+          <label for="edition-select" class="settings-label">Edition</label>
+          <select id="edition-select" class="settings-select">
+            <option value="pro">Pro</option>
+            <option value="standard">Standard</option>
+          </select>
+        </div>
+        <div class="settings-group">
+          <span class="settings-label">Visible Sections</span>
+          <label class="settings-checkbox"><input type="checkbox" id="vis-comp-grid" checked /> Comp Grid Data</label>
+          <label class="settings-checkbox"><input type="checkbox" id="vis-subject-data" checked /> Subject Data</label>
+          <label class="settings-checkbox"><input type="checkbox" id="vis-report-data" checked /> Report Data</label>
+          <label class="settings-checkbox"><input type="checkbox" id="vis-navica-tools" checked /> Navica Tools</label>
+        </div>
+        <div class="settings-actions">
+          <button id="settings-save" class="settings-save-btn">Save &amp; Apply</button>
+          <a href="#" id="settings-ext-link" class="settings-ext-link">Open Extension Page</a>
+        </div>
+      </div>
+
       <div class="content">
         <!-- <h2>Reports</h2>
         <button id="select-folder">Select Report Directory</button>
@@ -39,34 +61,14 @@
                 <span class="toggle-icon">▶</span>
               </div>
               <div class="section-content collapsed" data-section="ector">
-                <a
-                  href="https://search.ectorcad.org/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >CAD</a
-                >
-                <a
-                  href="https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >Deeds</a
-                >
-                <a
-                  href="https://search.ectorcad.org/map/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >GIS</a
-                >
-                <a
-                  href="https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >Zoning</a
-                >
+                <a href="https://search.ectorcad.org/" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://search.ectorcad.org/parcel/{q}"
+                  data-search-placeholder="12345.12345.12345">CAD</a>
+                <a href="https://ectorcountytx-web.tylerhost.net/web/search/DOCSEARCH144S1" target="_blank" class="link" rel="noopener noreferrer">Deeds</a>
+                <a href="https://search.ectorcad.org/map/" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://search.ectorcad.org/map/#{q}"
+                  data-search-placeholder="12345.12345.12345">GIS</a>
+                <a href="https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541/" target="_blank" class="link" rel="noopener noreferrer">Zoning</a>
               </div>
             </div>
 
@@ -76,27 +78,13 @@
                 <span class="toggle-icon">▶</span>
               </div>
               <div class="section-content collapsed" data-section="midland">
-                <a
-                  href="https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >CAD</a
-                >
-                <a
-                  href="https://midland.tx.publicsearch.us/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >Deeds</a
-                >
-                <a
-                  href="https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >GIS</a
-                >
+                <a href="https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id={q}"
+                  data-search-placeholder="R123456789">CAD</a>
+                <a href="https://midland.tx.publicsearch.us/" target="_blank" class="link" rel="noopener noreferrer">Deeds</a>
+                <a href="https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn={q}"
+                  data-search-placeholder="R123456789">GIS</a>
               </div>
             </div>
 
@@ -106,27 +94,15 @@
                 <span class="toggle-icon">▶</span>
               </div>
               <div class="section-content collapsed" data-section="upton">
-                <a
-                  href="https://uptoncad.org/home"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >CAD</a
-                >
-                <a
-                  href="https://i2j.uslandrecords.com/TX/Upton/D/default.aspx"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >Deeds</a
-                >
-                <a
-                  href="https://maps.pandai.com/UptonCAD/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >GIS</a
-                >
+                <a href="https://uptoncad.org/home" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://uptoncad.org/Home/Details?parcelId={q}"
+                  data-search-placeholder="1234">CAD</a>
+                <a href="https://i2j.uslandrecords.com/TX/Upton/D/default.aspx" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://i2j.uslandrecords.com/TX/Upton/D/default.aspx?doc={q}"
+                  data-search-placeholder="123456">Deeds</a>
+                <a href="https://maps.pandai.com/UptonCAD/" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://maps.pandai.com/UptonCAD/?find={q}"
+                  data-search-placeholder="1234">GIS</a>
               </div>
             </div>
 
@@ -136,26 +112,18 @@
                 <span class="toggle-icon">▶</span>
               </div>
               <div class="section-content collapsed" data-section="ward">
-                <a
-                  href="https://www.wardcad.org/home"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >CAD</a
-                >
-                <a
-                  href="https://maps.pandai.com/WardCAD/"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer"
-                  >GIS</a
-                >
+                <a href="https://www.wardcad.org/home" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://www.wardcad.org/Home/Details?parcelId={q}"
+                  data-search-placeholder="123456">CAD</a>
+                <a href="https://maps.pandai.com/WardCAD/" target="_blank" class="link" rel="noopener noreferrer"
+                  data-search-url="https://maps.pandai.com/WardCAD/?find={q}"
+                  data-search-placeholder="123456">GIS</a>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="section">
+        <div class="section" data-section-id="comp-grid">
           <div class="section-header main-section" data-section="comp-grid">
             <h2>Comp Grid Data</h2>
             <span class="toggle-icon">▶</span>
@@ -284,7 +252,7 @@
           </div>
         </div>
 
-        <div class="section">
+        <div class="section" data-section-id="subject-data">
           <div class="section-header main-section" data-section="subject-data">
             <h2>Subject Data</h2>
             <span class="toggle-icon">▶</span>
@@ -426,7 +394,7 @@
         </div>
 
         <!-- Navica Tools Section -->
-        <div class="section">
+        <div class="section" data-section-id="navica-tools">
           <div class="section-header main-section" data-section="navica-tools">
             <h2>Navica Tools</h2>
             <span class="toggle-icon">▶</span>
@@ -512,7 +480,7 @@
         </div>
 
         <!-- Report Data Section -->
-        <div class="section">
+        <div class="section" data-section-id="report-data">
           <div class="section-header main-section" data-section="report-data">
             <h2>Report Data</h2>
             <span class="toggle-icon">▶</span>
