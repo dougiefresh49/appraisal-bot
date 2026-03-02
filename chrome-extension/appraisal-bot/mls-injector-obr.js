@@ -33,12 +33,18 @@ function formatWardCadNumber(cadNumber) {
   return cadNumber.replace(/[^0-9]/g, '');
 }
 
+function formatAndrewsCadNumber(cadNumber) {
+  return cadNumber.replace(/[^0-9]/g, '');
+}
+
 function formatCad(apn, county) {
   switch (county) {
     case 'Midland':
       return formatMidlandCadNumber(apn);
     case 'Ward':
       return formatWardCadNumber(apn);
+    case 'Andrews':
+      return formatAndrewsCadNumber(apn);
     default:
       return formatEctorCadNumber(apn);
   }
@@ -74,6 +80,8 @@ function getCadUrl(parcelId, county) {
       return `https://www.wardcad.org/Home/Details?parcelId=${parcelId}`;
     case 'Upton':
       return `https://uptoncad.org/Home/Details?parcelId=${parcelId}`;
+    case 'Andrews':
+      return `https://esearch.andrewscad.org/Property/View/${parcelId}`;
     default:
       console.log(`⚠️ Unrecognized county: ${county}.`);
       return `https://search.ectorcad.org/parcel/${parcelId}`;
@@ -86,6 +94,8 @@ function addGisLink(valueSpan, parcelId, county) {
     gisUrl = `https://maps.midlandtexas.gov/portal/apps/webappviewer/index.html?id=3cce4985d5f94f1c8c5d0ea06e1e5b47&apn=${parcelId}`;
   } else if (county === 'Ward') {
     gisUrl = `https://maps.pandai.com/WardCAD/?find=${parcelId}`;
+  } else if (county === 'Andrews') {
+    gisUrl = `https://gis.bisclient.com/andrewscad/index.html?find=${parcelId}`;
   } else {
     gisUrl = `https://search.ectorcad.org/map/#${parcelId}`;
   }
@@ -164,28 +174,40 @@ function updateMlsTaxIdLink() {
     const valueSpan = container.querySelector('span');
 
     if (label && valueSpan && label.textContent.trim() === 'Tax ID:') {
-      const parcelId = formatCad(valueSpan.textContent.trim(), county);
-
-      // Ensure we don't modify it multiple times
       if (valueSpan.querySelector('a')) {
         console.log('CAD Link already exists, skipping...');
         return;
       }
 
-      console.log(`Found Tax ID: ${parcelId}`);
+      const rawText = valueSpan.textContent.trim();
 
-      // Create the CAD search URL
-      const cadUrl = getCadUrl(parcelId, county);
+      // Split on & to support multiple property IDs (e.g. Andrews "6676&418838")
+      const rawParts = rawText.split('&').map((s) => s.trim()).filter(Boolean);
+      const parcelIds = rawParts.map((part) => formatCad(part, county));
 
-      // Replace text with a clickable link with inline styles
-      valueSpan.innerHTML = `<a href="${cadUrl}" target="_blank" 
-        style="color: #0044cc; font-weight: bold; text-decoration: underline; cursor: pointer;">
-        ${parcelId}
-      </a>`;
+      console.log(`Found Tax ID(s): ${parcelIds.join(', ')}`);
 
-      console.log('✅ MLS Tax ID link updated successfully!');
+      valueSpan.innerHTML = '';
 
-      addGisLink(valueSpan, parcelId, county);
+      parcelIds.forEach((parcelId, idx) => {
+        if (idx > 0) {
+          valueSpan.appendChild(document.createTextNode(' & '));
+        }
+
+        const cadUrl = getCadUrl(parcelId, county);
+        const link = document.createElement('a');
+        link.href = cadUrl;
+        link.target = '_blank';
+        link.textContent = parcelId;
+        link.style.cssText =
+          'color: #0044cc; font-weight: bold; text-decoration: underline; cursor: pointer;';
+        valueSpan.appendChild(link);
+      });
+
+      console.log('✅ MLS Tax ID link(s) updated successfully!');
+
+      // Only one GIS link, using the first parcel ID
+      addGisLink(valueSpan, parcelIds[0], county);
     }
   });
 

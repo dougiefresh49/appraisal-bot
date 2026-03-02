@@ -21,6 +21,11 @@ function isWardAPN(text) {
   return /^\d{4,6}$/.test(text);
 }
 
+// Andrews County format checker (4-6 digit all-digit property IDs)
+function isAndrewsAPN(text) {
+  return /^\d{4,6}$/.test(text);
+}
+
 // Function to create context menu items
 function createContextMenuItems() {
   // Remove existing menu items
@@ -148,6 +153,32 @@ function createContextMenuItems() {
     title: 'GIS',
     contexts: ['all'],
   });
+
+  // Create Andrews County submenu
+  chrome.contextMenus.create({
+    id: 'andrews-county',
+    parentId: 'appraisal-bot-menu',
+    title: 'ANDREWS COUNTY',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'andrews-cad',
+    parentId: 'andrews-county',
+    title: 'CAD',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'andrews-deeds',
+    parentId: 'andrews-county',
+    title: 'Deeds',
+    contexts: ['all'],
+  });
+  chrome.contextMenus.create({
+    id: 'andrews-gis',
+    parentId: 'andrews-county',
+    title: 'GIS',
+    contexts: ['all'],
+  });
 }
 
 // Handle context menu clicks
@@ -240,6 +271,27 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         url = `https://maps.pandai.com/WardCAD/?find=${selectedText}`;
       } else {
         url = 'https://maps.pandai.com/WardCAD/';
+      }
+      break;
+
+    case 'andrews-cad':
+      if (selectedText && isAndrewsAPN(selectedText)) {
+        url = `https://esearch.andrewscad.org/Property/View/${selectedText}`;
+      } else {
+        url = 'https://esearch.andrewscad.org/';
+      }
+      break;
+
+    case 'andrews-deeds':
+      url =
+        'https://andrewscountytx-web.tylerhost.net/web/search/DOCSEARCH642S1';
+      break;
+
+    case 'andrews-gis':
+      if (selectedText && isAndrewsAPN(selectedText)) {
+        url = `https://gis.bisclient.com/andrewscad/index.html?find=${selectedText}`;
+      } else {
+        url = 'https://gis.bisclient.com/andrewscad/index.html';
       }
       break;
   }
