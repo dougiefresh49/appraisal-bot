@@ -2,13 +2,19 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const DIST = path.join(ROOT, 'dist', 'AppraisalBot-Shared');
+const DIST = path.join(ROOT, 'dist', 'AppraisalBot');
 const EXT_SRC = path.join(ROOT, 'chrome-extension', 'appraisal-bot');
 const EXT_DEST = path.join(DIST, 'appraisal-bot');
 const SCRIPTS_SRC = path.join(ROOT, 'scripts', 'windows');
 const SCRIPTS_DEST = path.join(DIST, 'scripts');
 
-const EXT_EXCLUDE = new Set(['examples', 'dom-samples', 'readme.md', '.ds_store', '.gitignore']);
+const EXT_EXCLUDE = new Set([
+  'examples',
+  'dom-samples',
+  'readme.md',
+  '.ds_store',
+  '.gitignore',
+]);
 
 function rimraf(dir) {
   if (fs.existsSync(dir)) {
@@ -83,6 +89,12 @@ if (fs.existsSync(SCRIPTS_SRC)) {
 console.log('  Writing README.txt...');
 fs.writeFileSync(path.join(DIST, 'README.txt'), README_TEXT);
 
-const manifest = JSON.parse(fs.readFileSync(path.join(EXT_DEST, 'manifest.json'), 'utf-8'));
-console.log(`\nDone! Bundled v${manifest.version} to dist/AppraisalBot-Shared/`);
-console.log('Copy the contents of that folder to your Google Drive shared folder.');
+const manifest = JSON.parse(
+  fs.readFileSync(path.join(EXT_DEST, 'manifest.json'), 'utf-8'),
+);
+console.log(
+  `\nDone! Bundled v${manifest.version} to dist/AppraisalBot-Shared/`,
+);
+console.log(
+  'Copy the contents of that folder to your Google Drive shared folder.',
+);

@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { getProjectArgs } from '../utils/project-args';
-import { PropertyIdentifier } from './types';
+import { PropertyIdentifier, RealApiResponse } from './types';
 import { fetchPropertyDetails, searchProperty } from './utils';
-import { findClosestMatch, sanitizeFileName } from './helpers';
+import { findClosestMatch, parseRealApiResponse, sanitizeFileName } from './helpers';
 
 /**
  * Processes a single property:
@@ -15,7 +15,7 @@ import { findClosestMatch, sanitizeFileName } from './helpers';
 async function processProperty(
   property: PropertyIdentifier,
   outputPath: string
-): Promise<void> {
+) {
   try {
     console.log(`Processing property with APN: ${property.apn}`);
     const searchString =
@@ -50,24 +50,24 @@ async function processProperty(
       JSON.stringify(details, null, 2)
     );
     console.log(`Saved property details to ${fileName}`);
-    return details;
+    return details ;
   } catch (error) {
     console.error(`Error processing property ${property.address}:`, error);
   }
 }
 
-async function getPropertyTaxInfo(property: PropertyIdentifier) {
-  try {
-    const details = await fetchPropertyDetails('_', property);
-    const taxInfo = details.taxInfo;
-    return taxInfo;
-  } catch (error) {
-    console.error(
-      `Error getting property tax info for ${property.address}:`,
-      error
-    );
-  }
-}
+// async function getPropertyTaxInfo(property: PropertyIdentifier) {
+//   try {
+//     const details = await fetchPropertyDetails('_', property);
+//     const taxInfo = details.taxInfo;
+//     return taxInfo;
+//   } catch (error) {
+//     console.error(
+//       `Error getting property tax info for ${property.address}:`,
+//       error
+//     );
+//   }
+// }
 
 /**
  * Main function:
@@ -88,6 +88,15 @@ async function main() {
     const outputData: any[] = [];
     for (const property of properties) {
       const details = await processProperty(property, outputPath);
+      const gsheetData = await parseRealApiResponse(details, property.instrumentNumber);
+      const fileName = `${sanitizeFileName(
+        property.address
+      )}-gsheet-data.json`;
+  
+      await fs.writeFile(
+        path.join(outputPath, fileName),
+        JSON.stringify(gsheetData, null, 2)
+      );
       // const taxInfo = await getPropertyTaxInfo(property);
       // outputData.push(taxInfo);
       outputData.push(details);

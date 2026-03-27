@@ -3,13 +3,14 @@ import {
   MlsAreaName,
   PropertyIdentifier,
   PropertyType,
+  RealApiResponse,
   SearchResult,
 } from './types';
 
 export async function fetchPropertyDetails(
   propertyId: string,
   property?: PropertyIdentifier
-): Promise<any> {
+): Promise<RealApiResponse> {
   const id = propertyId !== '_' ? propertyId : undefined;
   const body = {
     id,
@@ -32,7 +33,7 @@ export async function fetchPropertyDetails(
     'https://api.realestateapi.com/v2/PropertyDetail',
     options
   );
-  return response.json();
+  return response.json() as unknown as RealApiResponse;
 }
 
 export async function fetchNeighborStatByMlsArea(

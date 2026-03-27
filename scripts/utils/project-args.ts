@@ -22,7 +22,7 @@ type ProjectPaths = {
  * @returns {ProjectArgs & ProjectPaths} An object containing the parsed project arguments and paths.
  */
 export function getProjectArgs(
-  outputFolderName?: string
+  outputFolderName?: string,
 ): ProjectArgs & ProjectPaths {
   const args = process.argv.slice(2);
   const cadType =
@@ -51,26 +51,35 @@ export function getProjectArgs(
   return { ...projectArgs, ...projectPaths };
 }
 
+const appraisalDataRootEnv = 'APPRAISAL_PROJECT_DATA_ROOT';
+
 export function getProjectPaths(
   args: ProjectArgs,
-  outputFolderName?: string
+  outputFolderName?: string,
 ): ProjectPaths {
+  const dataRootBase = process.env[appraisalDataRootEnv];
+  if (!dataRootBase?.trim()) {
+    throw new Error(
+      `Set ${appraisalDataRootEnv} in .env (absolute path to your appraising root folder).`,
+    );
+  }
+  const year = String(new Date().getFullYear());
   const dataPathRoot = path.resolve(
-    '/Users/dougiefresh/Library/CloudStorage/GoogleDrive-dougiefreshdesigns@gmail.com/My Drive/appraising/basin-appraisals-llc/',
-    '2025',
+    dataRootBase.trim(),
+    year,
     args.projectType,
     'in-progress',
     args.projectFolder,
-    args.propType
+    args.propType,
   );
   const dataFilePath = path.resolve(
     dataPathRoot,
     `${
       args.nestedFolderDir ? `${args.nestedFolderDir}/` : ''
-    }data/property-data.json`
+    }data/property-data.json`,
   );
   const defaultOutputFolder =
-    args.propType === 'comps' ? outputFolderName ?? 'downloads' : '';
+    args.propType === 'comps' ? (outputFolderName ?? 'downloads') : '';
   const outputFolder = args.outDir ?? defaultOutputFolder;
   const outputPath = path.resolve(dataPathRoot, outputFolder);
 

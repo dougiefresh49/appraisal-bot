@@ -5,11 +5,10 @@ import path from 'path';
 import { getProjectArgs } from '../utils/project-args';
 
 type StagehandPage = typeof Stagehand.prototype.page;
-
 const { cadType, dataFilePath, outputPath } = getProjectArgs();
 
 const cadUrls = {
-  mcad: 'https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=',
+  mcad: 'https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=',
   ecad: 'https://search.ectorcad.org/parcel/',
 };
 const deedUrls = {
@@ -32,7 +31,7 @@ const properties: {
 async function downloadDeedDocs(
   page: StagehandPage,
   instrumentNumber: string,
-  address: string
+  address: string,
 ) {
   await page.context().addCookies([
     {
@@ -62,12 +61,12 @@ async function downloadDeedDocs(
 
   // Wait for the "View" button to be visible
   await page.waitForSelector(
-    '.selfServiceSearchFullResult.selfServiceSearchResultNavigation'
+    '.selfServiceSearchFullResult.selfServiceSearchResultNavigation',
   );
 
   // Click the "View" button
   await page.click(
-    '.selfServiceSearchFullResult.selfServiceSearchResultNavigation'
+    '.selfServiceSearchFullResult.selfServiceSearchResultNavigation',
   );
 
   // Wait for the iframe to load
@@ -88,7 +87,7 @@ async function downloadDeedDocs(
   // Save the downloaded deed record
   const pdfPath = path.join(
     outputPath,
-    `${address}-deed--${instrumentNumber}.pdf`
+    `${address}-deed--${instrumentNumber}.pdf`,
   );
   await download.saveAs(pdfPath);
 
@@ -99,7 +98,7 @@ async function downloadPropertyDocs() {
   const stagehand = new Stagehand({
     modelName: 'gpt-4o',
     env: 'LOCAL', // Or 'BROWSERBASE' if using API keys
-    headless: true, // Run in headless mode to bypass print preview UI
+    headless: false, // Run in headless mode to bypass print preview UI
   });
 
   await stagehand.init();
@@ -122,11 +121,15 @@ async function downloadPropertyDocs() {
     // Define PDF file path
     const pdfPath = path.join(
       outputPath,
-      `${sanitizedAddress}${lot ? `-lot-${lot}` : ''}-cad.pdf`
+      `${sanitizedAddress}${lot ? `-lot-${lot}` : ''}-cad.pdf`,
     );
 
     // Directly save the page as a PDF (bypasses print preview)
-    await page.pdf({ path: pdfPath, format: 'A4' });
+    await page.pdf({
+      path: pdfPath,
+      format: 'A4',
+      displayHeaderFooter: true,
+    });
 
     console.log(`✅ PDF saved: ${pdfPath}`);
 

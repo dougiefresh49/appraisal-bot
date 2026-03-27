@@ -1,4 +1,5 @@
-import { SearchResult } from './types';
+import { SheetParcel, SheetParcelImprovement, SheetSale } from './sheets-types';
+import { RealApiResponse, SearchResult } from './types';
 
 /**
  * Computes the Levenshtein distance between two strings.
@@ -64,4 +65,60 @@ export function findClosestMatch(
  */
 export function sanitizeFileName(name: string): string {
   return name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+}
+
+export function parseRealApiResponse(
+  response?: RealApiResponse,
+  _instrumentNumber?: string
+) {
+  if (!response) return undefined;
+
+  const instrumentNumber =
+    _instrumentNumber ?? response.data.lastSale.documentNumber ?? undefined;
+  const sale: SheetSale = {
+    address: response.data.propertyInfo.address.label,
+    saleDate: response.data.lastSale.saleDate ?? undefined,
+    salePrice: response.data.lastSale.saleAmount ?? undefined,
+    grantor: response.data.lastSale.sellerNames ?? undefined,
+    grantee: response.data.lastSale.buyerNames ?? undefined,
+    instrumentNumber,
+    mlsNumber: undefined,
+    saleTerms: response.data.lastSale.purchaseMethod ?? undefined,
+  };
+
+  const numBuildings = response.data.propertyInfo.buildingsCount ?? 0;
+  // create numBuildings number of improvements
+  const improvements: SheetParcelImprovement[] = new Array(numBuildings)
+    .fill(null)
+    .map((_, i) => ({
+      APN: response.data.lotInfo.apn,
+      buildingNumber: String(i + 1),
+      sectionNumber: '1',
+      yearBuilt: response.data.propertyInfo.yearBuilt ?? undefined,
+      grossBuildingAreaSquareFeet:
+        response.data.propertyInfo.buildingSquareFeet ?? undefined,
+      officeAreaSquareFeet: undefined,
+      warehouseAreaSquareFeet: undefined,
+      storageAreaSquareFeet: undefined,
+      comments: undefined,
+    }));
+
+  const parcels: SheetParcel[] = [
+    {
+      APN: response.data.lotInfo.apn,
+      instrumentNumber,
+      location: response.data.propertyInfo.address.address,
+      legalDescription: response.data.lotInfo.legalDescription,
+      lotNumber: response.data.lotInfo.lotNumber,
+      sizeAcres: response.data.lotInfo.lotAcres,
+      sizeSquareFeet: response.data.lotInfo.lotSquareFeet,
+      grossBuildingSizeSquareFeet:
+        response.data.propertyInfo.buildingSquareFeet,
+      officeAreaSquareFeet: undefined,
+      warehouseAreaSquareFeet: undefined,
+      taxAmount: response.data.taxInfo.taxAmount,
+    },
+  ];
+
+  return { ...sale, parcels, improvements };
 }
