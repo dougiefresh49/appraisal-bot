@@ -182,7 +182,10 @@ function updateMlsTaxIdLink() {
       const rawText = valueSpan.textContent.trim();
 
       // Split on & to support multiple property IDs (e.g. Andrews "6676&418838")
-      const rawParts = rawText.split('&').map((s) => s.trim()).filter(Boolean);
+      const rawParts = rawText
+        .split('&')
+        .map((s) => s.trim())
+        .filter(Boolean);
       const parcelIds = rawParts.map((part) => formatCad(part, county));
 
       console.log(`Found Tax ID(s): ${parcelIds.join(', ')}`);

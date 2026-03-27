@@ -206,6 +206,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Effective date
   const effectiveDateInput = document.getElementById('effective-date-input');
 
+  // Subject form elements
+  const subjectInputToggle = document.querySelector('.subject-input-toggle');
+  const subjectModeFormBtn = document.getElementById('subject-mode-form');
+  const subjectModeCsvBtn = document.getElementById('subject-mode-csv');
+  const subjectFormInputSection = document.getElementById('subject-form-input-section');
+  const subjectFormAddress = document.getElementById('subject-form-address');
+  const subjectFormCounty = document.getElementById('subject-form-county');
+  const subjectFormCad = document.getElementById('subject-form-cad');
+  const subjectFormEffDate = document.getElementById('subject-form-eff-date');
+  const subjectFormYearBuilt = document.getElementById('subject-form-year-built');
+  const subjectFormGla = document.getElementById('subject-form-gla');
+  const generateSubjectFormBtn = document.getElementById('generate-subject-form-btn');
+  const saveSubjectFormBtn = document.getElementById('save-subject-form-btn');
+
   // Subject data variables
   let subjectDataObj = { headers: [], data: [] };
   let currentSubjectFilePath = '';
@@ -237,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (result.apbotSubjectData) {
         subjectCsvInput.value = result.apbotSubjectData;
+        populateFormFromCsv(result.apbotSubjectData);
         console.log('📋 Loaded saved subject data from storage');
       }
       if (result.apbotSubjectCsvFilePath) {
@@ -248,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (result.apbotEffectiveDate) {
         effectiveDateInput.value = result.apbotEffectiveDate;
+        subjectFormEffDate.value = result.apbotEffectiveDate;
         console.log('📅 Loaded saved effective date:', result.apbotEffectiveDate);
       }
     },
@@ -1168,8 +1184,16 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       _subjectDataObj = subjectDataObj;
 
+      // Save to storage so content scripts always have the latest
+      chrome.storage.local.set(
+        { apbotSubjectData: csvText, apbotSubjectCsvFilePath: subjectCsvFilePath },
+        () => console.log('💾 Auto-saved subject data on generate'),
+      );
+
       // Switch to display mode
+      subjectInputToggle.classList.add('hidden');
       subjectCsvInputSection.classList.add('hidden');
+      subjectFormInputSection.classList.add('hidden');
       subjectDisplaySection.classList.remove('hidden');
 
       displaySubjectData();
@@ -1183,9 +1207,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function backToSubjectInput() {
-    subjectCsvInputSection.classList.remove('hidden');
     subjectDisplaySection.classList.add('hidden');
+    subjectInputToggle.classList.remove('hidden');
     subjectDataObj = [];
+    if (subjectModeFormBtn.classList.contains('active')) {
+      subjectFormInputSection.classList.remove('hidden');
+      subjectCsvInputSection.classList.add('hidden');
+    } else {
+      subjectCsvInputSection.classList.remove('hidden');
+      subjectFormInputSection.classList.add('hidden');
+    }
   }
 
   // Subject Tab switching function
@@ -1267,6 +1298,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (backToSubjectInputBtn) {
     backToSubjectInputBtn.addEventListener('click', backToSubjectInput);
+  }
+
+  // Subject input mode toggle
+  subjectModeFormBtn.addEventListener('click', () => {
+    subjectModeFormBtn.classList.add('active');
+    subjectModeCsvBtn.classList.remove('active');
+    subjectFormInputSection.classList.remove('hidden');
+    subjectCsvInputSection.classList.add('hidden');
+  });
+
+  subjectModeCsvBtn.addEventListener('click', () => {
+    subjectModeCsvBtn.classList.add('active');
+    subjectModeFormBtn.classList.remove('active');
+    subjectCsvInputSection.classList.remove('hidden');
+    subjectFormInputSection.classList.add('hidden');
+  });
+
+  function buildCsvFromForm() {
+    const address = subjectFormAddress.value.trim();
+    const county = subjectFormCounty.value;
+    const cad = subjectFormCad.value.trim();
+    const yearBuilt = subjectFormYearBuilt.value.trim();
+    const gla = subjectFormGla.value.trim();
+
+    const headers = ['Address', 'county', 'apn', 'Gross Living Area', 'Year Built'];
+    const escapedAddress = address.includes(',') ? `"${address}"` : address;
+    const row = [escapedAddress, county, cad, gla, yearBuilt];
+    return headers.join(',') + '\n' + row.join(',');
+  }
+
+  function populateFormFromCsv(csvText) {
+    if (!csvText) return;
+    try {
+      const parsed = parseCSV(csvText);
+      if (parsed.length < 2) return;
+      const headers = parsed[0].map((h) => h.toLowerCase().trim());
+      const data = parsed[1];
+
+      const addrIdx = headers.indexOf('address');
+      const countyIdx = headers.indexOf('county');
+      const apnIdx = headers.indexOf('apn');
+      const glaIdx = headers.findIndex((h) => h.includes('gross living'));
+      const ybIdx = headers.findIndex((h) => h.includes('year built'));
+
+      if (addrIdx >= 0 && data[addrIdx]) subjectFormAddress.value = data[addrIdx];
+      if (countyIdx >= 0 && data[countyIdx]) subjectFormCounty.value = data[countyIdx];
+      if (apnIdx >= 0 && data[apnIdx]) subjectFormCad.value = data[apnIdx];
+      if (glaIdx >= 0 && data[glaIdx]) subjectFormGla.value = data[glaIdx];
+      if (ybIdx >= 0 && data[ybIdx]) subjectFormYearBuilt.value = data[ybIdx];
+    } catch (e) {
+      console.warn('Could not populate form from CSV:', e);
+    }
+  }
+
+  generateSubjectFormBtn.addEventListener('click', () => {
+    const csvText = buildCsvFromForm();
+    subjectCsvInput.value = csvText;
+
+    if (subjectFormEffDate.value) {
+      effectiveDateInput.value = subjectFormEffDate.value;
+      chrome.storage.local.set({ apbotEffectiveDate: subjectFormEffDate.value });
+    }
+
+    generateSubjectData();
+  });
+
+  saveSubjectFormBtn.addEventListener('click', () => {
+    const csvText = buildCsvFromForm();
+    subjectCsvInput.value = csvText;
+
+    if (subjectFormEffDate.value) {
+      effectiveDateInput.value = subjectFormEffDate.value;
+      chrome.storage.local.set({ apbotEffectiveDate: subjectFormEffDate.value });
+    }
+
+    chrome.storage.local.set({ apbotSubjectData: csvText }, () => {
+      console.log('💾 Saved subject form data to storage as CSV');
+      showSubjectFormSaveSuccess();
+    });
+  });
+
+  function showSubjectFormSaveSuccess() {
+    const originalText = saveSubjectFormBtn.textContent;
+    saveSubjectFormBtn.textContent = '✅ Saved!';
+    saveSubjectFormBtn.style.backgroundColor = '#059669';
+    setTimeout(() => {
+      saveSubjectFormBtn.textContent = originalText;
+      saveSubjectFormBtn.style.backgroundColor = '';
+    }, 1500);
   }
 
   // Tab Event Listeners

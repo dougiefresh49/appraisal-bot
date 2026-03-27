@@ -413,8 +413,63 @@
             <span class="toggle-icon">▶</span>
           </div>
           <div class="section-content collapsed" data-section="subject-data">
+            <!-- Subject Input Mode Toggle -->
+            <div class="subject-input-toggle">
+              <button id="subject-mode-form" class="subject-mode-btn active">Form</button>
+              <button id="subject-mode-csv" class="subject-mode-btn">CSV</button>
+            </div>
+
+            <!-- Subject Form Input Section -->
+            <div id="subject-form-input-section">
+              <div class="subject-form-grid">
+                <div class="subject-form-field">
+                  <label for="subject-form-address">Address</label>
+                  <input type="text" id="subject-form-address" placeholder="e.g. 1337 Zeneta Ave, Odessa, TX 79763" />
+                </div>
+                <div class="subject-form-field">
+                  <label for="subject-form-county">County</label>
+                  <select id="subject-form-county">
+                    <option value="">—</option>
+                    <option value="Andrews">Andrews</option>
+                    <option value="Ector">Ector</option>
+                    <option value="Midland">Midland</option>
+                    <option value="Upton">Upton</option>
+                    <option value="Ward">Ward</option>
+                  </select>
+                </div>
+                <div class="subject-form-field">
+                  <label for="subject-form-cad">CAD Number</label>
+                  <input type="text" id="subject-form-cad" placeholder="e.g. 9263" />
+                </div>
+                <div class="subject-form-field">
+                  <label for="subject-form-eff-date">Effective Date</label>
+                  <input type="date" id="subject-form-eff-date" />
+                </div>
+                <div class="subject-form-field">
+                  <label for="subject-form-year-built">Year Built</label>
+                  <input type="text" id="subject-form-year-built" placeholder="e.g. 2005" />
+                </div>
+                <div class="subject-form-field">
+                  <label for="subject-form-gla">GLA (sq ft)</label>
+                  <input type="text" id="subject-form-gla" placeholder="e.g. 2400" />
+                </div>
+              </div>
+              <button
+                id="generate-subject-form-btn"
+                class="w-full mt-3 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Generate Subject Data
+              </button>
+              <button
+                id="save-subject-form-btn"
+                class="w-full mt-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Save Subject Data
+              </button>
+            </div>
+
             <!-- Subject CSV Input Section -->
-            <div id="subject-csv-input-section">
+            <div id="subject-csv-input-section" class="hidden">
               <label
                 for="subject-csv-input"
                 class="block text-sm font-medium mb-2"

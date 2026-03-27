@@ -130,32 +130,33 @@ class NavicaTools {
   }
 
   loadSubjectData() {
-    chrome.storage.local.get(['apbotSubjectData', 'apbotEffectiveDate', 'apbotSearchConfig'], (result) => {
-      if (result.apbotSubjectData) {
-        try {
-          const csvData = this.parseCSV(result.apbotSubjectData);
-          if (csvData.length >= 2) {
-            const headers = csvData[0];
-            const subjectRow = csvData[1];
-            this.subjectData = {};
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['apbotSubjectData', 'apbotEffectiveDate', 'apbotSearchConfig'], (result) => {
+        if (result.apbotSubjectData) {
+          try {
+            const csvData = this.parseCSV(result.apbotSubjectData);
+            if (csvData.length >= 2) {
+              const headers = csvData[0];
+              const subjectRow = csvData[1];
+              this.subjectData = {};
 
-            headers.forEach((header, index) => {
-              this.subjectData[header.toLowerCase()] = subjectRow[index] || '';
-            });
+              headers.forEach((header, index) => {
+                this.subjectData[header.toLowerCase()] = subjectRow[index] || '';
+              });
 
-            console.log('📋 Loaded subject data:', this.subjectData);
+              console.log('📋 Loaded subject data:', this.subjectData);
+            }
+          } catch (error) {
+            console.error('Error parsing subject data:', error);
           }
-        } catch (error) {
-          console.error('Error parsing subject data:', error);
         }
-      }
-      // Load effective date (yyyy-mm-dd from date input, or empty)
-      this.effectiveDate = result.apbotEffectiveDate || '';
-      console.log('📅 Effective date:', this.effectiveDate || '(not set, will use today)');
+        this.effectiveDate = result.apbotEffectiveDate || '';
+        console.log('📅 Effective date:', this.effectiveDate || '(not set, will use today)');
 
-      // Load search config (keyed by APN in sidepanel)
-      this.searchConfig = result.apbotSearchConfig || {};
-      console.log('⚙️ Search config:', this.searchConfig);
+        this.searchConfig = result.apbotSearchConfig || {};
+        console.log('⚙️ Search config:', this.searchConfig);
+        resolve();
+      });
     });
   }
 
@@ -194,6 +195,7 @@ class NavicaTools {
 
   // Add search criteria for comps
   async addSearchCriteriaComps() {
+    await this.loadSubjectData();
     if (!this.subjectData) {
       alert('Please load subject data first in the Subject Data section.');
       return;
@@ -211,6 +213,7 @@ class NavicaTools {
 
   // Add search criteria for neighborhood
   async addSearchCriteriaNbh() {
+    await this.loadSubjectData();
     if (!this.subjectData) {
       alert('Please load subject data first in the Subject Data section.');
       return;
@@ -288,6 +291,20 @@ class NavicaTools {
       if (val) return val;
     }
     return '';
+  }
+
+  getSubjectYearBuilt() {
+    const yearBuilt = this.parseNum(this.getSubjectField('Year Built', 'year built'));
+    if (yearBuilt > 0) return yearBuilt;
+
+    const age = this.parseNum(this.getSubjectField('Actual Age', 'actual age'));
+    if (age > 0) {
+      const refYear = this.effectiveDate
+        ? parseInt(this.effectiveDate.split('-')[0])
+        : new Date().getFullYear();
+      return refYear - age;
+    }
+    return 0;
   }
 
   // Get search config value with defaults
@@ -370,14 +387,14 @@ class NavicaTools {
 
     const currentYear = new Date().getFullYear();
     const gla = this.parseNum(this.getSubjectField('Gross Living Area', 'gross living area'));
-    const age = this.parseNum(this.getSubjectField('Actual Age', 'actual age'));
+    const subjectYearBuilt = this.getSubjectYearBuilt();
     let siteSize = this.parseNum(this.getSubjectField('Site', 'site'));
 
     // Get configurable values
     const glaPercent = this.getConfigValue('glaPercent') / 100;
     const yearRange = this.getConfigValue('yearRange');
 
-    console.log('Comp search - gla:', gla, 'age:', age, 'siteSize (raw):', siteSize,
+    console.log('Comp search - gla:', gla, 'yearBuilt:', subjectYearBuilt, 'siteSize (raw):', siteSize,
       'glaPercent:', glaPercent, 'yearRange:', yearRange);
 
     // Convert site size from sf to acres if needed (assuming sf if > 1)
@@ -388,8 +405,8 @@ class NavicaTools {
     // Calculate ranges using configurable percentages
     const sqftMin = Math.round(gla * (1 - glaPercent));
     const sqftMax = Math.round(gla * (1 + glaPercent));
-    const yearMin = currentYear - age - yearRange;
-    const yearMax = Math.min(currentYear - age + yearRange, currentYear);
+    const yearMin = subjectYearBuilt - yearRange;
+    const yearMax = Math.min(subjectYearBuilt + yearRange, currentYear);
     const acresMin = Math.round(siteSize * 0.85 * 100) / 100;
     const acresMax = Math.round(siteSize * 2 * 100) / 100;
 
@@ -990,6 +1007,7 @@ class NavicaTools {
 
   // Highlight listings functionality
   async highlightListings() {
+    await this.loadSubjectData();
     if (!this.subjectData) {
       alert('Please load subject data first in the Subject Data section.');
       return;
@@ -1002,9 +1020,7 @@ class NavicaTools {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const subjectGla = this.parseNum(this.getSubjectField('Gross Living Area', 'gross living area'));
-      const subjectAge = this.parseNum(this.getSubjectField('Actual Age', 'actual age'));
-      const currentYear = new Date().getFullYear();
-      const subjectYearBuilt = currentYear - subjectAge;
+      const subjectYearBuilt = this.getSubjectYearBuilt();
 
       console.log('🔍 Looking for listing rows...');
       console.log('Current URL:', window.location.href);
