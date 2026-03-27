@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 16px;
+        font-size: 14px;
+      }
+
+      .header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #4285f4;
+      }
+
+      .header h2 {
+        margin: 0 0 8px 0;
+        color: #1a73e8;
+        font-size: 18px;
+      }
+
+      .header p {
+        margin: 0;
+        color: #5f6368;
+        font-size: 12px;
+      }
+
+      .category-group {
+        margin-bottom: 20px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #34a853;
+      }
+
+      .category-title {
+        margin: 0 0 12px 0;
+        color: #1e7e34;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .range-button {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        text-align: left;
+        transition: all 0.2s;
+      }
+
+      .range-button:hover {
+        background: #e8f0fe;
+        border-color: #4285f4;
+        box-shadow: 0 2px 4px rgba(66, 133, 244, 0.2);
+      }
+
+      .range-button:active {
+        background: #d2e3fc;
+      }
+
+      .range-name {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .range-info {
+        font-size: 11px;
+        color: #666;
+        font-style: italic;
+      }
+
+      .status-message {
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-size: 12px;
+        display: none;
+      }
+
+      .status-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .loading {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+        font-style: italic;
+      }
+
+      .no-ranges {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+        font-style: italic;
+      }
+
+      .refresh-button {
+        width: 100%;
+        padding: 10px;
+        background: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .refresh-button:hover {
+        background: #3367d6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2>Range Selector</h2>
+      <p>Select a named range to copy and paste into Google Docs</p>
+    </div>
+
+    <div id="status" class="status-message"></div>
+
+    <div id="content">
+      <div class="loading">Loading ranges...</div>
+    </div>
+
+    <button onclick="refreshRanges()" class="refresh-button">
+      Refresh Ranges
+    </button>
+
+    <script type="text/javascript">
+      // Load ranges when sidebar opens
+      window.onload = function () {
+        loadRanges();
+      };
+
+      function loadRanges() {
+        document.getElementById('content').innerHTML =
+          '<div class="loading">Loading ranges...</div>';
+
+        google.script.run
+          .withSuccessHandler(function (groupedRanges) {
+            displayRanges(groupedRanges);
+          })
+          .withFailureHandler(function (error) {
+            document.getElementById('content').innerHTML = `
+              <div class="status-error">
+                Failed to load ranges: ${error.message}
+              </div>
+            `;
+          })
+          .getNamedRangesForSelector();
+      }
+
+      function displayRanges(groupedRanges) {
+        const content = document.getElementById('content');
+
+        const categories = Object.keys(groupedRanges);
+
+        if (categories.length === 0) {
+          content.innerHTML = `
+            <div class="no-ranges">
+              No matching ranges found. Make sure you have generated UI templates.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+
+        // Maintain the order: Land, Sales, Rentals, Reconciliation, Other
+        const compTypeOrder = [
+          'Land',
+          'Sales',
+          'Rentals',
+          'Reconciliation',
+          'Other',
+        ];
+        const sortedCategories = compTypeOrder
+          .filter((cat) => categories.includes(cat))
+          .concat(categories.filter((cat) => !compTypeOrder.includes(cat)));
+
+        sortedCategories.forEach((category) => {
+          const ranges = groupedRanges[category];
+
+          html += `
+            <div class="category-group">
+              <div class="category-title">${escapeHtml(category)}</div>
+          `;
+
+          ranges.forEach((range) => {
+            html += `
+              <button class="range-button" onclick="selectRange('${escapeHtml(
+                range.name
+              )}')">
+                <div class="range-name">${escapeHtml(range.name)}</div>
+                <div class="range-info">Sheet: ${escapeHtml(
+                  range.sheetName
+                )} • ${escapeHtml(range.range)}</div>
+              </button>
+            `;
+          });
+
+          html += '</div>';
+        });
+
+        content.innerHTML = html;
+      }
+
+      function selectRange(rangeName) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.className = 'status-message';
+        statusDiv.style.display = 'none';
+
+        google.script.run
+          .withSuccessHandler(function (message) {
+            // Close the sidebar to return focus to the spreadsheet
+            // This allows the user to immediately use Command+C to copy
+            google.script.host.close();
+          })
+          .withFailureHandler(function (error) {
+            statusDiv.className = 'status-message status-error';
+            statusDiv.textContent = 'Error: ' + error.message;
+            statusDiv.style.display = 'block';
+          })
+          .selectNamedRange(rangeName);
+      }
+
+      function refreshRanges() {
+        loadRanges();
+      }
+
+      function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+    </script>
+  </body>
+</html>

@@ -1,15 +1,16 @@
 {
   "timeZone": "America/Chicago",
   "dependencies": {
-    "libraries": [{
-      "userSymbol": "ApBot2",
-      "libraryId": "1x9wlJr2C0nAjxM4oulzGZsY0bRbPQQyFD2gqicv9ahPC5fo8NmipC0xf",
-      "version": "0",
-      "developmentMode": true
-    }]
+    "libraries": [
+      {
+        "userSymbol": "ApBot2",
+        "libraryId": "1x9wlJr2C0nAjxM4oulzGZsY0bRbPQQyFD2gqicv9ahPC5fo8NmipC0xf",
+        "version": "0",
+        "developmentMode": true
+      }
+    ]
   },
   "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8",
   "oauthScopes": [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.readonly",
@@ -19,5 +20,15 @@
     "https://www.googleapis.com/auth/script.storage",
     "https://www.googleapis.com/auth/script.container.ui",
     "https://www.googleapis.com/auth/userinfo.email"
-  ]
+  ],
+  "runtimeVersion": "V8",
+  "sheets": {
+    "macros": [
+      {
+        "menuName": "Range Sidebar",
+        "functionName": "showRangeSelectorSidebar",
+        "defaultShortcut": "Ctrl+Alt+Shift+9"
+      }
+    ]
+  }
 }

@@ -14,6 +14,18 @@ function onOpen() {
   menu.addItem('Export Report Data', 'exportReportData');
   menu.addSeparator();
 
+  menu.addItem('Range Selector', 'showRangeSelectorSidebar');
+  menu.addSeparator();
+
+  // --- UI Templates ---
+  menu.addItem('Generate UI', 'doNothing');
+  menu.addItem('Land - Default', 'generateStandardLandUI');
+  const salesMenu = ui.createMenu('Sales');
+  salesMenu.addItem('Default', 'generateStandardSalesUI');
+  salesMenu.addItem('Income', 'generateIncomeSalesUI');
+  menu.addSubMenu(salesMenu);
+  menu.addSeparator();
+
   // --- Edit Data ---
   menu.addItem('Edit Comp Data', 'showCompEditorSidebar');
   menu.addSeparator();
@@ -36,6 +48,10 @@ function onOpen() {
   menu.addSubMenu(adjMenu);
 
   menu.addToUi();
+}
+
+function doNothing() {
+  Logger.log('doNothing called');
 }
 
 /**
@@ -71,5 +87,17 @@ function showCompEditorSidebar() {
   )
     .setTitle('Comp Editor')
     .setWidth(400);
+  SpreadsheetApp.getUi().showSidebar(htmlOutput);
+}
+
+/**
+ * Shows the range selector sidebar for quick access to named ranges
+ */
+function showRangeSelectorSidebar() {
+  const htmlOutput = HtmlService.createHtmlOutputFromFile(
+    'ui/range-selector-sidebar'
+  )
+    .setTitle('Range Selector')
+    .setWidth(350);
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
 }

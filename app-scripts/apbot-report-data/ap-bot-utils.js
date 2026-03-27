@@ -2,7 +2,10 @@ function getCadLink(address, apns) {
   return ApBot2.getCadLink(address, apns);
 }
 
-function getEffectiveAge(buildingSizes, yearsBuilt, refYear) {
+function getEffectiveAge(buildingSizes, yearsBuilt, refYear, manualOverride) {
+  if (manualOverride) {
+    return manualOverride;
+  }
   return ApBot2.getEffectiveAge(buildingSizes, yearsBuilt, refYear);
 }
 

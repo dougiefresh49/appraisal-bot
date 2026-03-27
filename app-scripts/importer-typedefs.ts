@@ -27,6 +27,7 @@ type VerificationType =
 type UtilsWater = 'Public' | 'Well' | 'None';
 type UtilsSewer = 'Public' | 'Septic' | 'None';
 type LandSurface = 'Cleared' | 'Caliche' | 'Raw';
+type HvacOptions = 'Yes' | 'Office Only' | 'No';
 
 // --- MAIN OUTPUT STRUCTURE ---
 interface OutputData {
@@ -108,6 +109,10 @@ interface SaleData {
   'Year Built': number | string | null;
   'Effective Age': Generated;
   Condition: Condition | null;
+  HVAC: HvacOptions;
+  'Overhead Doors': string | null; // if size is known, put in the format of WxH (xQuantity). Ex: 14x12 (x6)
+  'Wash Bay': YesNoUnknown;
+  Hoisting: string | null; // None, Unknown, xT (where x is the tonage of the crane). if there are multiple cranes, list all of them. Ex: 2T (x2),5T (x3)
   'Zoning Location': string;
   'Zoning Description': string;
   Zoning: string | null;
@@ -162,6 +167,10 @@ interface RentalData {
   Age: number | null;
   'Effective Age': Generated;
   Condition: Condition;
+  HVAC: HvacOptions;
+  'Overhead Doors': string | null; // if size is known, put in the format of WxH (xQuantity). Ex: 14x12 (x6)
+  'Wash Bay': YesNoUnknown;
+  Hoisting: string | null; // None, Unknown, xT (where x is the tonage of the crane). if there are multiple cranes, list all of them. Ex: 2T (x2),5T (x3)
   Construction: string | null;
   'Other Features': string;
   'MLS #': string | null;
