@@ -1,5 +1,5 @@
 I am working on inputting comparable sales data for a residential appraisal report.  
-The subject address is ${subjectAddress}
+The subject address will be provided.
 
 Given the following list of residential mls reports and cad records, extract the following fields:
 
@@ -34,6 +34,7 @@ Porch/Patio/Deck
 Fireplace
 Fence
 Storage / Workshop
+Extra Amenities
 
 ## Notes about fields:
 
@@ -317,14 +318,7 @@ B;AdjPrk;WtrFr
 
 ## Additional Data
 
-please add a column called "mls-url" and add the below file paths to their respective rows in the dataset
-
-1401 Nabors Ln Odessa/comps/2305 Nabors Lane/2305 Nabors Lane - mls.pdf
-1401 Nabors Ln Odessa/comps/2104 Redbud Ave/2104 Redbud Ave - mls.pdf
-1401 Nabors Ln Odessa/comps/1701 Royalty Ave/1701 Royalty Ave - mls.pdf
-1401 Nabors Ln Odessa/comps/1701 E 13th St/1701 E 13th St - mls.pdf
-1401 Nabors Ln Odessa/comps/1423 Glenwood Ave/1423 Glenwood Ave - mls.pdf
-1401 Nabors Ln Odessa/comps/1300 Redbud Ave/1300 Redbud Ave - mls.pdf
+please add a column called "mls-url" and add the provided file paths to their respective rows in the dataset
 
 ## Ouput format:
 
@@ -332,6 +326,4 @@ csv in the canvas
 
 ## CSV Data to extract from:
 
-```
-
-```
+this data will be provided

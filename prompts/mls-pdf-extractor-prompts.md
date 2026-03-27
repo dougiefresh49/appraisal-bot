@@ -97,9 +97,9 @@ can you do the same thing for the following set of Midland County mls report pdf
 
 the only is the CAD url, which has the following rules:
 
-- if the CAD/Property ID is a number that is not all zeros, then the url is `https://iswdataclient.azurewebsites.net/webProperty.aspx?dbkey=MIDLANDCAD&id=${CAD/PropertyID}`
-- if the CAD/Property ID is all zeroso or missing, then the url is in the form of https://iswdataclient.azurewebsites.net/webSearchAddress.aspx?dbkey=MIDLANDCAD&stype=situs&sdata=County+Rd+01224%7c3426%7c .
-- if geo id is available, then the url is in the form of https://iswdataclient.azurewebsites.net/webSearchAddress.aspx?dbkey=MIDLANDCAD&stype=geoid&sdata=${geoId}
+- if the CAD/Property ID is a number that is not all zeros, then the url is `https://www.southwestdatasolution.com/webProperty.aspx?dbkey=MIDLANDCAD&id=${CAD/PropertyID}`
+- if the CAD/Property ID is all zeroso or missing, then the url is in the form of https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD&stype=situs&sdata=County+Rd+01224%7c3426%7c .
+- if geo id is available, then the url is in the form of https://www.southwestdatasolution.com/webSearchAddress.aspx?dbkey=MIDLANDCAD&stype=geoid&sdata=${geoId}
 
 ## Ward County Extractor info
 
