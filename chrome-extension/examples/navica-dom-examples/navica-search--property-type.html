@@ -1,0 +1,94 @@
+<div class="form-group">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between">
+        <div class="">
+          <label
+            class="labelFormatting smallScreen"
+            for="Sections_1__ListingFields_0__FieldHeadingShort"
+            >Property Type</label
+          >
+          <input
+            class="fieldHeading"
+            id="Sections_1__ListingFields_0__FieldHeading"
+            name="Sections[1].ListingFields[0].FieldHeading"
+            type="hidden"
+            value="Property Type"
+          />
+          <input
+            id="Sections_1__ListingFields_0__SearchType"
+            name="Sections[1].ListingFields[0].SearchType"
+            type="hidden"
+            value="P"
+          />
+          <input
+            id="Sections_1__ListingFields_0__FieldName"
+            name="Sections[1].ListingFields[0].FieldName"
+            type="hidden"
+            value="Property_Type"
+          />
+
+          <div class="d-inline pl-3 align-middle">
+            <input
+              id="Sections_1__ListingFields_0__FieldHeadingShort"
+              name="Sections[1].ListingFields[0].FieldHeadingShort"
+              type="hidden"
+              value="Ptype"
+            />
+
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                id="Sections_1__ListingFields_0__LogicalOperator"
+                name="Sections[1].ListingFields[0].LogicalOperator"
+                type="checkbox"
+                value="NOT"
+              /><input
+                name="Sections[1].ListingFields[0].LogicalOperator"
+                type="hidden"
+                value="false"
+              />
+              <label class="form-check-label small" for="logicalOperatorId"
+                >Exclude Selected</label
+              >
+            </div>
+          </div>
+        </div>
+        <div class="">
+          <span
+            data-listboxid="Sections_1__ListingFields_0__V"
+            role="button"
+            class="unselectAllMultiSelectLength btn btn-sm btn-outline-secondary border-0"
+            title="Un-Select All Items"
+          >
+            <i class="bi bi-x-circle-fill" title="Un-Select All Items"></i
+            ><span class="pl-1" title="Un-Select All Items">Clear</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="multiSelectWrapper">
+        <input
+          id="Sections_1__ListingFields_0__V_OriginalItems"
+          name="Sections[1].ListingFields[0].V_OriginalItems"
+          type="hidden"
+          value=""
+        />
+        <select
+          id="Sections_1__ListingFields_0__V"
+          class="selectMultiple multiSelectLength form-control form-control-sm addSelect"
+          fieldid="5"
+          multiple="multiple"
+          name="Sections[1].ListingFields[0].V"
+        >
+          <option value="RS">Single Family</option>
+          <option value="RT">Townhouse/Condo/Patio</option>
+          <option value="RM">Mobile Home</option>
+          <option value="RF">Manufactured Home</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

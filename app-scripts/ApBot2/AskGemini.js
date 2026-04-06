@@ -16,6 +16,7 @@ function askGemini(prompt, input) {
   // See available models: https://ai.google.dev/models/gemini
   const MODEL_ID = 'gemini-3-flash-preview'; // Or "gemini-pro"
   const CACHE_EXPIRATION_SECONDS = 1 * 60 * 60; // 1 hour
+  // const CACHE_EXPIRATION_SECONDS = 30; // 30 seconds
 
   // --- Cache Check ---
   // Use hashing for the cache key to prevent "Argument too large" errors
@@ -24,6 +25,7 @@ function askGemini(prompt, input) {
 
   if (cachedResult !== null) {
     Logger.log(`Cache hit for key: ${cacheKey}`);
+    Logger.log(`cached result: ${cachedResult}`);
     return cachedResult; // Return the cached result
   }
 
@@ -132,7 +134,7 @@ function _getGeminiCacheKey(modelId, prompt, input) {
   const digest = Utilities.computeDigest(
     Utilities.DigestAlgorithm.SHA_256,
     keyDataString,
-    Utilities.Charset.UTF_8
+    Utilities.Charset.UTF_8,
   );
 
   // Convert byte array to hex string
@@ -187,7 +189,7 @@ function _putGeminiInCache(key, value, expirationInSeconds) {
   try {
     const cache = CacheService.getScriptCache();
     Logger.log(
-      `Caching result for key: ${key} for ${expirationInSeconds} seconds.`
+      `Caching result for key: ${key} for ${expirationInSeconds} seconds.`,
     );
     cache.put(key, value, expirationInSeconds);
   } catch (e) {
@@ -195,7 +197,7 @@ function _putGeminiInCache(key, value, expirationInSeconds) {
     Logger.log(
       `Error putting value into cache for key ${key}: ${e}. Value length: ${
         value ? value.length : 'null'
-      }`
+      }`,
     );
     // Decide if you want to propagate the error or just log it.
     // For now, just logging, the function will still return the resultText.
@@ -211,7 +213,7 @@ function _putGeminiInCache(key, value, expirationInSeconds) {
 function clearGeminiCache() {
   const cache = CacheService.getScriptCache();
   Logger.log(
-    'Manual cache clearing requires specific key knowledge or waiting for expiration. This function is a placeholder.'
+    'Manual cache clearing requires specific key knowledge or waiting for expiration. This function is a placeholder.',
   );
   // To implement fully, you'd need to track keys or use cache.removeAll() if appropriate.
 }

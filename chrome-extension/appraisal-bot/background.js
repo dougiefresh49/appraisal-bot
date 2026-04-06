@@ -116,6 +116,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       console.error('Invalid zoning data received:', request.data);
     }
+  } else if (request.action === 'getTaxData') {
+    console.log('Received tax data request for APN:', request.apn);
+    getTaxData(request.apn, sender)
+      .then((data) => {
+        console.log('Sending back tax data:', data);
+        sendResponse({ success: true, data });
+      })
+      .catch((error) => {
+        console.error('Tax data fetch failed:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+    return true;
+  } else if (request.action === 'taxData') {
+    console.log('Received tax data from tax-injector:', request.data);
+    if (request.data && typeof request.data === 'object') {
+      chrome.storage.local.set({ taxData: request.data }, () => {
+        console.log('Tax data stored successfully');
+      });
+    } else {
+      console.error('Invalid tax data received:', request.data);
+    }
   } else if (request.action === 'getParcelsFromAdvSearch') {
     console.log('Received parcels request from adv search:', request);
     getParcelsFromAdvSearch(request.instrumentNumber, sender)
@@ -337,6 +358,37 @@ async function getParcelsFromAdvSearch(instrumentNumber, sender) {
         }, 30000);
       }
     );
+  });
+}
+
+async function getTaxData(apn, sender) {
+  return new Promise((resolve, reject) => {
+    console.log('Starting tax data fetch for APN:', apn);
+    const url = `https://www.ectorcad.org/Acctdetails/collections/${apn}`;
+
+    chrome.tabs.create({ url, active: false }, (tab) => {
+      console.log('Created tax data tab:', tab.id);
+
+      const checkData = setInterval(() => {
+        chrome.storage.local.get('taxData', (result) => {
+          if (result.taxData) {
+            console.log('Found tax data:', result.taxData);
+            clearInterval(checkData);
+            chrome.storage.local.remove('taxData');
+            resolve(result.taxData);
+            console.log('Closing tax data tab:', tab.id);
+            chrome.tabs.remove(tab.id);
+          }
+        });
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(checkData);
+        reject(new Error('Tax data not found after 30 seconds'));
+        console.log('Closing tax data tab (timeout):', tab.id);
+        chrome.tabs.remove(tab.id);
+      }, 30000);
+    });
   });
 }
 

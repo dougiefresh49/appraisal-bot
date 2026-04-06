@@ -46,6 +46,9 @@ observer.observe(document.body, {
 // Initial run in case the element is already there
 updateLinks();
 
+// Fetch and inject current-year tax data once on load
+requestAndInsertTaxSection();
+
 /* Main Function */
 function updateLinks() {
   if (isUpdating) return;
@@ -436,4 +439,66 @@ function insertIncParcelsRow(targetRow, parcels) {
 
   // Insert after the Last Sale Instrument row
   targetRow.insertAdjacentElement('afterend', incParcelsRow);
+}
+
+/**
+ * Fetches current-year tax data from the Acctdetails/collections page via the
+ * background script and injects a styled tax section before section.pp.
+ * Styled to match section.land / section.grid2 so it blends with the page.
+ */
+function requestAndInsertTaxSection() {
+  if (document.querySelector('.AppraisalBot-tax-section')) return;
+
+  const apn = extractApnFromUrl();
+  if (!apn) {
+    console.error('[AppraisalBot] Could not extract APN for tax request');
+    return;
+  }
+
+  const ppSection = document.querySelector('section.pp');
+  if (!ppSection) {
+    console.error('[AppraisalBot] Could not find section.pp for tax insertion');
+    return;
+  }
+
+  // Insert a loading placeholder styled like section.land
+  const taxSection = document.createElement('section');
+  taxSection.className = 'AppraisalBot-tax-section';
+  taxSection.innerHTML =
+    '<h2>Taxes (Current Year)</h2>' +
+    '<p style="padding: 8px 0; color: #666; font-style: italic;">Loading tax data...</p>';
+  ppSection.insertAdjacentElement('beforebegin', taxSection);
+
+  chrome.runtime.sendMessage({ action: 'getTaxData', apn }, (response) => {
+    if (!response || !response.success) {
+      taxSection.innerHTML =
+        '<h2>Taxes (Current Year)</h2>' +
+        `<p style="color: #cc0000;">Error loading tax data: ${response?.error || 'no response'}</p>`;
+      console.error('[AppraisalBot] Failed to get tax data:', response?.error);
+      return;
+    }
+
+    const { year, total, jurisdictions } = response.data;
+    const jurisEntries = Object.entries(jurisdictions);
+
+    const headerCells = jurisEntries.map(([k]) => `<th>${k}</th>`).join('');
+    const valueCells = jurisEntries
+      .map(([, v]) => `<td class="right">${v || '$0.00'}</td>`)
+      .join('');
+
+    taxSection.innerHTML =
+      `<h2>Taxes ${year}</h2>` +
+      '<div class="wide">' +
+        '<table class="grid2">' +
+          '<thead>' +
+            '<tr>' + headerCells + '<th>TOTAL</th>' + '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr>' + valueCells + `<td class="right"><strong>${total}</strong></td>` + '</tr>' +
+          '</tbody>' +
+        '</table>' +
+      '</div>';
+
+    console.log('[AppraisalBot] Tax section injected for APN:', apn);
+  });
 }

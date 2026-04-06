@@ -1,4 +1,4 @@
-// --- UTILITY TYPES ---
+/* --- UTILITY TYPES --- */
 type Generated = 'GENERATED' | 'BLANK' | null;
 type Condition = 'Good' | 'Average' | 'Fair' | 'Poor';
 type YesNoUnknown = boolean | null;
@@ -12,24 +12,45 @@ type ZoningLocation =
   | 'Inside ETJ'
   | 'Outside ETJ'
   | 'None';
-type ExpenceStructure = 'NNN' | 'NN' | 'N' | 'None';
-type TenantStructure = 'Individual' | 'Multiple';
+type FrontageType =
+  | 'Highway'
+  | 'Main'
+  | 'Secondary'
+  | 'Dirt'
+  | 'None'
+  | 'Yes'
+  | 'No';
+type HasFencing = 'Yes' | 'Partial' | 'No';
+type FenceType = 'Wood' | 'Barbed Wire' | 'Chainlink' | 'Metal' | 'Unk';
+type UtilitiesStatus = 'Available' | 'Part. Available' | 'None';
+type UtilsElectricity = 'Yes' | 'No' | 'Unk';
+type UtilsWater = 'Public' | 'Well' | 'None' | 'Unk';
+type UtilsSewer = 'Public' | 'Septic' | 'None' | 'Unk';
+type LandSurface = 'Cleared' | 'Caliche' | 'Raw';
+type ConditionsOfSaleType =
+  | "Arm's Length"
+  | 'Owner Finance'
+  | 'Sale-Leaseback'
+  | 'Listing'
+  | "Not Arm's Length"
+  | 'Other';
 type VerificationType =
   | 'Appraiser'
   | 'Broker'
   | 'Realtor'
   | 'Crexi'
   | 'MLS/CAD/Deeds'
+  | 'Owner'
   | 'Other'
   | 'Buyer'
-  | 'Seller'
-  | 'Owner';
-type UtilsWater = 'Public' | 'Well' | 'None';
-type UtilsSewer = 'Public' | 'Septic' | 'None';
-type LandSurface = 'Cleared' | 'Caliche' | 'Raw';
+  | 'Seller';
+
+type ExpenceStructure = 'NNN' | 'NN' | 'N' | 'None';
+type TenantStructure = 'Individual' | 'Multiple';
 type HvacOptions = 'Yes' | 'Office Only' | 'No';
 
 // --- MAIN OUTPUT STRUCTURE ---
+
 interface OutputData {
   landSaleData: LandSaleData[];
   saleData: SaleData[];
@@ -42,6 +63,7 @@ interface OutputData {
 }
 
 // --- DATA INTERFACES ---
+
 interface LandSaleData {
   '#': number;
   Address: string;
@@ -54,23 +76,27 @@ interface LandSaleData {
   'Sale Price': string;
   'Financing Terms': string;
   'Property Rights': string;
-  'Conditions of Sale': string;
+  'Conditions of Sale': ConditionsOfSaleType;
   'Sale Price / AC': Generated;
   'Sale Price / SF': Generated;
-  'Land Size (AC)': number | null;
-  'Land Size (SF)': number | null;
-  APN: string | null;
-  Legal: string | null;
+  'Land Size (AC)': Generated;
+  'Land Size (SF)': Generated;
+  APN: Generated;
+  Legal: Generated;
   Corner: boolean;
-  'Highway Frontage': boolean;
-  'Utils - Electricity': YesNoUnknown;
+  Frontage: FrontageType;
+  'Has Fencing': HasFencing;
+  'Fence Type': FenceType;
+  Fencing: string | null; // UI Label: Fencing Notes
+  'Utils - Electricity': UtilsElectricity;
   'Utils - Water': UtilsWater | null;
   'Utils - Sewer': UtilsSewer | null;
+  Utilities: UtilitiesStatus; // UI Label: Utilities (Overall)
   Surface: LandSurface | null;
-  'Zoning Location': string;
+  'Zoning Location': ZoningLocation;
   'Zoning Description': string;
-  Zoning: string | null;
-  Taxes: number | null;
+  Zoning: Generated;
+  Taxes: Generated;
   'MLS #': string | null;
   'Verification Type': VerificationType | null;
   'Verified By': string | null;
@@ -88,47 +114,61 @@ interface SaleData {
   'Date of Sale': string;
   'Market Conditions': Generated;
   'Sale Price': string;
+  'Adj Sale Price': Generated;
   'Financing Terms': string;
   'Property Rights': string;
-  'Conditions of Sale': string;
+  'Conditions of Sale': ConditionsOfSaleType;
+  'Renovation Cost': number | null;
   'Sale Price / SF': Generated;
+  'Sale Price / SF (Adj)': Generated;
   'Improvements / SF': Generated;
-  'Land Size (AC)': number | null;
-  'Land Size (SF)': number | null;
-  'Land Value': number | null;
-  APN: string | null;
-  Legal: string | null;
-  'Building Size (SF)': number | null;
+  'Land Size (AC)': Generated;
+  'Land Size (SF)': Generated;
+  'Excess Land Size (AC)': Generated;
+  'Excess Land Value / AC': number | null;
+  'Excess Land Value': Generated;
+  APN: Generated;
+  Legal: Generated;
+  'Parking (SF)': Generated;
+  'Building Size (SF)': Generated;
+  'Office Area (SF)': Generated;
+  'Warehouse Area (SF)': Generated;
+  'Office %': Generated;
+  'Warehouse %': Generated;
   'Occupancy %': string | null;
-  'Land / Bld Ratio': number | null;
+  'Land / Bld Ratio': Generated;
+  'Land / Bld Ratio (Adj)': Generated;
   'Property Type': string | null;
   Construction: string | null;
-  'Other Features': string | null;
-  'Parking (SF)': number | null;
-  Buildings: number | null;
-  'Year Built': number | string | null;
-  'Effective Age': Generated;
-  Condition: Condition | null;
+  'Other Features Description': string | null;
+  'Other Features': Generated;
   HVAC: HvacOptions;
-  'Overhead Doors': string | null; // if size is known, put in the format of WxH (xQuantity). Ex: 14x12 (x6)
+  'Overhead Doors': string | null;
   'Wash Bay': YesNoUnknown;
-  Hoisting: string | null; // None, Unknown, xT (where x is the tonage of the crane). if there are multiple cranes, list all of them. Ex: 2T (x2),5T (x3)
-  'Zoning Location': string;
+  Hoisting: string | null;
+  'Has Fencing': HasFencing;
+  Buildings: Generated;
+  'Year Built': Generated;
+  'Effective Age': Generated;
+  Age: Generated;
+  Condition: Condition | null;
+  'Zoning Location': ZoningLocation;
   'Zoning Description': string;
-  Zoning: string | null;
+  Zoning: Generated;
+  'Rent / Month': number | null;
   'Rent / SF': Generated;
   'Potential Gross Income': Generated;
-  'Vacancy %': string;
-  Vacancy: string | null;
-  'Effective Gross Income': string | null;
-  Taxes: string | null;
-  Insurance: string | null;
-  Expenses: string | null;
-  'Net Operating Income': string | null;
-  'Overall Cap Rate': string | null;
-  GPI: string | null;
-  'Gross Income Multiplier': number | null;
-  'Potential Value': string | null;
+  'Vacancy %': Generated;
+  Vacancy: Generated;
+  'Effective Gross Income': Generated;
+  Taxes: Generated;
+  Insurance: Generated;
+  Expenses: Generated;
+  'Net Operating Income': Generated;
+  'Overall Cap Rate': Generated;
+  GPI: Generated;
+  'Gross Income Multiplier': Generated;
+  'Potential Value': Generated;
   'MLS #': string | null;
   'Verification Type': VerificationType | null;
   'Verified By': string | null;
@@ -183,21 +223,33 @@ interface RentalData {
 interface SubjectData {
   Address: string;
   Type: SubjectParcelType;
-  APN: string | null;
-  Legal: string | null;
+  APN: Generated;
+  Legal: Generated;
   'Property Rights': string;
   instrumentNumber: string | null;
   'Date of Sale': string; // always "Current" for subject
   'Market Conditions': Generated;
-  'Land Size (AC)': number | null;
-  'Land Size (SF)': number | null;
-  'Parking (SF)': number | null;
-  'Building Size (SF)': number | null;
+  'Post Sale Renovation Cost': number | null;
+  Tenant: string | null;
+  'Lease Start': string | null;
+  'Rent / Month': number | null;
+  'Rent / SF / Year': Generated;
+  'Expense Structure': ExpenceStructure | null;
+  'Occupancy %': string | null;
+  'Land Size (AC)': Generated;
+  'Land Size (SF)': Generated;
+  'Parking (SF)': Generated;
+  'Parking Spaces': number | null;
+  'Parking Spaces Details': string | null;
+  'Parking Ratio': Generated;
+  'Building Size (SF)': Generated;
   'Office Area (SF)': Generated;
   'Warehouse Area (SF)': Generated;
   'Office %': Generated;
-  'Land / Bld Ratio': number | null;
-  'Total Taxes': number | null;
+  'Floor Area Ratio': Generated;
+  'Land / Bld Ratio': Generated;
+  'Total Taxes': Generated;
+  'County Appraised Value': Generated;
   City: string;
   State: string;
   County: string;
@@ -206,23 +258,28 @@ interface SubjectData {
   AddressLocal: Generated;
   'Zoning Area': string;
   'Zoning Description': string;
-  Zoning: string | null;
+  Zoning: Generated;
   'Other Features': string | null;
-  Hoisting: YesNoUnknown;
   'Wash Bay': YesNoUnknown;
+  Hoisting: string | null;
   Corner: boolean;
   'Highway Frontage': boolean;
+  Frontage: FrontageType | null;
   'Utils - Electricity': YesNoUnknown;
-  'Utils - Water': UtilsWater | null;
-  'Utils - Sewer': UtilsSewer | null;
+  'Utils - Water': UtilsWater;
+  'Utils - Sewer': UtilsSewer;
+  Utilities: UtilitiesStatus | null;
   Surface: LandSurface | null;
+  'Property Type': string | null;
+  'Property Type Long': string | null;
   Construction: string | null;
   Condition: Condition;
-  'Year Built': number | null;
-  Age: number | null;
+  'Year Built': Generated;
+  Age: Generated;
   'Effective Age': Generated;
-  'Est Insurance': number | null;
-  'Est Expences': number | null;
+  'Est Insurance': Generated;
+  'Est Expences': Generated;
+  'Size Multiplier': Generated;
 }
 
 interface ParcelData {

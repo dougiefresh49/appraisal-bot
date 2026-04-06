@@ -10,7 +10,7 @@
 function processJsonData(jsonDataString) {
   Logger.log(
     'Received JSON string. Length: ' +
-      (jsonDataString ? jsonDataString.length : 0)
+      (jsonDataString ? jsonDataString.length : 0),
   );
   if (!jsonDataString) {
     Logger.log('Error: No JSON data received.');
@@ -36,31 +36,46 @@ function processJsonData(jsonDataString) {
     };
 
     const ignoreLists = {
+      // Keys match importer-typedefs fields with type Generated (sheet formulas fill these).
       saleData: [
         'Market Conditions',
+        'Adj Sale Price',
         'Sale Price / SF',
+        'Sale Price / SF (Adj)',
         'Improvements / SF',
+        'Land Size (AC)',
         'Land Size (SF)',
+        'Excess Land Size (AC)',
+        'Excess Land Value',
         'APN',
         'Legal',
-        'Building Size (SF)',
-        'Occupancy %',
-        'Land / Bld Ratio',
-        'Construction',
         'Parking (SF)',
+        'Building Size (SF)',
+        'Office Area (SF)',
+        'Warehouse Area (SF)',
+        'Office %',
+        'Warehouse %',
+        'Land / Bld Ratio',
+        'Land / Bld Ratio (Adj)',
+        'Other Features',
         'Buildings',
         'Year Built',
         'Effective Age',
+        'Age',
         'Zoning',
         'Rent / SF',
         'Potential Gross Income',
+        'Vacancy %',
         'Vacancy',
         'Effective Gross Income',
+        'Taxes',
+        'Insurance',
+        'Expenses',
         'Net Operating Income',
         'Overall Cap Rate',
         'GPI',
-        'Verification Type',
-        'Verified By',
+        'Gross Income Multiplier',
+        'Potential Value',
         'Verification',
       ],
       landSaleData: [
@@ -72,8 +87,7 @@ function processJsonData(jsonDataString) {
         'APN',
         'Legal',
         'Zoning',
-        'Verification Type',
-        'Verified By',
+        'Taxes',
         'Verification',
       ],
       parcelData: [
@@ -90,21 +104,28 @@ function processJsonData(jsonDataString) {
         'APN',
         'Legal',
         'Market Conditions',
+        'Rent / SF / Year',
         'Land Size (AC)',
         'Land Size (SF)',
         'Parking (SF)',
+        'Parking Ratio',
         'Building Size (SF)',
         'Office Area (SF)',
         'Warehouse Area (SF)',
         'Office %',
+        'Floor Area Ratio',
         'Land / Bld Ratio',
         'Total Taxes',
+        'County Appraised Value',
         'AddressLabel',
         'AddressLocal',
         'Zoning',
         'Year Built',
         'Age',
         'Effective Age',
+        'Est Insurance',
+        'Est Expences',
+        'Size Multiplier',
       ],
       subjectTaxes: [
         /* No explicit generated fields listed in type */
@@ -113,29 +134,15 @@ function processJsonData(jsonDataString) {
         /* Not applicable as it's a direct range population */
       ],
       rentalData: [
-        // Ignore list for RentalData based on 'Generated' fields
-        'APN',
-        'Legal',
-        'Zoning',
-        'Land Size (AC)',
-        'Land Size (SF)',
-        'Rentable SF',
         'Office %',
-        'Land / Bld Ratio',
-        'Rent / Month',
         'Rent / SF / Year',
-        'Year Built',
-        'Age',
         'Effective Age',
-        'Construction',
         'Verification',
       ],
     };
-    const landSaleYesNoFields = [
-      'Corner',
-      'Highway Frontage',
-      'Utils - Electricity',
-    ];
+    // LandSaleData: only boolean fields → sheet Yes/No/Unk (Utils - Electricity is UtilsElectricity string enum).
+    const landSaleYesNoFields = ['Corner'];
+    const saleRentalYesNoUnknownFields = ['Wash Bay'];
     const subjectSpecificConversionFields = [
       'Hoisting',
       'Wash Bay',
@@ -158,7 +165,7 @@ function processJsonData(jsonDataString) {
         const dataArray = inputData[dataType];
 
         Logger.log(
-          `Processing ${dataArray.length} records for ${dataType}. Target sheet: "${sheetName}"`
+          `Processing ${dataArray.length} records for ${dataType}. Target sheet: "${sheetName}"`,
         );
 
         // If dataArray is empty, move onto next
@@ -170,7 +177,7 @@ function processJsonData(jsonDataString) {
         const sheet = ss.getSheetByName(sheetName);
         if (!sheet) {
           Logger.log(
-            `Warning: Sheet "${sheetName}" not found. Skipping ${dataType}.`
+            `Warning: Sheet "${sheetName}" not found. Skipping ${dataType}.`,
           );
           continue;
         }
@@ -181,7 +188,7 @@ function processJsonData(jsonDataString) {
           const taxEntitiesRange = ss.getRangeByName(namedRangeName);
           if (!taxEntitiesRange) {
             Logger.log(
-              `Warning: Named range "${namedRangeName}" not found in sheet "${sheetName}". Skipping ${dataType}.`
+              `Warning: Named range "${namedRangeName}" not found in sheet "${sheetName}". Skipping ${dataType}.`,
             );
             continue;
           }
@@ -218,7 +225,7 @@ function processJsonData(jsonDataString) {
                 1,
                 0,
                 taxEntitiesRange.getNumRows() - 1,
-                taxEntitiesRange.getNumColumns()
+                taxEntitiesRange.getNumColumns(),
               )
               .clearContent();
           }
@@ -232,7 +239,7 @@ function processJsonData(jsonDataString) {
             dataRowsInNamedRange > 0
           ) {
             Logger.log(
-              `Warning: Data for ${namedRangeName} (${rangeDataToSet.length} rows) exceeds available space in named range (${dataRowsInNamedRange} data rows). Data might be truncated.`
+              `Warning: Data for ${namedRangeName} (${rangeDataToSet.length} rows) exceeds available space in named range (${dataRowsInNamedRange} data rows). Data might be truncated.`,
             );
             // Optionally, resize the named range here if business logic allows, or throw error.
             // For simplicity, we'll write what fits.
@@ -247,15 +254,15 @@ function processJsonData(jsonDataString) {
                 rangeDataToSet.length,
                 dataRowsInNamedRange > 0
                   ? dataRowsInNamedRange
-                  : rangeDataToSet.length
+                  : rangeDataToSet.length,
               ),
-              rangeHeaders.length
+              rangeHeaders.length,
             );
             targetWriteRange.setValues(
-              rangeDataToSet.slice(0, targetWriteRange.getNumRows())
+              rangeDataToSet.slice(0, targetWriteRange.getNumRows()),
             );
             Logger.log(
-              `Successfully populated named range "${namedRangeName}" with ${targetWriteRange.getNumRows()} rows of data.`
+              `Successfully populated named range "${namedRangeName}" with ${targetWriteRange.getNumRows()} rows of data.`,
             );
           }
           namedRangesProcessedCount++;
@@ -271,7 +278,7 @@ function processJsonData(jsonDataString) {
         ) {
           // Check if sheet is truly empty
           Logger.log(
-            `Warning: Sheet "${sheetName}" appears to be completely empty. Skipping ${dataType}.`
+            `Warning: Sheet "${sheetName}" appears to be completely empty. Skipping ${dataType}.`,
           );
           continue;
         }
@@ -308,6 +315,13 @@ function processJsonData(jsonDataString) {
                 else if (value === false) value = 'No';
                 else value = 'Unk';
               } else if (
+                (dataType === 'saleData' || dataType === 'rentalData') &&
+                saleRentalYesNoUnknownFields.includes(trimmedField)
+              ) {
+                if (value === true) value = 'Yes';
+                else if (value === false) value = 'No';
+                else value = 'Unk';
+              } else if (
                 dataType === 'subject' &&
                 subjectSpecificConversionFields.includes(trimmedField)
               ) {
@@ -328,7 +342,7 @@ function processJsonData(jsonDataString) {
               } else {
                 if (!ignoreList.includes(trimmedField)) {
                   Logger.log(
-                    `Warning: Field "${trimmedField}" from JSON (${dataType}) not found in sheet "${sheetName}" headers or ignore list. Skipping field.`
+                    `Warning: Field "${trimmedField}" from JSON (${dataType}) not found in sheet "${sheetName}" headers or ignore list. Skipping field.`,
                   );
                 }
               }
@@ -338,7 +352,7 @@ function processJsonData(jsonDataString) {
             rowsToAppend.push(newRow);
           } else {
             Logger.log(
-              `Skipping empty data row derived from record index ${recordIdx} for ${dataType}.`
+              `Skipping empty data row derived from record index ${recordIdx} for ${dataType}.`,
             );
           }
         });
@@ -351,23 +365,23 @@ function processJsonData(jsonDataString) {
           if (lastNewRowNeeded > sheet.getMaxRows()) {
             sheet.insertRowsAfter(
               sheet.getMaxRows(),
-              lastNewRowNeeded - sheet.getMaxRows()
+              lastNewRowNeeded - sheet.getMaxRows(),
             );
             Logger.log(
               `Inserted ${
                 lastNewRowNeeded - sheet.getMaxRows()
-              } rows to sheet "${sheetName}".`
+              } rows to sheet "${sheetName}".`,
             );
           }
           if (numColumns > sheet.getMaxColumns() && numColumns > 0) {
             sheet.insertColumnsAfter(
               Math.max(1, sheet.getMaxColumns()),
-              numColumns - Math.max(1, sheet.getMaxColumns())
+              numColumns - Math.max(1, sheet.getMaxColumns()),
             );
             Logger.log(
               `Inserted ${
                 numColumns - Math.max(1, sheet.getMaxColumns())
-              } columns to sheet "${sheetName}".`
+              } columns to sheet "${sheetName}".`,
             );
           }
 
@@ -376,12 +390,12 @@ function processJsonData(jsonDataString) {
               .getRange(startAppendRow, 1, numAppendedRows, numColumns)
               .setValues(rowsToAppend);
             Logger.log(
-              `Successfully appended ${numAppendedRows} rows of raw data to sheet "${sheetName}" from R${startAppendRow}.`
+              `Successfully appended ${numAppendedRows} rows of raw data to sheet "${sheetName}" from R${startAppendRow}.`,
             );
 
             if (lastPopulatedRow >= 2 && numColumns > 0) {
               Logger.log(
-                `Attempting to apply formulas from row ${lastPopulatedRow} down ${numAppendedRows} rows in sheet "${sheetName}" (Corrected AutoFill Method).`
+                `Attempting to apply formulas from row ${lastPopulatedRow} down ${numAppendedRows} rows in sheet "${sheetName}" (Corrected AutoFill Method).`,
               );
               try {
                 for (let col = 1; col <= numColumns; col++) {
@@ -389,27 +403,27 @@ function processJsonData(jsonDataString) {
                   const sourceFormulaA1 = sourceCell.getFormula();
                   if (sourceFormulaA1 && sourceFormulaA1.startsWith('=')) {
                     Logger.log(
-                      `Source cell R${lastPopulatedRow}C${col} has formula: ${sourceFormulaA1}`
+                      `Source cell R${lastPopulatedRow}C${col} has formula: ${sourceFormulaA1}`,
                     );
                     const autoFillDestinationRange = sheet.getRange(
                       lastPopulatedRow,
                       col,
                       numAppendedRows + 1,
-                      1
+                      1,
                     );
                     sourceCell.autoFill(
                       autoFillDestinationRange,
-                      SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES
+                      SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES,
                     );
                     Logger.log(
                       `Auto-filled formulas in C${col} from R${lastPopulatedRow} down to R${
                         lastPopulatedRow + numAppendedRows
-                      }.`
+                      }.`,
                     );
                   }
                 }
                 Logger.log(
-                  `Finished applying formulas column by column for sheet "${sheetName}".`
+                  `Finished applying formulas column by column for sheet "${sheetName}".`,
                 );
               } catch (formulaError) {
                 Logger.log(
@@ -417,17 +431,17 @@ function processJsonData(jsonDataString) {
                     formulaError.message
                   }${
                     formulaError.stack ? '\nStack: ' + formulaError.stack : ''
-                  }. Source Row: ${lastPopulatedRow}`
+                  }. Source Row: ${lastPopulatedRow}`,
                 );
               }
             } else {
               Logger.log(
-                `Skipping formula copy for "${sheetName}" because source row (${lastPopulatedRow}) is less than 2 or numColumns (${numColumns}) is 0.`
+                `Skipping formula copy for "${sheetName}" because source row (${lastPopulatedRow}) is less than 2 or numColumns (${numColumns}) is 0.`,
               );
             }
           } else {
             Logger.log(
-              `Skipping append for sheet "${sheetName}" as numColumns is 0.`
+              `Skipping append for sheet "${sheetName}" as numColumns is 0.`,
             );
           }
           sheetsProcessedCount++;
@@ -437,7 +451,7 @@ function processJsonData(jsonDataString) {
       } else {
         if (sheetMappings.hasOwnProperty(dataType)) {
           Logger.log(
-            `Data type "${dataType}" not found as an array in the input JSON or is not an array. Skipping.`
+            `Data type "${dataType}" not found as an array in the input JSON or is not an array. Skipping.`,
           );
         }
       }
@@ -460,7 +474,7 @@ function processJsonData(jsonDataString) {
     Logger.log(
       `Error processing JSON: ${e.toString()}${
         e.stack ? '\nStack: ' + e.stack : ''
-      }`
+      }`,
     );
     if (e instanceof SyntaxError) {
       return (

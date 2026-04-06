@@ -1,0 +1,105 @@
+<div class="form-row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between">
+      <div class="">
+        <label
+          class="labelFormatting"
+          for="Sections_1__ListingFields_5__FieldHeadingShort"
+          >Property Status</label
+        >
+        <input
+          class="fieldHeading"
+          id="Sections_1__ListingFields_5__FieldHeading"
+          name="Sections[1].ListingFields[5].FieldHeading"
+          type="hidden"
+          value="Property Status"
+        />
+        <input
+          id="Sections_1__ListingFields_5__SearchType"
+          name="Sections[1].ListingFields[5].SearchType"
+          type="hidden"
+          value="PS"
+        />
+        <input
+          id="Sections_1__ListingFields_5__LookupValues"
+          name="Sections[1].ListingFields[5].LookupValues"
+          type="hidden"
+          value=""
+        />
+        <input
+          id="Sections_1__ListingFields_5__FieldName"
+          name="Sections[1].ListingFields[5].FieldName"
+          type="hidden"
+          value="Property_Status"
+        />
+
+        <div class="d-inline pl-3 align-middle">
+          <input
+            id="Sections_1__ListingFields_5__FieldHeadingShort"
+            name="Sections[1].ListingFields[5].FieldHeadingShort"
+            type="hidden"
+            value="Status"
+          />
+
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              id="Sections_1__ListingFields_5__LogicalOperator"
+              name="Sections[1].ListingFields[5].LogicalOperator"
+              type="checkbox"
+              value="NOT"
+            /><input
+              name="Sections[1].ListingFields[5].LogicalOperator"
+              type="hidden"
+              value="false"
+            />
+            <label class="form-check-label small" for="logicalOperatorId"
+              >Exclude Selected</label
+            >
+          </div>
+        </div>
+      </div>
+      <div class="">
+        <span
+          data-listboxid="Sections_1__ListingFields_5__V"
+          role="button"
+          class="unselectAllMultiSelectLength btn btn-sm btn-outline-secondary border-0"
+        >
+          <i class="bi bi-x-circle-fill" title="Un-Select All Items"></i
+          ><span class="pl-1" title="Un-Select All Items">Clear</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="multiSelectWrapper">
+      <input
+        id="Sections_1__ListingFields_5__V_OriginalItems"
+        name="Sections[1].ListingFields[5].V_OriginalItems"
+        type="hidden"
+        value=""
+      />
+      <select
+        id="Sections_1__ListingFields_5__V"
+        class="multiSelectLength form-control form-control-sm propertyStatusBox addSelect"
+        multiple="multiple"
+        name="Sections[1].ListingFields[5].V"
+      >
+        <option selected="selected" value="A">Active</option>
+        <option selected="selected" value="M">
+          Active/Contingency May Be Shown
+        </option>
+        <option value="P">UC - May Be Shown</option>
+        <option value="O">UC - w/Option</option>
+        <option value="U">UC - Do Not Show</option>
+        <option value="S">Sold</option>
+        <option value="T">Temporary Hold-Don't Show</option>
+        <option value="W">Withdrawn</option>
+        <option value="D">Deleted</option>
+        <option value="X">Expired</option>
+        <option value="R">Leased/Rented</option>
+      </select>
+    </div>
+  </div>
+</div>
