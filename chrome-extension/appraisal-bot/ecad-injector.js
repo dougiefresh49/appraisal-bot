@@ -1,5 +1,9 @@
 console.log('Deed Link Enhancer: Content script loaded!');
 
+/** Direct Ector zoning map (no query params; automation TODO in README). */
+const ECTOR_ZONING_MAP_URL =
+  'https://experience.arcgis.com/experience/7889746e0f64472994a7554eb9771f57';
+
 let isUpdating = false;
 let lastProcessedContent = '';
 
@@ -15,7 +19,7 @@ const observer = new MutationObserver((mutations) => {
 
     // Get the current content of the grid
     const currentContent = Array.from(
-      document.querySelectorAll('table.grid tbody tr')
+      document.querySelectorAll('table.grid tbody tr'),
     )
       .map((row) => {
         const header = row.querySelector('th');
@@ -188,11 +192,7 @@ function updateDeedLink(cell, instrument) {
 function linkAddressToGoogleMaps(cell, address) {
   if (!address) return;
   // Prevent duplicate links
-  if (
-    cell.querySelector('.AppraisalBot-google-maps-link') ||
-    cell.querySelector('.AppraisalBot-zoning-link')
-  )
-    return;
+  if (cell.querySelector('.AppraisalBot-google-maps-link')) return;
 
   // If address contains <br> or <br/>, replace with space for display and link
   let addressHtml = cell.innerHTML;
@@ -202,10 +202,7 @@ function linkAddressToGoogleMaps(cell, address) {
     .trim();
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    cleanAddress
-  )}`;
-  const zoningUrl = `https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541&addr=${encodeURIComponent(
-    cleanAddress
+    cleanAddress,
   )}`;
 
   // Create container for address and links
@@ -219,10 +216,8 @@ function linkAddressToGoogleMaps(cell, address) {
   addressSpan.textContent = cleanAddress + ' ';
   container.appendChild(addressSpan);
 
-  // Add Google Maps link
+  // Add Google Maps link (zoning map link is added in requestAndInsertZoning)
   addLinkElement(container, mapUrl, '📍', 'AppraisalBot-google-maps-link');
-  // Add Zoning Map link
-  addLinkElement(container, zoningUrl, '🏢', 'AppraisalBot-zoning-link');
 
   // Clear cell and add container
   cell.innerHTML = '';
@@ -247,74 +242,14 @@ function addLinkElement(parent, url, label, className) {
   parent.appendChild(link);
 }
 
-function insertZoningRowAfter(
-  locationRow,
-  classification,
-  description,
-  isError = false,
-  isLoading = false
-) {
-  console.log('Inserting zoning row:', {
-    classification,
-    description,
-    isError,
-    isLoading,
-  });
-  // Check if zoning row already exists
-  if (
-    locationRow.nextSibling &&
-    locationRow.nextSibling.querySelector &&
-    locationRow.nextSibling.querySelector('th') &&
-    locationRow.nextSibling.querySelector('th').textContent.trim() === 'Zoning'
-  ) {
-    console.log('Zoning row already exists');
-    // Already inserted
-    // if (isLoading || isError) {
-    // Update value cell if needed
-    const valueCell = locationRow.nextSibling.querySelector('td');
-    const newText = isError ? 'Error' : `${classification}, ${description}`;
-    console.log('Updating zoning value:', newText);
-    valueCell.textContent = isLoading ? 'Loading zoning...' : newText;
-    // }
-    return;
-  }
-  const zoningRow = document.createElement('tr');
-  const zoningLabelCell = document.createElement('th');
-  zoningLabelCell.textContent = 'Zoning';
-  zoningLabelCell.style.textAlign = 'left';
-  const zoningValueCell = document.createElement('td');
-  zoningValueCell.textContent = isLoading
-    ? 'Loading zoning...'
-    : isError
-    ? 'Error'
-    : `${classification}, ${description}`;
-  zoningRow.appendChild(zoningLabelCell);
-  zoningRow.appendChild(zoningValueCell);
-  locationRow.insertAdjacentElement('afterend', zoningRow);
-}
-
 function requestAndInsertZoning(address, locationRow) {
-  // Prevent duplicate requests
-  if (locationRow.dataset.zoningRequested) return;
-  locationRow.dataset.zoningRequested = 'true';
-  insertZoningRowAfter(locationRow, '', '', false, true); // Show loading
-  chrome.runtime.sendMessage({ action: 'getZoning', address }, (response) => {
-    console.log('[AppraisalBot] Zoning response:', response);
-    if (!response || !response.success) {
-      insertZoningRowAfter(locationRow, '', '', true, false); // Show error
-      console.error(
-        '[AppraisalBot] Failed to get zoning info:',
-        response?.error
-      );
-      return;
-    }
-    const { classification, description } = response.data;
-    console.log('Inserting zoning row:', {
-      classification,
-      description,
-    });
-    insertZoningRowAfter(locationRow, classification, description);
-  });
+  if (!address?.trim()) return;
+  const valueCell = locationRow.querySelector('td');
+  if (!valueCell || valueCell.querySelector('.AppraisalBot-zoning-link')) return;
+
+  const container = valueCell.querySelector('div');
+  const parent = container || valueCell;
+  addLinkElement(parent, ECTOR_ZONING_MAP_URL, '🏢', 'AppraisalBot-zoning-link');
 }
 
 function requestAndInsertParcels(instrumentNumber, lastSaleInstrumentRow) {
@@ -339,7 +274,7 @@ function requestAndInsertParcels(instrumentNumber, lastSaleInstrumentRow) {
       if (!response || !response.success) {
         console.error(
           '[AppraisalBot] Failed to get parcels info:',
-          response?.error
+          response?.error,
         );
         return;
       }
@@ -355,11 +290,11 @@ function requestAndInsertParcels(instrumentNumber, lastSaleInstrumentRow) {
         } else if (parcels.length === 1 && parcels[0] === apn) {
           // Only the current parcel found, no need to show anything
           console.log(
-            '[AppraisalBot] Only current parcel found, no related parcels'
+            '[AppraisalBot] Only current parcel found, no related parcels',
           );
         }
       }
-    }
+    },
   );
 }
 
@@ -489,14 +424,20 @@ function requestAndInsertTaxSection() {
     taxSection.innerHTML =
       `<h2>Taxes ${year}</h2>` +
       '<div class="wide">' +
-        '<table class="grid2">' +
-          '<thead>' +
-            '<tr>' + headerCells + '<th>TOTAL</th>' + '</tr>' +
-          '</thead>' +
-          '<tbody>' +
-            '<tr>' + valueCells + `<td class="right"><strong>${total}</strong></td>` + '</tr>' +
-          '</tbody>' +
-        '</table>' +
+      '<table class="grid2">' +
+      '<thead>' +
+      '<tr>' +
+      headerCells +
+      '<th>TOTAL</th>' +
+      '</tr>' +
+      '</thead>' +
+      '<tbody>' +
+      '<tr>' +
+      valueCells +
+      `<td class="right"><strong>${total}</strong></td>` +
+      '</tr>' +
+      '</tbody>' +
+      '</table>' +
       '</div>';
 
     console.log('[AppraisalBot] Tax section injected for APN:', apn);

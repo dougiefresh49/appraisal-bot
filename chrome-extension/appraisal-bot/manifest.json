@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppraisalBot Linker",
   "author": "AppraisalBot",
-  "version": "1.14.0",
+  "version": "1.14.1",
   "description": "Appraisal workflow automation for West Texas. Links CAD, MLS, Deeds, and GIS sites together. Quick search across Andrews, Ector, Midland, Upton, and Ward counties. Navica MLS tools for search criteria, reports, and comp management.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwqxTg11Fz2FPWCVqIJid6rN7LAuNOatX2ncJURVjWhUpuqF9tzWksHONOY9ZlO57D6l5VSQIopoMy9/Ud95olckMpS+XS5QvlvrjFusUj1p0o0Jm2TA5FBNJi8tfgVuSUMUWH5QyOsR9PAuS3lcRNxtpou6/jIMZbR+tzrrMl9pdFYbAWPcDE6iwMuJdPijV+TW9jtEGY9w4QQRVPeJhw2s367FwKTSRW8qYt0YauLnFMtsqGQ09GCE4gTgRTSsMWmwuPivlNqBbP3wi8oJzFgQcU2hg9iki2h/wpRl2sasiTfN5jU2TrA5z5f/7B9vh4vjREGoBSXo5GBKJAwSFWQIDAQAB",
   "icons": {
@@ -114,13 +114,6 @@
       ],
       "run_at": "document_end",
       "all_frames": true
-    },
-    {
-      "matches": [
-        "https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541*"
-      ],
-      "js": ["zoning-injector-ector.js"],
-      "run_at": "document_end"
     },
     {
       "matches": ["https://midland.tx.publicsearch.us/results*"],

@@ -30,7 +30,7 @@ Located in `chrome-extension/appraisal-bot/`. Built for Manifest V3.
 | Midland CAD (`southwestdatasolution.com/webProperty.aspx*`)      | `mcad-injector.js`                                                          | Enhances Midland CAD property pages                                                                                          |
 | Midland County Deeds (`midland.tx.publicsearch.us/results*`)     | `mcad-deed-injector.js`                                                     | Enhances Midland deed search results                                                                                         |
 | Midland GIS (`maps.midlandtexas.gov/*`)                          | `gis-injector-midland--search.js`, `gis-injector-midland--popup.js`         | Search and popup enhancements on the Midland GIS viewer                                                                      |
-| Ector Zoning (ArcGIS viewer)                                     | `zoning-injector-ector.js`                                                  | Enhancements to the Ector County zoning map                                                                                  |
+| Ector Zoning (ArcGIS Experience)                                 | —                                                                           | `zoning-injector-ector.js` is **not** registered in the manifest (automation paused). Ector CAD injects a direct map link only. |
 | Upton County Deeds (`i2j.uslandrecords.com/TX/Upton/*`)          | `upton-deed-injector.js`                                                    | Deed search automation for Upton County                                                                                      |
 | Ward CAD GIS (`maps.pandai.com/WardCAD/*`)                       | `gis-injector-ward--search.js`                                              | Search enhancements on the Ward CAD GIS viewer                                                                               |
 | Navica MLS — OBR (`next.navicamls.net/377/*`)                    | `navica-tools.js`, `mls-injector-obr.js`                                    | Adds CAD/GIS links to Tax ID fields; drives all Navica Tools side panel actions                                              |
@@ -51,6 +51,10 @@ Right-clicking selected text (a CAD number or address) in Chrome shows an "Appra
 | Midland | southwestdatasolution.com (SWDS) | midland.tx.publicsearch.us        | maps.midlandtexas.gov        |
 | Upton   | uptoncad.org                     | i2j.uslandrecords.com/TX/Upton    | maps.pandai.com/UptonCAD     |
 | Ward    | wardcad.org                      | —                                 | maps.pandai.com/WardCAD      |
+
+### TODO (Chrome extension)
+
+- **Ector automated zoning:** The county map now uses ArcGIS Experience Builder. Restore end-to-end behavior by (1) adding a `content_scripts` entry in `manifest.json` that matches the new app URL, (2) porting or rewriting `zoning-injector-ector.js` to read zoning from that UI, (3) updating `background.js` `getZoning` if the hidden-tab flow or URL shape changes, and (4) re-calling `requestAndInsertZoning` from `ecad-injector.js` on the Location row when automation works again.
 
 ### Installing the Extension (Development)
 

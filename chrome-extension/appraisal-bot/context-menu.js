@@ -223,7 +223,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     case 'ector-zoning':
       url =
-        'https://www.arcgis.com/apps/webappviewer/index.html?id=0264ff5463fa42a6b7ead58e42a46541';
+        'https://experience.arcgis.com/experience/7889746e0f64472994a7554eb9771f57';
       break;
 
     case 'ector-deeds':
