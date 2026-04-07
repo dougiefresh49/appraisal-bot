@@ -518,6 +518,15 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionEl.classList.toggle('hidden', !visibility[id]);
       }
     });
+    const reportsQuickLinks = document.getElementById(
+      'quick-links-appraisalbot-reports-wrapper',
+    );
+    if (reportsQuickLinks) {
+      reportsQuickLinks.classList.toggle(
+        'hidden',
+        !visibility['report-data'],
+      );
+    }
   }
 
   function syncCheckboxes(visibility) {
