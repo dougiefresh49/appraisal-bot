@@ -72,6 +72,10 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# Playwriter batch temp snippets
+scripts/playwriter/_batch-temp-*.js
+scripts/playwriter/listings.json
+
 # dotenv environment variable files
 .env
 .env.development.local
