@@ -203,7 +203,138 @@ function processJsonData(jsonDataString) {
             return map;
           }, {});
 
-          // Prepare data for the named range
+          // Prepare data for the named range (Rate → formula =<rate>*100 so the cell stays a formula like the sheet template)
+          const rangeDataToSet = dataArray.map((record) => {
+            const newRangeRow = new Array(rangeHeaders.length).fill('');
+            for (const field in record) {
+              if (
+                record.hasOwnProperty(field) &&
+                rangeHeaderMap.hasOwnProperty(field.trim())
+              ) {
+                const trimmedField = field.trim();
+                const colIndex = rangeHeaderMap[trimmedField];
+                if (trimmedField === 'Rate') {
+                  const raw = record[field];
+                  const num =
+                    typeof raw === 'number'
+                      ? raw
+                      : raw !== null &&
+                          raw !== undefined &&
+                          String(raw).trim() !== ''
+                        ? parseFloat(String(raw).replace(/,/g, ''))
+                        : NaN;
+                  if (!isNaN(num)) {
+                    newRangeRow[colIndex] = '=' + num + '*100';
+                  } else {
+                    newRangeRow[colIndex] =
+                      raw === null || raw === undefined ? '' : raw;
+                  }
+                } else {
+                  newRangeRow[colIndex] = record[field];
+                }
+              }
+            }
+            return newRangeRow;
+          });
+
+          const taxEntitiesSheet = taxEntitiesRange.getSheet();
+          const totalRowsInRange = taxEntitiesRange.getNumRows();
+          // Last row inside the named range is reserved for the "Combined Rate" summary row.
+          const dataRowsCapacity = totalRowsInRange - 2;
+
+          if (totalRowsInRange < 2) {
+            Logger.log(
+              `Warning: Named range "${namedRangeName}" must include at least a header row and a summary row (minimum 2 rows). Skipping ${dataType}.`,
+            );
+            continue;
+          }
+
+          // Clear only data rows (not the summary row at the bottom of the range)
+          if (dataRowsCapacity > 0) {
+            taxEntitiesRange
+              .offset(1, 0, dataRowsCapacity, taxEntitiesRange.getNumColumns())
+              .clearContent();
+          }
+
+          if (
+            rangeDataToSet.length > dataRowsCapacity &&
+            dataRowsCapacity > 0
+          ) {
+            Logger.log(
+              `Warning: Data for ${namedRangeName} (${rangeDataToSet.length} rows) exceeds available data rows (${dataRowsCapacity}; last row is summary). Data might be truncated.`,
+            );
+          }
+
+          let numWritten = 0;
+          if (rangeDataToSet.length > 0 && dataRowsCapacity > 0) {
+            const rowsToWrite = Math.min(
+              rangeDataToSet.length,
+              dataRowsCapacity,
+            );
+            const targetWriteRange = taxEntitiesRange.offset(
+              1,
+              0,
+              rowsToWrite,
+              rangeHeaders.length,
+            );
+            targetWriteRange.setValues(
+              rangeDataToSet.slice(0, targetWriteRange.getNumRows()),
+            );
+            numWritten = targetWriteRange.getNumRows();
+            Logger.log(
+              `Successfully populated named range "${namedRangeName}" with ${numWritten} data row(s).`,
+            );
+          }
+
+          // Summary row: last row of the named range — label + table SUM on Rate
+          const summaryRow =
+            taxEntitiesRange.getRow() + totalRowsInRange - 1;
+          const rangeLeftCol = taxEntitiesRange.getColumn();
+          const entityCol1 = rangeHeaderMap.hasOwnProperty('Entity')
+            ? rangeLeftCol + rangeHeaderMap['Entity']
+            : rangeLeftCol;
+          taxEntitiesSheet
+            .getRange(summaryRow, entityCol1)
+            .setValue('Combined Rate');
+          if (!rangeHeaderMap.hasOwnProperty('Rate')) {
+            Logger.log(
+              `Warning: No "Rate" column in "${namedRangeName}" header row; summary SUM not set.`,
+            );
+          } else {
+            const rateCol1 = rangeLeftCol + rangeHeaderMap['Rate'];
+            const sumFormula = '=SUM(TaxEntities[Rate])';
+            taxEntitiesSheet.getRange(summaryRow, rateCol1).setFormula(sumFormula);
+            Logger.log(
+              `Set summary row at R${summaryRow} ("Combined Rate" + ${sumFormula}).`,
+            );
+          }
+          namedRangesProcessedCount++;
+          continue; // Skip the standard append logic for this dataType
+        }
+        // --- End special handling for taxEntities ---
+
+        // --- Special handling for subjectTaxes: write only into SubjectParcelTaxesRange ---
+        // Avoids appending full-sheet-width rows from row 2, which overwrites TaxesInput (e.g. P:Q).
+        if (dataType === 'subjectTaxes') {
+          const namedRangeName = 'SubjectParcelTaxesRange';
+          const subjectParcelTaxesRange = ss.getRangeByName(namedRangeName);
+          if (!subjectParcelTaxesRange) {
+            Logger.log(
+              `Warning: Named range "${namedRangeName}" not found. Skipping ${dataType}.`,
+            );
+            continue;
+          }
+
+          const rangeHeaders = subjectParcelTaxesRange
+            .offset(0, 0, 1, subjectParcelTaxesRange.getNumColumns())
+            .getValues()[0];
+          const rangeHeaderMap = rangeHeaders.reduce((map, header, index) => {
+            if (header && typeof header === 'string' && header.trim()) {
+              map[header.trim()] = index;
+            }
+            return map;
+          }, {});
+
           const rangeDataToSet = dataArray.map((record) => {
             const newRangeRow = new Array(rangeHeaders.length).fill('');
             for (const field in record) {
@@ -218,36 +349,29 @@ function processJsonData(jsonDataString) {
             return newRangeRow;
           });
 
-          // Clear content below headers before writing new data
-          if (taxEntitiesRange.getNumRows() > 1) {
-            taxEntitiesRange
+          if (subjectParcelTaxesRange.getNumRows() > 1) {
+            subjectParcelTaxesRange
               .offset(
                 1,
                 0,
-                taxEntitiesRange.getNumRows() - 1,
-                taxEntitiesRange.getNumColumns(),
+                subjectParcelTaxesRange.getNumRows() - 1,
+                subjectParcelTaxesRange.getNumColumns(),
               )
               .clearContent();
           }
 
-          // Ensure the named range is large enough for the new data (if it's dynamic)
-          // For now, assuming the named range is predefined to be large enough or will be manually adjusted.
-          // If dataArray is longer than available rows in named range (excluding header), log a warning.
-          const dataRowsInNamedRange = taxEntitiesRange.getNumRows() - 1;
+          const dataRowsInNamedRange = subjectParcelTaxesRange.getNumRows() - 1;
           if (
             rangeDataToSet.length > dataRowsInNamedRange &&
             dataRowsInNamedRange > 0
           ) {
             Logger.log(
-              `Warning: Data for ${namedRangeName} (${rangeDataToSet.length} rows) exceeds available space in named range (${dataRowsInNamedRange} data rows). Data might be truncated.`,
+              `Warning: Data for ${namedRangeName} (${rangeDataToSet.length} rows) exceeds available space (${dataRowsInNamedRange} data rows). Data may be truncated.`,
             );
-            // Optionally, resize the named range here if business logic allows, or throw error.
-            // For simplicity, we'll write what fits.
           }
 
           if (rangeDataToSet.length > 0) {
-            // Write data starting from the second row of the named range
-            const targetWriteRange = taxEntitiesRange.offset(
+            const targetWriteRange = subjectParcelTaxesRange.offset(
               1,
               0,
               Math.min(
@@ -262,13 +386,13 @@ function processJsonData(jsonDataString) {
               rangeDataToSet.slice(0, targetWriteRange.getNumRows()),
             );
             Logger.log(
-              `Successfully populated named range "${namedRangeName}" with ${targetWriteRange.getNumRows()} rows of data.`,
+              `Successfully populated named range "${namedRangeName}" with ${targetWriteRange.getNumRows()} rows.`,
             );
           }
           namedRangesProcessedCount++;
-          continue; // Skip the standard append logic for this dataType
+          continue;
         }
-        // --- End special handling for taxEntities ---
+        // --- End special handling for subjectTaxes ---
 
         const lastCol = sheet.getLastColumn();
         if (
@@ -294,9 +418,7 @@ function processJsonData(jsonDataString) {
         }, {});
 
         const rowsToAppend = [];
-        // Note: subjectTaxes has other things in it that stay and the table is in the first few columns
-        const lastPopulatedRow =
-          dataType === 'subjectTaxes' ? 1 : sheet.getLastRow();
+        const lastPopulatedRow = sheet.getLastRow();
 
         dataArray.forEach((record, recordIdx) => {
           const newRow = new Array(numColumns).fill('');
