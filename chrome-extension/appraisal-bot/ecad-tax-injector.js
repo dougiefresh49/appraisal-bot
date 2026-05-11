@@ -3,6 +3,8 @@ console.log('[AppraisalBot] ECAD Tax Injector loaded');
 /**
  * Extracts tax data from the Acctdetails/collections page and sends it
  * to the background script for storage and relay back to the parcel page.
+ * Code → full entity name labels are applied when rendering the table on
+ * search.ectorcad.org/parcel/* (ecad-injector.js) using utils/ector-taxes.json.
  *
  * DOM structure expected:
  *   .detailstitle + div > table > tbody
@@ -12,13 +14,21 @@ console.log('[AppraisalBot] ECAD Tax Injector loaded');
  *     tr[3]: 6 td's with <strong> headers (GOL, FMLR, CED, ESD1, ESD2, "")
  *     tr[4]: 6 td's with values
  */
-function extractAndSendTaxData() {
+function findTaxTable() {
   const detailsDiv = document.querySelector('.detailstitle');
-  if (!detailsDiv) {
-    return false;
+  if (detailsDiv) {
+    const t = detailsDiv.nextElementSibling?.querySelector('table');
+    if (t) return t;
   }
+  return (
+    document.querySelector('.main-content table[width="100%"]') ||
+    document.querySelector('.main-content div > table') ||
+    null
+  );
+}
 
-  const table = detailsDiv.nextElementSibling?.querySelector('table');
+function extractAndSendTaxData() {
+  const table = findTaxTable();
   if (!table) {
     return false;
   }

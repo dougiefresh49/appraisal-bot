@@ -1,0 +1,57 @@
+[
+  {
+    "Entity Name": "Ector County",
+    "Code": "COU",
+    "2025 Rate": 0.0043895
+  },
+  {
+    "Entity Name": "Ector County ISD",
+    "Code": "ISD",
+    "2025 Rate": 0.010048
+  },
+  {
+    "Entity Name": "Odessa College",
+    "Code": "OC",
+    "2025 Rate": 0.00176887
+  },
+  {
+    "Entity Name": "Ector County Hospital District",
+    "Code": "HOS",
+    "2025 Rate": 0.00133344
+  },
+  {
+    "Entity Name": "City of Odessa",
+    "Code": "ODE",
+    "2025 Rate": 0.004707
+  },
+  {
+    "Entity Name": "City of Goldsmith",
+    "Code": "GOL",
+    "2025 Rate": 0.00191762
+  },
+  {
+    "Entity Name": "Ector County Utility District",
+    "Code": "ECUD",
+    "2025 Rate": 0
+  },
+  {
+    "Entity Name": "Farm-to-Market Road / Flood Control",
+    "Code": "FMLR",
+    "2025 Rate": 0
+  },
+  {
+    "Entity Name": "County Education District",
+    "Code": "CED",
+    "2025 Rate": null
+  },
+  {
+    "Entity Name": "Ector County ESD #1",
+    "Code": "ESD1",
+    "2025 Rate": 0.0008
+  },
+  {
+    "Entity Name": "Ector County ESD #2",
+    "Code": "ESD2",
+    "2025 Rate": 0.0008
+  }
+]

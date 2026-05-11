@@ -376,10 +376,190 @@ function insertIncParcelsRow(targetRow, parcels) {
   targetRow.insertAdjacentElement('afterend', incParcelsRow);
 }
 
+/** utils/ector-taxes.json (cached). */
+let ectorTaxesJsonPromise = null;
+
+function loadEctorTaxesJson() {
+  if (!ectorTaxesJsonPromise) {
+    ectorTaxesJsonPromise = fetch(
+      chrome.runtime.getURL('utils/ector-taxes.json')
+    ).then((r) => {
+      if (!r.ok) throw new Error('Failed to load ector-taxes.json');
+      return r.json();
+    });
+  }
+  return ectorTaxesJsonPromise;
+}
+
+function escapeHtmlAttr(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatUsd(n) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(n);
+}
+
+/** Display tax rate (decimal per $1 of value). */
+function formatTaxRate(rate) {
+  if (rate == null || !Number.isFinite(rate)) return '—';
+  return rate.toFixed(6);
+}
+
 /**
- * Fetches current-year tax data from the Acctdetails/collections page via the
- * background script and injects a styled tax section before section.pp.
- * Styled to match section.land / section.grid2 so it blends with the page.
+ * Net Assessed Value for the current year: first data column in Value History
+ * (table.grid-transposed, row "Net Assessed Value").
+ */
+function parseNetAssessedValueFromDom() {
+  const table =
+    document.querySelector('section.value-summary table.grid-transposed') ||
+    document.querySelector('main table.grid-transposed') ||
+    document.querySelector('table.grid-transposed');
+  if (!table) return null;
+
+  const row = Array.from(table.querySelectorAll('tbody tr')).find((tr) => {
+    const th = tr.querySelector('th');
+    return th && th.textContent.trim() === 'Net Assessed Value';
+  });
+  const td = row?.querySelector('td');
+  if (!td) return null;
+
+  const n = parseFloat(td.textContent.replace(/[$,]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+function waitForNetAssessedValue(maxMs = 4000, intervalMs = 250) {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    const tick = () => {
+      const v = parseNetAssessedValueFromDom();
+      if (v != null) {
+        resolve(v);
+        return;
+      }
+      if (Date.now() - start > maxMs) {
+        resolve(null);
+        return;
+      }
+      setTimeout(tick, intervalMs);
+    };
+    tick();
+  });
+}
+
+/** Order jurisdiction codes: JSON order first, then any extra keys from scraper. */
+function orderJurisdictionCodes(jsonRows, scraperKeys) {
+  const order = jsonRows.map((r) => r.Code).filter(Boolean);
+  const set = new Set(Object.keys(scraperKeys));
+  const primary = order.filter((c) => set.has(c));
+  const extras = [...set].filter((c) => !order.includes(c));
+  return [...primary, ...extras];
+}
+
+function metaForCode(jsonRows, code, year) {
+  const row = jsonRows.find((r) => r.Code === code);
+  if (!row) {
+    return { name: code, rate: null };
+  }
+  const yearKey = `${year} Rate`;
+  const raw =
+    row[yearKey] !== undefined && row[yearKey] !== null
+      ? row[yearKey]
+      : row['2025 Rate'];
+  const rate =
+    typeof raw === 'number' && Number.isFinite(raw)
+      ? raw
+      : raw === null || raw === undefined
+      ? null
+      : Number(raw);
+  return {
+    name: row['Entity Name'] || code,
+    rate: rate != null && Number.isFinite(rate) ? rate : null,
+  };
+}
+
+/**
+ * Vertical table: Jurisdiction | Tax Rate | Assessed Value | Tax
+ * Tax amounts and footer total come from Acctdetails (ecad-tax-injector).
+ * Rates/names from ector-taxes.json; assessed from Value History on parcel page.
+ */
+function buildVerticalTaxTableHtml(
+  year,
+  total,
+  jurisdictions,
+  jsonRows,
+  netAssessed
+) {
+  const codes = orderJurisdictionCodes(jsonRows, jurisdictions);
+  const assessedDisplay =
+    netAssessed != null ? formatUsd(netAssessed) : '—';
+
+  const bodyRows = [];
+
+  for (const code of codes) {
+    const { name, rate } = metaForCode(jsonRows, code, year);
+    const taxStr = jurisdictions[code] || '$0.00';
+
+    bodyRows.push(
+      '<tr>' +
+        `<td class="left">${escapeHtmlAttr(name)}</td>` +
+        `<td class="right">${formatTaxRate(rate)}</td>` +
+        `<td class="right">${assessedDisplay}</td>` +
+        `<td class="right">${escapeHtmlAttr(taxStr)}</td>` +
+        '</tr>'
+    );
+  }
+
+  const totalCell =
+    total != null && String(total).trim() !== ''
+      ? `<strong>${escapeHtmlAttr(total)}</strong>`
+      : '—';
+
+  return (
+    `<h2>Taxes ${year}</h2>` +
+    (netAssessed == null
+      ? '<p style="color:#a60;font-size:0.9em;margin:0 0 8px;">Net Assessed Value not found on page yet.</p>'
+      : '') +
+    '<div class="wide">' +
+    '<table class="grid2">' +
+    '<thead>' +
+    '<tr>' +
+    '<th class="left">Jurisdiction</th>' +
+    '<th class="right">Tax Rate</th>' +
+    '<th class="right">Assessed Value</th>' +
+    '<th class="right">Tax</th>' +
+    '</tr>' +
+    '</thead>' +
+    '<tbody>' +
+    bodyRows.join('') +
+    '</tbody>' +
+    '<tfoot>' +
+    '<tr>' +
+    '<th class="left">TOTAL CALCULATED TAX AMOUNT</th>' +
+    '<td></td>' +
+    '<td></td>' +
+    `<td class="right">${totalCell}</td>` +
+    '</tr>' +
+    '</tfoot>' +
+    '</table>' +
+    '</div>' +
+    '<p class="AppraisalBot-tax-rates-note" style="font-size:0.9em;margin:10px 0 0;opacity:0.9;">' +
+    'Tax rates can be found ' +
+    '<a href="https://www.ectorcad.org/pdf/Tax_Rates.pdf" target="_blank" rel="noopener noreferrer">here</a>.' +
+    '</p>'
+  );
+}
+
+/**
+ * Fetches tax line items from Acctdetails (ecad-tax-injector), loads rates/names
+ * from utils/ector-taxes.json, reads Net Assessed Value from Value History table.
+ * Footer uses the CAD-reported total from Acctdetails.
  */
 function requestAndInsertTaxSection() {
   if (document.querySelector('.AppraisalBot-tax-section')) return;
@@ -396,7 +576,6 @@ function requestAndInsertTaxSection() {
     return;
   }
 
-  // Insert a loading placeholder styled like section.land
   const taxSection = document.createElement('section');
   taxSection.className = 'AppraisalBot-tax-section';
   taxSection.innerHTML =
@@ -414,32 +593,23 @@ function requestAndInsertTaxSection() {
     }
 
     const { year, total, jurisdictions } = response.data;
-    const jurisEntries = Object.entries(jurisdictions);
 
-    const headerCells = jurisEntries.map(([k]) => `<th>${k}</th>`).join('');
-    const valueCells = jurisEntries
-      .map(([, v]) => `<td class="right">${v || '$0.00'}</td>`)
-      .join('');
-
-    taxSection.innerHTML =
-      `<h2>Taxes ${year}</h2>` +
-      '<div class="wide">' +
-      '<table class="grid2">' +
-      '<thead>' +
-      '<tr>' +
-      headerCells +
-      '<th>TOTAL</th>' +
-      '</tr>' +
-      '</thead>' +
-      '<tbody>' +
-      '<tr>' +
-      valueCells +
-      `<td class="right"><strong>${total}</strong></td>` +
-      '</tr>' +
-      '</tbody>' +
-      '</table>' +
-      '</div>';
-
-    console.log('[AppraisalBot] Tax section injected for APN:', apn);
+    Promise.all([loadEctorTaxesJson(), waitForNetAssessedValue()])
+      .then(([jsonRows, netAssessed]) => {
+        taxSection.innerHTML = buildVerticalTaxTableHtml(
+          year,
+          total,
+          jurisdictions,
+          jsonRows,
+          netAssessed
+        );
+        console.log('[AppraisalBot] Tax section injected for APN:', apn);
+      })
+      .catch((err) => {
+        console.error('[AppraisalBot] Tax table build failed:', err);
+        taxSection.innerHTML =
+          `<h2>Taxes ${year}</h2>` +
+          '<p style="color:#cc0000;">Could not load tax rates (ector-taxes.json).</p>';
+      });
   });
 }

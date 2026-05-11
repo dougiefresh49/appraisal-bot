@@ -195,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const compReorderList = document.getElementById('comp-reorder-list');
   const compReorderSave = document.getElementById('comp-reorder-save');
   const compReorderCancel = document.getElementById('comp-reorder-cancel');
+  const openCompGridBtn = document.getElementById('open-comp-grid-btn');
+  const openCompGridHeaderBtn = document.getElementById(
+    'open-comp-grid-header-btn',
+  );
 
   let compsData = { headers: [], data: [] };
   let currentCompIndex = 0;
@@ -1283,9 +1287,32 @@ document.addEventListener('DOMContentLoaded', () => {
     subjectMlsIframe.src = fileUrl;
   }
 
+  function openCompGridPage() {
+    chrome.storage.local.get(['apbotCompGridData'], (r) => {
+      const csv = r.apbotCompGridData;
+      if (!csv || !String(csv).trim()) {
+        alert(
+          'No comp grid data in storage. Paste or load comps CSV in the side panel, then Save Data.',
+        );
+        return;
+      }
+      chrome.tabs.create({
+        url: chrome.runtime.getURL('comp-grid/comp-grid.html'),
+      });
+    });
+  }
+
   // Comp Grid Event Listeners
   if (generateCompsBtn) {
     generateCompsBtn.addEventListener('click', generateComps);
+  }
+
+  if (openCompGridBtn) {
+    openCompGridBtn.addEventListener('click', openCompGridPage);
+  }
+
+  if (openCompGridHeaderBtn) {
+    openCompGridHeaderBtn.addEventListener('click', openCompGridPage);
   }
 
   if (nextCompBtn) {
