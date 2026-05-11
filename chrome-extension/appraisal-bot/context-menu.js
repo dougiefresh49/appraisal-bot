@@ -179,6 +179,12 @@ function createContextMenuItems() {
     title: 'GIS',
     contexts: ['all'],
   });
+  chrome.contextMenus.create({
+    id: 'andrews-zoning',
+    parentId: 'andrews-county',
+    title: 'Zoning',
+    contexts: ['all'],
+  });
 }
 
 // Handle context menu clicks
@@ -293,6 +299,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       } else {
         url = 'https://gis.bisclient.com/andrewscad/index.html';
       }
+      break;
+
+    case 'andrews-zoning':
+      url =
+        'https://cityofandrews.maps.arcgis.com/apps/mapviewer/index.html?webmap=740a263c862a4fa48c09e19e87036549';
       break;
   }
 
